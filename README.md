@@ -1,35 +1,83 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Mermaid フローチャート エディター
 
-## Getting Started
+ReactFlowを使ったMermaidフローチャートのGUIエディターです。ドラッグ&ドロップでフローチャートを作成し、Mermaid形式のコードとして出力できます。
 
-First, run the development server:
+## 🌐 Live Demo
+
+GitHub Pagesで公開されています：
+**[https://your-username.github.io/mermaid-editor/](https://your-username.github.io/mermaid-editor/)**
+
+## ✨ 機能
+
+- 📝 ノードをダブルクリックでテキスト編集
+- 🔗 ドラッグ&ドロップでノード間を接続
+- ➕ エッジを空の場所にドロップして新しいノード作成
+- 📋 Mermaidコードの生成・コピー・ダウンロード
+- 🎨 直感的なビジュアルインターフェース
+
+## 🚀 Getting Started
+
+まず、開発サーバーを起動します：
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
 pnpm dev
-# or
-bun dev
+# または
+npm run dev
+# または
+yarn dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+[http://localhost:3000](http://localhost:3000) をブラウザで開いて結果を確認できます。
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 🛠️ 技術スタック
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+- **Next.js 14** (App Router)
+- **ReactFlow** - フローチャート作成
+- **Yamada UI** - UIコンポーネント
+- **TypeScript** - 型安全性
+- **GitHub Actions** - 自動デプロイ
+- **GitHub Pages** - ホスティング
 
-## Learn More
+## 📦 ビルド・デプロイ
 
-To learn more about Next.js, take a look at the following resources:
+### ローカルビルド
+```bash
+pnpm build
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### 自動デプロイ
+mainブランチにプッシュすると、GitHub Actionsが自動的に：
+1. アプリケーションをビルド
+2. `docs`フォルダに静的ファイルを出力
+3. GitHub Pagesにデプロイ
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+## 🎯 使い方
 
-## Deploy on Vercel
+1. **ノード追加**: 左上の「ノード追加」ボタンまたはエッジを空の場所にドロップ
+2. **ノード編集**: ノードをダブルクリックしてテキストを編集
+3. **ノード接続**: ノードの端点をドラッグして他のノードに接続
+4. **コード生成**: 「コード生成」ボタンでMermaidコードを表示
+5. **ダウンロード**: 生成されたコードをファイルとして保存
+
+## 📁 プロジェクト構成
+
+```
+├── app/
+│   ├── layout.tsx
+│   └── page.tsx
+├── components/
+│   ├── editable-node.tsx
+│   ├── flow-editor.tsx
+│   ├── flow-panel.tsx
+│   ├── download-modal.tsx
+│   ├── copy-button.tsx
+│   ├── node-types.tsx
+│   └── types.ts
+├── .github/
+│   └── workflows/
+│       └── deploy.yml
+└── docs/ (自動生成)
+```
 
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 

@@ -1,0 +1,53 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  actions: write
+  checks: write
+  contents: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup PNPM
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          registry-url: "https://registry.npmjs.org"
+          cache: "pnpm"
+
+      - name: Install node_modules
+        run: |
+          node --version
+          pnpm install
+
+      - name: Build
+        run: |
+          pnpm build
+        env:
+          NODE_ENV: production
+
+      - name: Create .nojekyll file
+        run: |
+          touch docs/.nojekyll
+
+      - name: Push to GitHub
+        uses: EndBug/add-and-commit@v9
+        with:
+          add: "docs"
+          default_author: github_actions
+          message: ":rocket: Deploy to GitHub Pages"
