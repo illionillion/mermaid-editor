@@ -52,31 +52,66 @@ export function FlowEditor() {
   }, [handleLabelChange, setNodes]);
 
   const onConnect = useCallback(
-    (params: any) => setEdges((eds) => addEdge(params, eds)),
+    (params: any) => {
+      setEdges((eds) => addEdge(params, eds));
+      // 既存のノードに接続された場合、フラグを設定
+      connectingNodeId.current = 'connected';
+    },
     [setEdges]
   );
 
   const onConnectStart = useCallback((_: any, params: any) => {
     connectingNodeId.current = params.nodeId;
+    // ハンドルタイプも保存
+    connectingNodeId.current = `${params.nodeId}-${params.handleType}`;
   }, []);
 
   const onConnectEnd = useCallback(
     (event: MouseEvent | TouchEvent) => {
       if (!connectingNodeId.current) return;
+      
+      // 既存のノードに接続された場合は新しいノードを作成しない
+      if (connectingNodeId.current === 'connected') {
+        connectingNodeId.current = null;
+        return;
+      }
 
       const targetIsPane = (event.target as Element)?.classList?.contains('react-flow__pane');
 
       if (targetIsPane) {
-        // エッジの終点がペイン（空の領域）の場合、新しいノードを作成
-        const position = screenToFlowPosition({
+        // 接続情報を解析
+        const [sourceNodeId, handleType] = connectingNodeId.current.split('-');
+        
+        // 元のノードの位置を取得
+        const sourceNode = nodes.find(node => node.id === sourceNodeId);
+        if (!sourceNode) return;
+
+        // マウス位置を取得
+        const mousePosition = screenToFlowPosition({
           x: (event as MouseEvent).clientX,
           y: (event as MouseEvent).clientY,
         });
 
+        // ハンドルタイプに基づいて新しいノードの位置を調整
+        let newPosition;
+        if (handleType === 'source') {
+          // sourceハンドル（下）から接続した場合、下に配置
+          newPosition = {
+            x: sourceNode.position.x,
+            y: sourceNode.position.y + 120, // ノードの下に配置
+          };
+        } else {
+          // targetハンドル（上）から接続した場合、上に配置
+          newPosition = {
+            x: sourceNode.position.x,
+            y: sourceNode.position.y - 120, // ノードの上に配置
+          };
+        }
+
         const newNode: Node = {
           id: nodeId.toString(),
           type: 'editableNode',
-          position,
+          position: newPosition,
           data: { 
             label: `Node ${nodeId}`,
             onLabelChange: handleLabelChange,
@@ -85,11 +120,11 @@ export function FlowEditor() {
 
         setNodes((nds) => nds.concat(newNode));
         
-        // 新しいノードへのエッジを作成
+        // 新しいノードへのエッジを作成（方向を考慮）
         const newEdge: Edge = {
-          id: `${connectingNodeId.current}-${nodeId}`,
-          source: connectingNodeId.current,
-          target: nodeId.toString(),
+          id: `${sourceNodeId}-${nodeId}`,
+          source: handleType === 'source' ? sourceNodeId : nodeId.toString(),
+          target: handleType === 'source' ? nodeId.toString() : sourceNodeId,
         };
         setEdges((eds) => [...eds, newEdge]);
 
@@ -98,7 +133,7 @@ export function FlowEditor() {
 
       connectingNodeId.current = null;
     },
-    [nodeId, setNodes, setEdges, screenToFlowPosition, handleLabelChange]
+    [nodeId, setNodes, setEdges, screenToFlowPosition, handleLabelChange, nodes]
   );
 
   const addNode = useCallback(() => {
