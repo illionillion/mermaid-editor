@@ -12,7 +12,12 @@ const initialNodes: Node[] = [
     id: '1',
     type: 'editableNode',
     position: { x: 250, y: 5 },
-    data: { label: 'Start' },
+    data: { 
+        label: 'Start',
+        // 表示名と変数名を持ちたい
+        variableName: 'start',
+        // 削除機能は後でuseEffectで追加される
+    },
   },
 ];
 
@@ -38,7 +43,13 @@ export function FlowEditor() {
     );
   }, [setNodes]);
 
-  // 初期ノードにhandleLabelChangeを追加
+  // ノード削除のハンドラー
+  const handleNodeDelete = useCallback((nodeId: string) => {
+    setNodes((nds) => nds.filter((node) => node.id !== nodeId));
+    setEdges((eds) => eds.filter((edge) => edge.source !== nodeId && edge.target !== nodeId));
+  }, [setNodes, setEdges]);
+
+  // 初期ノードにhandleLabelChangeとhandleNodeDeleteを追加
   useEffect(() => {
     setNodes((nds) =>
       nds.map((node) => ({
@@ -46,10 +57,11 @@ export function FlowEditor() {
         data: {
           ...node.data,
           onLabelChange: handleLabelChange,
+          onDelete: handleNodeDelete,
         },
       }))
     );
-  }, [handleLabelChange, setNodes]);
+  }, [handleLabelChange, handleNodeDelete, setNodes]);
 
   const onConnect = useCallback(
     (params: any) => {
@@ -105,6 +117,7 @@ export function FlowEditor() {
           data: { 
             label: `Node ${nodeId}`,
             onLabelChange: handleLabelChange,
+            onDelete: handleNodeDelete,
           },
         };
 
@@ -134,11 +147,12 @@ export function FlowEditor() {
       data: { 
         label: `Node ${nodeId}`,
         onLabelChange: handleLabelChange,
+        onDelete: handleNodeDelete,
       },
     };
     setNodes((nds) => nds.concat(newNode));
     setNodeId(nodeId + 1);
-  }, [nodeId, setNodes, handleLabelChange]);
+  }, [nodeId, setNodes, handleLabelChange, handleNodeDelete]);
 
   const generateMermaidCode = useCallback(() => {
     let code = 'flowchart TD\n';
