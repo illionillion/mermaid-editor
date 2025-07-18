@@ -92,21 +92,11 @@ export function FlowEditor() {
           y: (event as MouseEvent).clientY,
         });
 
-        // ハンドルタイプに基づいて新しいノードの位置を調整
-        let newPosition;
-        if (handleType === 'source') {
-          // sourceハンドル（下）から接続した場合、下に配置
-          newPosition = {
-            x: sourceNode.position.x,
-            y: sourceNode.position.y + 120, // ノードの下に配置
-          };
-        } else {
-          // targetハンドル（上）から接続した場合、上に配置
-          newPosition = {
-            x: sourceNode.position.x,
-            y: sourceNode.position.y - 120, // ノードの上に配置
-          };
-        }
+        // 新しいノードの位置はマウス位置を使用
+        const newPosition = {
+          x: mousePosition.x - 60, // ノード幅の半分を引いて中央に配置
+          y: mousePosition.y - 20, // ノード高さの半分を引いて中央に配置
+        };
 
         const newNode: Node = {
           id: nodeId.toString(),
