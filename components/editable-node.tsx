@@ -46,6 +46,10 @@ export function EditableNode({ data, id }: EditableNodeProps) {
         }
     };
 
+    const handleEdit = () => {
+        setIsEditing(true);
+    };
+
     return (
         <>
             <Box
@@ -64,7 +68,7 @@ export function EditableNode({ data, id }: EditableNodeProps) {
                 _hover={{ boxShadow: 'md' }}
                 position={'relative'}
             >
-                <NodeMenu onDelete={handleDelete} />
+                <NodeMenu onDelete={handleDelete} onEdit={handleEdit} />
 
                 {isEditing ? (
                     <Input
