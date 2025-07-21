@@ -1,9 +1,11 @@
 'use client';
 
 import { Handle, Position } from '@xyflow/react';
-import { Box, Text, Input } from '@yamada-ui/react';
+import { Box } from '@yamada-ui/react';
 import { useState, useRef, MouseEvent, ChangeEvent, KeyboardEvent } from 'react';
 import { NodeMenu } from './node-menu';
+import { VariableNameEditor } from './variable-name-editor';
+import { LabelEditor } from './label-editor';
 
 interface EditableNodeProps {
     data: {
@@ -150,82 +152,33 @@ export function EditableNode({ data, id }: EditableNodeProps) {
                 cursor="pointer"
                 onDoubleClick={handleLabelDoubleClick}
                 _hover={{ boxShadow: 'md' }}
-                position={'relative'}
+                position='relative'
             >
                 {/* 変数名を左上に表示 */}
-                <Box
-                    position="absolute"
-                    top="-12px"
-                    left="0px"
-                    bg="blue.500"
-                    color="white"
-                    px={1}
-                    py="1px"
-                    borderRadius="sm"
-                    fontSize="10px"
-                    fontWeight="medium"
-                    cursor="pointer"
+                <VariableNameEditor
+                    value={variableName}
+                    isEditing={isEditingVariableName}
                     onClick={handleVariableNameClick}
-                    _hover={{ bg: "blue.600" }}
-                    zIndex={10}
-                >
-                    {isEditingVariableName ? (
-                        <Input
-                            value={variableName}
-                            onChange={handleVariableNameChange}
-                            onKeyDown={handleVariableNameKeyPress}
-                            onCompositionStart={handleCompositionStart}
-                            onCompositionEnd={handleCompositionEnd}
-                            onBlur={handleVariableNameSave}
-                            size="xs"
-                            autoFocus
-                            w="60px"
-                            h="16px"
-                            p={0}
-                            fontSize="10px"
-                            bg="white"
-                            color="black"
-                            border="none"
-                            _focus={{ boxShadow: 'none', outline: 'none' }}
-                        />
-                    ) : (
-                        data.variableName || `node${id}`
-                    )}
-                </Box>
+                    onChange={handleVariableNameChange}
+                    onKeyDown={handleVariableNameKeyPress}
+                    onCompositionStart={handleCompositionStart}
+                    onCompositionEnd={handleCompositionEnd}
+                    onBlur={handleVariableNameSave}
+                />
 
                 <NodeMenu onDelete={handleDelete} onEdit={handleEdit} onEditVariableName={handleEditVariableName} />
 
                 {/* メインのラベル表示・編集エリア */}
-                {isEditingLabel ? (
-                    <Input
-                        value={label}
-                        onChange={handleLabelChange}
-                        onKeyDown={handleLabelKeyPress}
-                        onCompositionStart={handleCompositionStart}
-                        onCompositionEnd={handleCompositionEnd}
-                        onBlur={handleLabelSave}
-                        size="sm"
-                        autoFocus
-                        textAlign="center"
-                        w="full"
-                        h="24px"
-                        p={1}
-                        fontSize="sm"
-                        border="none"
-                        bg="transparent"
-                        _focus={{ boxShadow: 'none', outline: 'none' }}
-                    />
-                ) : (
-                    <Text
-                        w="full"
-                        fontSize="sm"
-                        fontWeight="medium"
-                        wordBreak="break-word"
-                        lineHeight="1.2"
-                    >
-                        {label}
-                    </Text>
-                )}
+                <LabelEditor
+                    value={label}
+                    isEditing={isEditingLabel}
+                    onDoubleClick={handleLabelDoubleClick}
+                    onChange={handleLabelChange}
+                    onKeyDown={handleLabelKeyPress}
+                    onCompositionStart={handleCompositionStart}
+                    onCompositionEnd={handleCompositionEnd}
+                    onBlur={handleLabelSave}
+                />
             </Box>
             <Handle type="target" position={Position.Top} />
             <Handle type="source" position={Position.Bottom} />
