@@ -1,7 +1,7 @@
 'use client';
 
 import { ReactFlow, Node, Edge, addEdge, Controls, Background, useNodesState, useEdgesState, useReactFlow } from '@xyflow/react';
-import { Box, useDisclosure } from '@yamada-ui/react';
+import { Box, useDisclosure, useToken } from '@yamada-ui/react';
 import { useCallback, useState, useRef, useEffect } from 'react';
 import { nodeTypes } from './node-types';
 import { FlowPanel } from './flow-panel';
@@ -31,6 +31,20 @@ export function FlowEditor() {
   const [mermaidCode, setMermaidCode] = useState('');
   const connectingNodeId = useRef<string | null>(null);
   const { screenToFlowPosition } = useReactFlow();
+
+  // ノードサイズをトークンから取得（フォールバック値あり）
+  const nodeWidthToken = useToken("sizes", "xs");
+  const nodeHeightToken = useToken("sizes", "6xs");
+  
+  // 文字列から数値に変換（pxを取り除いて数値化）
+  const parseSize = (sizeStr: string | undefined, fallback: number): number => {
+    if (!sizeStr) return fallback;
+    const numValue = parseFloat(sizeStr.replace('px', '').replace('rem', ''));
+    return isNaN(numValue) ? fallback : (sizeStr.includes('rem') ? numValue * 16 : numValue);
+  };
+  
+  const nodeWidth = parseSize(nodeWidthToken, 80); // フォールバック: 80px
+  const nodeHeight = parseSize(nodeHeightToken, 48); // フォールバック: 48px
 
   // ノードラベル変更のハンドラー
   const handleLabelChange = useCallback((nodeId: string, newLabel: string) => {
@@ -106,8 +120,8 @@ export function FlowEditor() {
 
         // 新しいノードの位置はマウス位置を使用
         const newPosition = {
-          x: mousePosition.x - 60, // ノード幅の半分を引いて中央に配置
-          y: mousePosition.y - 20, // ノード高さの半分を引いて中央に配置
+          x: mousePosition.x - nodeWidth / 2, // ノード幅の半分を引いて中央に配置
+          y: mousePosition.y - nodeHeight / 2, // ノード高さの半分を引いて中央に配置
         };
 
         const newNode: Node = {
@@ -136,7 +150,7 @@ export function FlowEditor() {
 
       connectingNodeId.current = null;
     },
-    [nodeId, setNodes, setEdges, screenToFlowPosition, handleLabelChange, nodes]
+    [nodeId, setNodes, setEdges, screenToFlowPosition, handleLabelChange, nodes, nodeWidth, nodeHeight]
   );
 
   const addNode = useCallback(() => {
