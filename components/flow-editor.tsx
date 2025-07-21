@@ -15,7 +15,7 @@ const initialNodes: Node[] = [
     data: { 
         label: 'Start',
         // 表示名と変数名を持ちたい
-        variableName: 'start',
+        variableName: 'startNode',
         // 削除機能は後でuseEffectで追加される
     },
   },
@@ -57,6 +57,17 @@ export function FlowEditor() {
     );
   }, [setNodes]);
 
+  // ノード変数名変更のハンドラー
+  const handleVariableNameChange = useCallback((nodeId: string, newVariableName: string) => {
+    setNodes((nds) =>
+      nds.map((node) =>
+        node.id === nodeId
+          ? { ...node, data: { ...node.data, variableName: newVariableName } }
+          : node
+      )
+    );
+  }, [setNodes]);
+
   // ノード削除のハンドラー
   const handleNodeDelete = useCallback((nodeId: string) => {
     setNodes((nds) => nds.filter((node) => node.id !== nodeId));
@@ -71,11 +82,12 @@ export function FlowEditor() {
         data: {
           ...node.data,
           onLabelChange: handleLabelChange,
+          onVariableNameChange: handleVariableNameChange,
           onDelete: handleNodeDelete,
         },
       }))
     );
-  }, [handleLabelChange, handleNodeDelete, setNodes]);
+  }, [handleLabelChange, handleVariableNameChange, handleNodeDelete, setNodes]);
 
   const onConnect = useCallback(
     (params: any) => {
@@ -130,7 +142,9 @@ export function FlowEditor() {
           position: newPosition,
           data: { 
             label: `Node ${nodeId}`,
+            variableName: `node${nodeId}`,
             onLabelChange: handleLabelChange,
+            onVariableNameChange: handleVariableNameChange,
             onDelete: handleNodeDelete,
           },
         };
@@ -160,25 +174,73 @@ export function FlowEditor() {
       position: { x: Math.random() * 500, y: Math.random() * 500 },
       data: { 
         label: `Node ${nodeId}`,
+        variableName: `node${nodeId}`,
         onLabelChange: handleLabelChange,
+        onVariableNameChange: handleVariableNameChange,
         onDelete: handleNodeDelete,
       },
     };
     setNodes((nds) => nds.concat(newNode));
     setNodeId(nodeId + 1);
-  }, [nodeId, setNodes, handleLabelChange, handleNodeDelete]);
+  }, [nodeId, setNodes, handleLabelChange, handleVariableNameChange, handleNodeDelete]);
 
   const generateMermaidCode = useCallback(() => {
     let code = 'flowchart TD\n';
     
+    // Mermaidの予約語リスト
+    const reservedWords = new Set([
+      'end', 'start', 'subgraph', 'class', 'classDef', 'click', 'style',
+      'linkStyle', 'direction', 'flowchart', 'graph', 'if', 'else', 'elseif',
+      'while', 'for', 'function', 'return', 'break', 'continue'
+    ]);
+
+    // 安全な変数名を生成する関数
+    const getSafeVariableName = (variableName: string): string => {
+      // 空文字チェック
+      if (!variableName || variableName.trim() === '') {
+        return 'node_unnamed';
+      }
+
+      let safeName = variableName.trim();
+      
+      // 予約語チェック
+      if (reservedWords.has(safeName.toLowerCase())) {
+        safeName = `node_${safeName}`;
+      }
+      
+      // 先頭が数字の場合はアンダースコアを追加
+      if (/^[0-9]/.test(safeName)) {
+        safeName = `_${safeName}`;
+      }
+      
+      // スペースやタブなどの空白文字のみアンダースコアに変換
+      // 日本語文字（ひらがな、カタカナ、漢字）は保持
+      safeName = safeName.replace(/\s+/g, '_');
+      
+      // 特殊記号のみ変換（日本語文字は保持）
+      safeName = safeName.replace(/[^\w\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FAF]/g, '_');
+      
+      return safeName;
+    };
+
     // ノードの定義
     nodes.forEach((node) => {
-      code += `    ${node.id}[${node.data.label}]\n`;
+      const variableName = (node.data.variableName as string) || `node${node.id}`;
+      const safeVariableName = getSafeVariableName(variableName);
+      code += `    ${safeVariableName}[${node.data.label}]\n`;
     });
     
     // エッジの定義
     edges.forEach((edge) => {
-      code += `    ${edge.source} --> ${edge.target}\n`;
+      // ノードIDから変数名を取得
+      const sourceNode = nodes.find(node => node.id === edge.source);
+      const targetNode = nodes.find(node => node.id === edge.target);
+      
+      if (sourceNode && targetNode) {
+        const sourceVariableName = getSafeVariableName((sourceNode.data.variableName as string) || `node${sourceNode.id}`);
+        const targetVariableName = getSafeVariableName((targetNode.data.variableName as string) || `node${targetNode.id}`);
+        code += `    ${sourceVariableName} --> ${targetVariableName}\n`;
+      }
     });
     
     setMermaidCode(code);
