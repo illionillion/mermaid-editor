@@ -2,7 +2,7 @@
 
 import { Handle, Position } from '@xyflow/react';
 import { Box, Text, Input } from '@yamada-ui/react';
-import { useState, useRef } from 'react';
+import { useState, useRef, MouseEvent, ChangeEvent, KeyboardEvent } from 'react';
 import { NodeMenu } from './node-menu';
 
 interface EditableNodeProps {
@@ -38,7 +38,7 @@ export function EditableNode({ data, id }: EditableNodeProps) {
         setIsEditingLabel(true);
     };
 
-    const handleVariableNameClick = (e: React.MouseEvent) => {
+    const handleVariableNameClick = (e: MouseEvent) => {
         e.stopPropagation(); // クリックイベントが親要素に伝播しないようにする
         e.preventDefault(); // デフォルトの動作を防ぐ
         
@@ -53,11 +53,11 @@ export function EditableNode({ data, id }: EditableNodeProps) {
         setIsEditingVariableName(true);
     };
 
-    const handleLabelChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleLabelChange = (e: ChangeEvent<HTMLInputElement>) => {
         setLabel(e.target.value);
     };
 
-    const handleVariableNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleVariableNameChange = (e: ChangeEvent<HTMLInputElement>) => {
         setVariableName(e.target.value);
     };
 
@@ -85,7 +85,7 @@ export function EditableNode({ data, id }: EditableNodeProps) {
         setVariableName(data.variableName || `node${id}`);
     };
 
-    const handleLabelKeyPress = (e: React.KeyboardEvent) => {
+    const handleLabelKeyPress = (e: KeyboardEvent) => {
         // IME入力中はEnterキーを無視
         if (e.key === 'Enter' && !isComposing) {
             handleLabelSave();
@@ -94,7 +94,7 @@ export function EditableNode({ data, id }: EditableNodeProps) {
         }
     };
 
-    const handleVariableNameKeyPress = (e: React.KeyboardEvent) => {
+    const handleVariableNameKeyPress = (e: KeyboardEvent) => {
         // IME入力中はEnterキーを無視
         if (e.key === 'Enter' && !isComposing) {
             handleVariableNameSave();
@@ -124,6 +124,14 @@ export function EditableNode({ data, id }: EditableNodeProps) {
             handleVariableNameSave();
         }
         setIsEditingLabel(true);
+    };
+
+    const handleEditVariableName = () => {
+        // ラベル編集中の場合は強制終了
+        if (isEditingLabel) {
+            handleLabelSave();
+        }
+        setIsEditingVariableName(true);
     };
 
     return (
@@ -185,7 +193,7 @@ export function EditableNode({ data, id }: EditableNodeProps) {
                     )}
                 </Box>
 
-                <NodeMenu onDelete={handleDelete} onEdit={handleEdit} />
+                <NodeMenu onDelete={handleDelete} onEdit={handleEdit} onEditVariableName={handleEditVariableName} />
 
                 {/* メインのラベル表示・編集エリア */}
                 {isEditingLabel ? (
