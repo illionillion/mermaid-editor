@@ -1,7 +1,7 @@
 'use client';
 
 import { Modal, ModalHeader, ModalBody, ModalCloseButton, HStack, Text, Button, Textarea, IconButton } from '@yamada-ui/react';
-import { ClipboardIcon, DownloadIcon } from '@yamada-ui/lucide';
+import { DownloadIcon } from '@yamada-ui/lucide';
 import { useCallback } from 'react';
 import { CopyButton } from './copy-button';
 
