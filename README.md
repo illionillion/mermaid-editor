@@ -5,7 +5,7 @@ ReactFlowを使ったMermaidフローチャートのGUIエディターです。�
 ## 🌐 Live Demo
 
 GitHub Pagesで公開されています：
-**[https://your-username.github.io/mermaid-editor/](https://your-username.github.io/mermaid-editor/)**
+**[https://github.com/illionillion/mermaid-editor/](https://github.com/illionillion/mermaid-editor/)**
 
 ## ✨ 機能
 
