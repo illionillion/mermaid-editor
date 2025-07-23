@@ -1,9 +1,10 @@
 'use client';
 
-import { Modal, ModalHeader, ModalBody, ModalCloseButton, HStack, Text, Button, Textarea, IconButton } from '@yamada-ui/react';
+import { Modal, ModalHeader, ModalBody, ModalCloseButton, HStack, Text, Button } from '@yamada-ui/react';
 import { DownloadIcon } from '@yamada-ui/lucide';
 import { useCallback } from 'react';
 import { CopyButton } from './copy-button';
+import { MermaidHighlight } from './mermaid-highlight';
 
 interface DownloadModalProps {
   open: boolean;
@@ -41,13 +42,7 @@ export function DownloadModal({ open, onClose, mermaidCode }: DownloadModalProps
       <ModalBody pb={6} position="relative">
         {/* コピーボタン */}
         <CopyButton value={mermaidCode} position="absolute" top={2} right={6} zIndex={1} />
-        <Textarea
-          value={mermaidCode}
-          readOnly
-          rows={15}
-          fontFamily="mono"
-          fontSize="sm"
-        />
+        <MermaidHighlight code={mermaidCode} />
       </ModalBody>
     </Modal>
   );
