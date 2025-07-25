@@ -2,10 +2,12 @@
 
 import { Box, Input } from '@yamada-ui/react';
 import { MouseEvent, ChangeEvent, KeyboardEvent } from 'react';
+import { formatMermaidShape } from '../utils/mermaid';
 
 interface VariableNameEditorProps {
     value: string;
     isEditing: boolean;
+    shapeType?: string;
     onClick: (e: MouseEvent) => void;
     onChange: (e: ChangeEvent<HTMLInputElement>) => void;
     onKeyDown: (e: KeyboardEvent) => void;
@@ -17,6 +19,7 @@ interface VariableNameEditorProps {
 export function VariableNameEditor({
     value,
     isEditing,
+    shapeType,
     onClick,
     onChange,
     onKeyDown,
@@ -24,6 +27,9 @@ export function VariableNameEditor({
     onCompositionEnd,
     onBlur
 }: VariableNameEditorProps) {
+    // formatMermaidShapeを使って形状記号付きの表示を取得
+    const displayValue = formatMermaidShape(shapeType || 'rectangle', value);
+
     return (
         <Box
             position="absolute"
@@ -61,7 +67,7 @@ export function VariableNameEditor({
                     _focus={{ boxShadow: 'none', outline: 'none' }}
                 />
             ) : (
-                value
+                displayValue
             )}
         </Box>
     );

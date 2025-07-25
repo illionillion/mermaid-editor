@@ -11,8 +11,10 @@ interface EditableNodeProps {
     data: {
         label: string;
         variableName?: string;
+        shapeType?: string;
         onLabelChange?: (nodeId: string, newLabel: string) => void;
         onVariableNameChange?: (nodeId: string, newVariableName: string) => void;
+        onShapeTypeChange?: (nodeId: string, newShapeType: string) => void;
         onDelete?: (nodeId: string) => void;
     };
     id: string;
@@ -136,6 +138,10 @@ export function EditableNode({ data, id }: EditableNodeProps) {
         setIsEditingVariableName(true);
     };
 
+    const handleShapeChange = (shapeType: string) => {
+        data.onShapeTypeChange?.(id, shapeType);
+    };
+
     return (
         <>
             <Box
@@ -158,6 +164,7 @@ export function EditableNode({ data, id }: EditableNodeProps) {
                 <VariableNameEditor
                     value={variableName}
                     isEditing={isEditingVariableName}
+                    shapeType={data.shapeType}
                     onClick={handleVariableNameClick}
                     onChange={handleVariableNameChange}
                     onKeyDown={handleVariableNameKeyPress}
@@ -166,7 +173,13 @@ export function EditableNode({ data, id }: EditableNodeProps) {
                     onBlur={handleVariableNameSave}
                 />
 
-                <NodeMenu onDelete={handleDelete} onEdit={handleEdit} onEditVariableName={handleEditVariableName} />
+                <NodeMenu 
+                    onDelete={handleDelete} 
+                    onEdit={handleEdit} 
+                    onEditVariableName={handleEditVariableName}
+                    onShapeChange={handleShapeChange}
+                    currentShape={data.shapeType || 'rectangle'}
+                />
 
                 {/* メインのラベル表示・編集エリア */}
                 <LabelEditor

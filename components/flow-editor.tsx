@@ -1,12 +1,12 @@
 'use client';
 
-import { ReactFlow, Node, Edge, addEdge, Controls, Background, useNodesState, useEdgesState, useReactFlow } from '@xyflow/react';
+import { ReactFlow, Node, Edge, addEdge, Controls, Background, useNodesState, useEdgesState, useReactFlow, Connection, OnConnectStartParams, OnConnectEnd } from '@xyflow/react';
 import { Box, useDisclosure, useToken } from '@yamada-ui/react';
 import { useCallback, useState, useRef, useEffect } from 'react';
 import { nodeTypes } from './node-types';
 import { FlowPanel } from './flow-panel';
 import { DownloadModal } from './download-modal';
-import { getSafeVariableName } from '../utils/mermaid';
+import { getSafeVariableName, formatMermaidShape } from '../utils/mermaid';
 
 const initialNodes: Node[] = [
   {
@@ -17,6 +17,8 @@ const initialNodes: Node[] = [
         label: 'Start',
         // 表示名と変数名を持ちたい
         variableName: 'startNode',
+        // ノードの形状タイプ
+        shapeType: 'rectangle',
         // 削除機能は後でuseEffectで追加される
     },
   },
@@ -69,6 +71,17 @@ export function FlowEditor() {
     );
   }, [setNodes]);
 
+  // ノード形状変更のハンドラー
+  const handleShapeTypeChange = useCallback((nodeId: string, newShapeType: string) => {
+    setNodes((nds) =>
+      nds.map((node) =>
+        node.id === nodeId
+          ? { ...node, data: { ...node.data, shapeType: newShapeType } }
+          : node
+      )
+    );
+  }, [setNodes]);
+
   // ノード削除のハンドラー
   const handleNodeDelete = useCallback((nodeId: string) => {
     setNodes((nds) => nds.filter((node) => node.id !== nodeId));
@@ -84,14 +97,15 @@ export function FlowEditor() {
           ...node.data,
           onLabelChange: handleLabelChange,
           onVariableNameChange: handleVariableNameChange,
+          onShapeTypeChange: handleShapeTypeChange,
           onDelete: handleNodeDelete,
         },
       }))
     );
-  }, [handleLabelChange, handleVariableNameChange, handleNodeDelete, setNodes]);
+  }, [handleLabelChange, handleVariableNameChange, handleShapeTypeChange, handleNodeDelete, setNodes]);
 
   const onConnect = useCallback(
-    (params: any) => {
+    (params: Connection) => {
       setEdges((eds) => addEdge(params, eds));
       // 既存のノードに接続された場合、フラグを設定
       connectingNodeId.current = 'connected';
@@ -99,14 +113,14 @@ export function FlowEditor() {
     [setEdges]
   );
 
-  const onConnectStart = useCallback((_: any, params: any) => {
+  const onConnectStart = useCallback((_: MouseEvent | TouchEvent | null, params: OnConnectStartParams) => {
     connectingNodeId.current = params.nodeId;
     // ハンドルタイプも保存
     connectingNodeId.current = `${params.nodeId}-${params.handleType}`;
   }, []);
 
-  const onConnectEnd = useCallback(
-    (event: MouseEvent | TouchEvent) => {
+  const onConnectEnd: OnConnectEnd = useCallback(
+    (event) => {
       if (!connectingNodeId.current) return;
       
       // 既存のノードに接続された場合は新しいノードを作成しない
@@ -115,9 +129,9 @@ export function FlowEditor() {
         return;
       }
 
-      const targetIsPane = (event.target as Element)?.classList?.contains('react-flow__pane');
+      const targetIsPane = (event?.target as Element)?.classList?.contains('react-flow__pane');
 
-      if (targetIsPane) {
+      if (targetIsPane && event) {
         // 接続情報を解析
         const [sourceNodeId, handleType] = connectingNodeId.current.split('-');
         
@@ -144,8 +158,10 @@ export function FlowEditor() {
           data: { 
             label: `Node ${nodeId}`,
             variableName: `node${nodeId}`,
+            shapeType: 'rectangle',
             onLabelChange: handleLabelChange,
             onVariableNameChange: handleVariableNameChange,
+            onShapeTypeChange: handleShapeTypeChange,
             onDelete: handleNodeDelete,
           },
         };
@@ -165,7 +181,7 @@ export function FlowEditor() {
 
       connectingNodeId.current = null;
     },
-    [nodeId, setNodes, setEdges, screenToFlowPosition, handleLabelChange, nodes, nodeWidth, nodeHeight]
+    [nodeId, setNodes, setEdges, screenToFlowPosition, handleLabelChange, handleVariableNameChange, handleShapeTypeChange, handleNodeDelete, nodes, nodeWidth, nodeHeight]
   );
 
   const addNode = useCallback(() => {
@@ -176,14 +192,16 @@ export function FlowEditor() {
       data: { 
         label: `Node ${nodeId}`,
         variableName: `node${nodeId}`,
+        shapeType: 'rectangle',
         onLabelChange: handleLabelChange,
         onVariableNameChange: handleVariableNameChange,
+        onShapeTypeChange: handleShapeTypeChange,
         onDelete: handleNodeDelete,
       },
     };
     setNodes((nds) => nds.concat(newNode));
     setNodeId(nodeId + 1);
-  }, [nodeId, setNodes, handleLabelChange, handleVariableNameChange, handleNodeDelete]);
+  }, [nodeId, setNodes, handleLabelChange, handleVariableNameChange, handleShapeTypeChange, handleNodeDelete]);
 
   const generateMermaidCode = useCallback(() => {
     let code = 'flowchart TD\n';
@@ -192,7 +210,10 @@ export function FlowEditor() {
     nodes.forEach((node) => {
       const variableName = (node.data.variableName as string) || `node${node.id}`;
       const safeVariableName = getSafeVariableName(variableName);
-      code += `    ${safeVariableName}[${node.data.label}]\n`;
+      const shapeType = (node.data.shapeType as string) || 'rectangle';
+      const label = (node.data.label as string) || '';
+      const shapeCode = formatMermaidShape(shapeType, label);
+      code += `    ${safeVariableName}${shapeCode}\n`;
     });
     
     // エッジの定義

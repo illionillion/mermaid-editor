@@ -45,3 +45,28 @@ export const getSafeVariableName = (variableName: string): string => {
 export const getReservedWords = (): Set<string> => {
   return new Set(RESERVED_WORDS);
 };
+
+/**
+ * ノードの形状タイプをMermaidの記法に変換する
+ * @param shapeType 形状タイプ
+ * @param label ノードラベル
+ * @returns Mermaidの形状記法
+ */
+export const formatMermaidShape = (shapeType: string, label: string): string => {
+  switch (shapeType) {
+    case 'rectangle':
+      return `[${label}]`;
+    case 'diamond':
+      return `{${label}}`;
+    case 'rounded':
+      return `(${label})`;
+    case 'circle':
+      return `((${label}))`;
+    case 'hexagon':
+      return `{{${label}}}`;
+    case 'stadium':
+      return `([${label}])`;
+    default:
+      return `[${label}]`; // デフォルトは四角形
+  }
+};
