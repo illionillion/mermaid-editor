@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import { Box, Input } from '@yamada-ui/react';
-import { MouseEvent, ChangeEvent, KeyboardEvent } from 'react';
-import { formatMermaidShape } from '../../utils/mermaid';
+import { Box, Input } from "@yamada-ui/react";
+import { MouseEvent, ChangeEvent, KeyboardEvent } from "react";
+import { formatMermaidShape } from "../../utils/mermaid";
 
 interface VariableNameEditorProps {
     value: string;
@@ -28,7 +28,7 @@ export function VariableNameEditor({
     onBlur
 }: VariableNameEditorProps) {
     // formatMermaidShapeを使って形状記号付きの表示を取得
-    const displayValue = formatMermaidShape(shapeType || 'rectangle', value);
+    const displayValue = formatMermaidShape(shapeType || "rectangle", value);
 
     return (
         <Box
@@ -64,7 +64,7 @@ export function VariableNameEditor({
                     bg="white"
                     color="black"
                     border="none"
-                    _focus={{ boxShadow: 'none', outline: 'none' }}
+                    _focus={{ boxShadow: "none", outline: "none" }}
                 />
             ) : (
                 displayValue

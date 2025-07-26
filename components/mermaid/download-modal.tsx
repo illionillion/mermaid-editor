@@ -1,10 +1,10 @@
-'use client';
+"use client";
 
-import { Modal, ModalHeader, ModalBody, ModalCloseButton, HStack, Text, Button } from '@yamada-ui/react';
-import { DownloadIcon } from '@yamada-ui/lucide';
-import { useCallback } from 'react';
-import { CopyButton } from '../ui';
-import { MermaidHighlight } from './mermaid-highlight';
+import { DownloadIcon } from "@yamada-ui/lucide";
+import { Modal, ModalHeader, ModalBody, ModalCloseButton, HStack, Text, Button } from "@yamada-ui/react";
+import { useCallback } from "react";
+import { CopyButton } from "../ui";
+import { MermaidHighlight } from "./mermaid-highlight";
 
 interface DownloadModalProps {
   open: boolean;
@@ -14,10 +14,10 @@ interface DownloadModalProps {
 
 export function DownloadModal({ open, onClose, mermaidCode }: DownloadModalProps) {
   const downloadMermaidCode = useCallback(() => {
-    const element = document.createElement('a');
-    const file = new Blob([mermaidCode], { type: 'text/plain' });
+    const element = document.createElement("a");
+    const file = new Blob([mermaidCode], { type: "text/plain" });
     element.href = URL.createObjectURL(file);
-    element.download = 'flowchart.mmd';
+    element.download = "flowchart.mmd";
     document.body.appendChild(element);
     element.click();
     document.body.removeChild(element);

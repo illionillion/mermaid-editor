@@ -1,10 +1,10 @@
-'use client';
+"use client";
 
-import { Handle, Position } from '@xyflow/react';
-import { Box } from '@yamada-ui/react';
-import { useState, useRef, MouseEvent, ChangeEvent, KeyboardEvent } from 'react';
-import { NodeMenu } from './node-menu';
-import { VariableNameEditor, LabelEditor } from '../editor';
+import { Handle, Position } from "@xyflow/react";
+import { Box } from "@yamada-ui/react";
+import { useState, useRef, MouseEvent, ChangeEvent, KeyboardEvent } from "react";
+import { VariableNameEditor, LabelEditor } from "../editor";
+import { NodeMenu } from "./node-menu";
 
 interface EditableNodeProps {
     data: {
@@ -90,18 +90,18 @@ export function EditableNode({ data, id }: EditableNodeProps) {
 
     const handleLabelKeyPress = (e: KeyboardEvent) => {
         // IME入力中はEnterキーを無視
-        if (e.key === 'Enter' && !isComposing) {
+        if (e.key === "Enter" && !isComposing) {
             handleLabelSave();
-        } else if (e.key === 'Escape') {
+        } else if (e.key === "Escape") {
             handleLabelCancel();
         }
     };
 
     const handleVariableNameKeyPress = (e: KeyboardEvent) => {
         // IME入力中はEnterキーを無視
-        if (e.key === 'Enter' && !isComposing) {
+        if (e.key === "Enter" && !isComposing) {
             handleVariableNameSave();
-        } else if (e.key === 'Escape') {
+        } else if (e.key === "Escape") {
             handleVariableNameCancel();
         }
     };
@@ -156,8 +156,8 @@ export function EditableNode({ data, id }: EditableNodeProps) {
                 textAlign="center"
                 cursor="pointer"
                 onDoubleClick={handleLabelDoubleClick}
-                _hover={{ boxShadow: 'md' }}
-                position='relative'
+                _hover={{ boxShadow: "md" }}
+                position="relative"
             >
                 {/* 変数名を左上に表示 */}
                 <VariableNameEditor
@@ -177,7 +177,7 @@ export function EditableNode({ data, id }: EditableNodeProps) {
                     onEdit={handleEdit} 
                     onEditVariableName={handleEditVariableName}
                     onShapeChange={handleShapeChange}
-                    currentShape={data.shapeType || 'rectangle'}
+                    currentShape={data.shapeType || "rectangle"}
                 />
 
                 {/* メインのラベル表示・編集エリア */}

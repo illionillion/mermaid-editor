@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import { Text, Input } from '@yamada-ui/react';
-import { ChangeEvent, KeyboardEvent } from 'react';
+import { Text, Input } from "@yamada-ui/react";
+import { ChangeEvent, KeyboardEvent } from "react";
 
 interface LabelEditorProps {
     value: string;
@@ -43,7 +43,7 @@ export function LabelEditor({
                     fontSize="sm"
                     border="none"
                     bg="transparent"
-                    _focus={{ boxShadow: 'none', outline: 'none' }}
+                    _focus={{ boxShadow: "none", outline: "none" }}
                 />
             ) : (
                 <Text

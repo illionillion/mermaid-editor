@@ -1,8 +1,8 @@
 // Mermaidの予約語リスト
 const RESERVED_WORDS = new Set([
-  'end', 'start', 'subgraph', 'class', 'classDef', 'click', 'style',
-  'linkStyle', 'direction', 'flowchart', 'graph', 'if', 'else', 'elseif',
-  'while', 'for', 'function', 'return', 'break', 'continue'
+  "end", "start", "subgraph", "class", "classDef", "click", "style",
+  "linkStyle", "direction", "flowchart", "graph", "if", "else", "elseif",
+  "while", "for", "function", "return", "break", "continue"
 ]);
 
 /**
@@ -12,8 +12,8 @@ const RESERVED_WORDS = new Set([
  */
 export const getSafeVariableName = (variableName: string): string => {
   // 空文字チェック
-  if (!variableName || variableName.trim() === '') {
-    return 'node_unnamed';
+  if (!variableName || variableName.trim() === "") {
+    return "node_unnamed";
   }
 
   let safeName = variableName.trim();
@@ -30,10 +30,10 @@ export const getSafeVariableName = (variableName: string): string => {
   
   // スペースやタブなどの空白文字のみアンダースコアに変換
   // 日本語文字（ひらがな、カタカナ、漢字）は保持
-  safeName = safeName.replace(/\s+/g, '_');
+  safeName = safeName.replace(/\s+/g, "_");
   
   // 特殊記号のみ変換（日本語文字は保持）
-  safeName = safeName.replace(/[^\w\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FAF]/g, '_');
+  safeName = safeName.replace(/[^\w\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FAF]/g, "_");
   
   return safeName;
 };
@@ -54,17 +54,17 @@ export const getReservedWords = (): Set<string> => {
  */
 export const formatMermaidShape = (shapeType: string, label: string): string => {
   switch (shapeType) {
-    case 'rectangle':
+    case "rectangle":
       return `[${label}]`;
-    case 'diamond':
+    case "diamond":
       return `{${label}}`;
-    case 'rounded':
+    case "rounded":
       return `(${label})`;
-    case 'circle':
+    case "circle":
       return `((${label}))`;
-    case 'hexagon':
+    case "hexagon":
       return `{{${label}}}`;
-    case 'stadium':
+    case "stadium":
       return `([${label}])`;
     default:
       return `[${label}]`; // デフォルトは四角形

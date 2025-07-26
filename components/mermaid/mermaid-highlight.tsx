@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import { Box } from '@yamada-ui/react';
-import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
+import { Box } from "@yamada-ui/react";
+import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
+import { vscDarkPlus } from "react-syntax-highlighter/dist/esm/styles/prism";
 
 interface MermaidHighlightProps {
   code: string;
@@ -14,8 +14,8 @@ interface MermaidHighlightProps {
 export function MermaidHighlight({ 
   code, 
   showLineNumbers = true, 
-  minHeight = '400px',
-  fontSize = '14px'
+  minHeight = "400px",
+  fontSize = "14px"
 }: MermaidHighlightProps) {
   return (
     <Box

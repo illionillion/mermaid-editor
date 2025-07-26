@@ -1,24 +1,24 @@
-'use client';
+"use client";
 
-import { ReactFlow, Node, Edge, addEdge, Controls, Background, useNodesState, useEdgesState, useReactFlow, Connection, OnConnectStartParams, OnConnectEnd } from '@xyflow/react';
-import { Box, useDisclosure, useToken } from '@yamada-ui/react';
-import { useCallback, useState, useRef, useEffect } from 'react';
-import { nodeTypes } from './node-types';
-import { FlowPanel } from './flow-panel';
-import { DownloadModal } from '../mermaid';
-import { getSafeVariableName, formatMermaidShape } from '../../utils/mermaid';
+import { ReactFlow, Node, Edge, addEdge, Controls, Background, useNodesState, useEdgesState, useReactFlow, Connection, OnConnectStartParams, OnConnectEnd } from "@xyflow/react";
+import { Box, useDisclosure, useToken } from "@yamada-ui/react";
+import { useCallback, useState, useRef, useEffect } from "react";
+import { getSafeVariableName, formatMermaidShape } from "../../utils/mermaid";
+import { DownloadModal } from "../mermaid";
+import { FlowPanel } from "./flow-panel";
+import { nodeTypes } from "./node-types";
 
 const initialNodes: Node[] = [
   {
-    id: '1',
-    type: 'editableNode',
+    id: "1",
+    type: "editableNode",
     position: { x: 250, y: 5 },
     data: { 
-        label: 'Start',
+        label: "Start",
         // 表示名と変数名を持ちたい
-        variableName: 'startNode',
+        variableName: "startNode",
         // ノードの形状タイプ
-        shapeType: 'rectangle',
+        shapeType: "rectangle",
         // 削除機能は後でuseEffectで追加される
     },
   },
@@ -31,7 +31,7 @@ export function FlowEditor() {
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
   const [nodeId, setNodeId] = useState(2);
   const { open, onOpen, onClose } = useDisclosure();
-  const [mermaidCode, setMermaidCode] = useState('');
+  const [mermaidCode, setMermaidCode] = useState("");
   const connectingNodeId = useRef<string | null>(null);
   const { screenToFlowPosition } = useReactFlow();
 
@@ -42,8 +42,8 @@ export function FlowEditor() {
   // 文字列から数値に変換（pxを取り除いて数値化）
   const parseSize = (sizeStr: string | undefined, fallback: number): number => {
     if (!sizeStr) return fallback;
-    const numValue = parseFloat(sizeStr.replace('px', '').replace('rem', ''));
-    return isNaN(numValue) ? fallback : (sizeStr.includes('rem') ? numValue * 16 : numValue);
+    const numValue = parseFloat(sizeStr.replace("px", "").replace("rem", ""));
+    return isNaN(numValue) ? fallback : (sizeStr.includes("rem") ? numValue * 16 : numValue);
   };
   
   const nodeWidth = parseSize(nodeWidthToken, 80); // フォールバック: 80px
@@ -108,7 +108,7 @@ export function FlowEditor() {
     (params: Connection) => {
       setEdges((eds) => addEdge(params, eds));
       // 既存のノードに接続された場合、フラグを設定
-      connectingNodeId.current = 'connected';
+      connectingNodeId.current = "connected";
     },
     [setEdges]
   );
@@ -124,16 +124,16 @@ export function FlowEditor() {
       if (!connectingNodeId.current) return;
       
       // 既存のノードに接続された場合は新しいノードを作成しない
-      if (connectingNodeId.current === 'connected') {
+      if (connectingNodeId.current === "connected") {
         connectingNodeId.current = null;
         return;
       }
 
-      const targetIsPane = (event?.target as Element)?.classList?.contains('react-flow__pane');
+      const targetIsPane = (event?.target as Element)?.classList?.contains("react-flow__pane");
 
       if (targetIsPane && event) {
         // 接続情報を解析
-        const [sourceNodeId, handleType] = connectingNodeId.current.split('-');
+        const [sourceNodeId, handleType] = connectingNodeId.current.split("-");
         
         // 元のノードの位置を取得
         const sourceNode = nodes.find(node => node.id === sourceNodeId);
@@ -153,12 +153,12 @@ export function FlowEditor() {
 
         const newNode: Node = {
           id: nodeId.toString(),
-          type: 'editableNode',
+          type: "editableNode",
           position: newPosition,
           data: { 
             label: `Node ${nodeId}`,
             variableName: `node${nodeId}`,
-            shapeType: 'rectangle',
+            shapeType: "rectangle",
             onLabelChange: handleLabelChange,
             onVariableNameChange: handleVariableNameChange,
             onShapeTypeChange: handleShapeTypeChange,
@@ -171,8 +171,8 @@ export function FlowEditor() {
         // 新しいノードへのエッジを作成（方向を考慮）
         const newEdge: Edge = {
           id: `${sourceNodeId}-${nodeId}`,
-          source: handleType === 'source' ? sourceNodeId : nodeId.toString(),
-          target: handleType === 'source' ? nodeId.toString() : sourceNodeId,
+          source: handleType === "source" ? sourceNodeId : nodeId.toString(),
+          target: handleType === "source" ? nodeId.toString() : sourceNodeId,
         };
         setEdges((eds) => [...eds, newEdge]);
 
@@ -187,12 +187,12 @@ export function FlowEditor() {
   const addNode = useCallback(() => {
     const newNode: Node = {
       id: nodeId.toString(),
-      type: 'editableNode',
+      type: "editableNode",
       position: { x: Math.random() * 500, y: Math.random() * 500 },
       data: { 
         label: `Node ${nodeId}`,
         variableName: `node${nodeId}`,
-        shapeType: 'rectangle',
+        shapeType: "rectangle",
         onLabelChange: handleLabelChange,
         onVariableNameChange: handleVariableNameChange,
         onShapeTypeChange: handleShapeTypeChange,
@@ -204,14 +204,14 @@ export function FlowEditor() {
   }, [nodeId, setNodes, handleLabelChange, handleVariableNameChange, handleShapeTypeChange, handleNodeDelete]);
 
   const generateMermaidCode = useCallback(() => {
-    let code = 'flowchart TD\n';
+    let code = "flowchart TD\n";
 
     // ノードの定義
     nodes.forEach((node) => {
       const variableName = (node.data.variableName as string) || `node${node.id}`;
       const safeVariableName = getSafeVariableName(variableName);
-      const shapeType = (node.data.shapeType as string) || 'rectangle';
-      const label = (node.data.label as string) || '';
+      const shapeType = (node.data.shapeType as string) || "rectangle";
+      const label = (node.data.label as string) || "";
       const shapeCode = formatMermaidShape(shapeType, label);
       code += `    ${safeVariableName}${shapeCode}\n`;
     });

@@ -10,12 +10,12 @@ interface ShapeSelectorProps {
 
 export const ShapeSelector = ({ currentShape, onShapeChange }: ShapeSelectorProps) => {
     const shapeOptions = [
-        { type: 'rectangle', label: '四角形', symbol: '[ ]' },
-        { type: 'diamond', label: '菱形', symbol: '{ }' },
-        { type: 'rounded', label: '角丸四角', symbol: '( )' },
-        { type: 'circle', label: '円形', symbol: '(( ))' },
-        { type: 'hexagon', label: '六角形', symbol: '{{ }}' },
-        { type: 'stadium', label: 'スタジアム', symbol: '([ ])' },
+        { type: "rectangle", label: "四角形", symbol: "[ ]" },
+        { type: "diamond", label: "菱形", symbol: "{ }" },
+        { type: "rounded", label: "角丸四角", symbol: "( )" },
+        { type: "circle", label: "円形", symbol: "(( ))" },
+        { type: "hexagon", label: "六角形", symbol: "{{ }}" },
+        { type: "stadium", label: "スタジアム", symbol: "([ ])" },
     ];
 
     return (

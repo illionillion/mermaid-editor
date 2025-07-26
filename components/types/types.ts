@@ -1,4 +1,4 @@
-import { Node, Edge } from '@xyflow/react';
+import { Node, Edge } from "@xyflow/react";
 
 export interface MermaidNode extends Node {
   data: {
@@ -7,9 +7,7 @@ export interface MermaidNode extends Node {
   };
 }
 
-export interface MermaidEdge extends Edge {
-  // 将来的に独自のエッジプロパティを追加する場合
-}
+export type MermaidEdge = Edge;
 
 export interface FlowState {
   nodes: MermaidNode[];

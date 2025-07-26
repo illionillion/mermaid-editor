@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import { Panel } from '@xyflow/react';
-import { VStack, HStack, Text, Button } from '@yamada-ui/react';
-import { PlusIcon, CodeIcon } from '@yamada-ui/lucide';
+import { Panel } from "@xyflow/react";
+import { PlusIcon, CodeIcon } from "@yamada-ui/lucide";
+import { VStack, HStack, Text, Button } from "@yamada-ui/react";
 
 interface FlowPanelProps {
   onAddNode: () => void;
