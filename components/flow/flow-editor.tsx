@@ -5,6 +5,7 @@ import { Box, useDisclosure, useToken } from "@yamada-ui/react";
 import { useCallback, useState, useRef, useEffect } from "react";
 import { getSafeVariableName, formatMermaidShape } from "../../utils/mermaid";
 import { DownloadModal } from "../mermaid";
+import { edgeTypes } from "./edge-types";
 import { FlowPanel } from "./flow-panel";
 import { nodeTypes } from "./node-types";
 
@@ -88,6 +89,17 @@ export function FlowEditor() {
     setEdges((eds) => eds.filter((edge) => edge.source !== nodeId && edge.target !== nodeId));
   }, [setNodes, setEdges]);
 
+  // エッジラベル変更のハンドラー
+  const handleEdgeLabelChange = useCallback((edgeId: string, newLabel: string) => {
+    setEdges((eds) =>
+      eds.map((edge) =>
+        edge.id === edgeId
+          ? { ...edge, data: { ...edge.data, label: newLabel } }
+          : edge
+      )
+    );
+  }, [setEdges]);
+
   // 初期ノードにhandleLabelChangeとhandleNodeDeleteを追加
   useEffect(() => {
     setNodes((nds) =>
@@ -104,13 +116,35 @@ export function FlowEditor() {
     );
   }, [handleLabelChange, handleVariableNameChange, handleShapeTypeChange, handleNodeDelete, setNodes]);
 
+  // エッジにハンドラーを追加
+  useEffect(() => {
+    setEdges((eds) =>
+      eds.map((edge) => ({
+        ...edge,
+        type: "editableEdge",
+        data: {
+          ...edge.data,
+          onLabelChange: handleEdgeLabelChange,
+        },
+      }))
+    );
+  }, [handleEdgeLabelChange, setEdges]);
+
   const onConnect = useCallback(
     (params: Connection) => {
-      setEdges((eds) => addEdge(params, eds));
+      const newEdge = {
+        ...params,
+        type: "editableEdge",
+        data: {
+          label: "",
+          onLabelChange: handleEdgeLabelChange,
+        },
+      };
+      setEdges((eds) => addEdge(newEdge, eds));
       // 既存のノードに接続された場合、フラグを設定
       connectingNodeId.current = "connected";
     },
-    [setEdges]
+    [setEdges, handleEdgeLabelChange]
   );
 
   const onConnectStart = useCallback((_: MouseEvent | TouchEvent | null, params: OnConnectStartParams) => {
@@ -171,8 +205,13 @@ export function FlowEditor() {
         // 新しいノードへのエッジを作成（方向を考慮）
         const newEdge: Edge = {
           id: `${sourceNodeId}-${nodeId}`,
+          type: "editableEdge",
           source: handleType === "source" ? sourceNodeId : nodeId.toString(),
           target: handleType === "source" ? nodeId.toString() : sourceNodeId,
+          data: {
+            label: "",
+            onLabelChange: handleEdgeLabelChange,
+          },
         };
         setEdges((eds) => [...eds, newEdge]);
 
@@ -181,7 +220,7 @@ export function FlowEditor() {
 
       connectingNodeId.current = null;
     },
-    [nodeId, setNodes, setEdges, screenToFlowPosition, handleLabelChange, handleVariableNameChange, handleShapeTypeChange, handleNodeDelete, nodes, nodeWidth, nodeHeight]
+    [nodeId, setNodes, setEdges, screenToFlowPosition, handleLabelChange, handleVariableNameChange, handleShapeTypeChange, handleNodeDelete, handleEdgeLabelChange, nodes, nodeWidth, nodeHeight]
   );
 
   const addNode = useCallback(() => {
@@ -225,7 +264,13 @@ export function FlowEditor() {
       if (sourceNode && targetNode) {
         const sourceVariableName = getSafeVariableName((sourceNode.data.variableName as string) || `node${sourceNode.id}`);
         const targetVariableName = getSafeVariableName((targetNode.data.variableName as string) || `node${targetNode.id}`);
-        code += `    ${sourceVariableName} --> ${targetVariableName}\n`;
+        const edgeLabel = edge.data?.label as string | undefined;
+        
+        if (edgeLabel && edgeLabel.trim() !== "") {
+          code += `    ${sourceVariableName} -->|${edgeLabel}| ${targetVariableName}\n`;
+        } else {
+          code += `    ${sourceVariableName} --> ${targetVariableName}\n`;
+        }
       }
     });
     
@@ -244,6 +289,7 @@ export function FlowEditor() {
         onConnectStart={onConnectStart}
         onConnectEnd={onConnectEnd}
         nodeTypes={nodeTypes}
+        edgeTypes={edgeTypes}
         fitView
       >
         <Controls />

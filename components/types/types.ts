@@ -7,7 +7,11 @@ export interface MermaidNode extends Node {
   };
 }
 
-export type MermaidEdge = Edge;
+export interface MermaidEdge extends Edge {
+  data?: {
+    label?: string;
+  };
+}
 
 export interface FlowState {
   nodes: MermaidNode[];
