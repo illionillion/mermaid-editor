@@ -100,6 +100,11 @@ export function FlowEditor() {
     );
   }, [setEdges]);
 
+  // エッジ削除のハンドラー
+  const handleEdgeDelete = useCallback((edgeId: string) => {
+    setEdges((eds) => eds.filter((edge) => edge.id !== edgeId));
+  }, [setEdges]);
+
   // 初期ノードにhandleLabelChangeとhandleNodeDeleteを追加
   useEffect(() => {
     setNodes((nds) =>
@@ -125,10 +130,11 @@ export function FlowEditor() {
         data: {
           ...edge.data,
           onLabelChange: handleEdgeLabelChange,
+          onDelete: handleEdgeDelete,
         },
       }))
     );
-  }, [handleEdgeLabelChange, setEdges]);
+  }, [handleEdgeLabelChange, handleEdgeDelete, setEdges]);
 
   const onConnect = useCallback(
     (params: Connection) => {
@@ -138,13 +144,14 @@ export function FlowEditor() {
         data: {
           label: "",
           onLabelChange: handleEdgeLabelChange,
+          onDelete: handleEdgeDelete,
         },
       };
       setEdges((eds) => addEdge(newEdge, eds));
       // 既存のノードに接続された場合、フラグを設定
       connectingNodeId.current = "connected";
     },
-    [setEdges, handleEdgeLabelChange]
+    [setEdges, handleEdgeLabelChange, handleEdgeDelete]
   );
 
   const onConnectStart = useCallback((_: MouseEvent | TouchEvent | null, params: OnConnectStartParams) => {
@@ -211,6 +218,7 @@ export function FlowEditor() {
           data: {
             label: "",
             onLabelChange: handleEdgeLabelChange,
+            onDelete: handleEdgeDelete,
           },
         };
         setEdges((eds) => [...eds, newEdge]);
@@ -220,7 +228,7 @@ export function FlowEditor() {
 
       connectingNodeId.current = null;
     },
-    [nodeId, setNodes, setEdges, screenToFlowPosition, handleLabelChange, handleVariableNameChange, handleShapeTypeChange, handleNodeDelete, handleEdgeLabelChange, nodes, nodeWidth, nodeHeight]
+    [nodeId, setNodes, setEdges, screenToFlowPosition, handleLabelChange, handleVariableNameChange, handleShapeTypeChange, handleNodeDelete, handleEdgeLabelChange, handleEdgeDelete, nodes, nodeWidth, nodeHeight]
   );
 
   const addNode = useCallback(() => {

@@ -1,13 +1,15 @@
 "use client";
 
 import { BaseEdge, EdgeLabelRenderer, EdgeProps, getBezierPath } from "@xyflow/react";
-import { Input, Box } from "@yamada-ui/react";
+import { X } from "@yamada-ui/lucide";
+import { Input, Box, IconButton, HStack } from "@yamada-ui/react";
 import { useState, useRef, useEffect } from "react";
 
 interface EditableEdgeProps extends EdgeProps {
   data?: {
     label?: string;
     onLabelChange?: (edgeId: string, newLabel: string) => void;
+    onDelete?: (edgeId: string) => void;
   };
 }
 
@@ -68,6 +70,14 @@ export function EditableEdge({
     handleSubmit();
   };
 
+  const handleDelete = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (data?.onDelete) {
+      data.onDelete(id);
+    }
+  };
+
   return (
     <>
       <BaseEdge path={edgePath} markerEnd={markerEnd} />
@@ -94,21 +104,35 @@ export function EditableEdge({
               textAlign="center"
             />
           ) : (
-            <Box
-              onClick={handleClick}
-              bg="white"
-              p="1"
-              px="2"
-              borderRadius="md"
-              fontSize="xs"
-              border="1px solid"
-              borderColor="gray.300"
-              cursor="pointer"
-              minW="20px"
-              textAlign="center"
-            >
-              {edgeLabel || "..."}
-            </Box>
+            <HStack gap="1" align="center">
+              <Box
+                onClick={handleClick}
+                bg="white"
+                p="1"
+                px="2"
+                borderRadius="md"
+                fontSize="xs"
+                border="1px solid"
+                borderColor="gray.300"
+                cursor="pointer"
+                minW="20px"
+                textAlign="center"
+              >
+                {edgeLabel || "..."}
+              </Box>
+              <IconButton
+                aria-label="Delete edge"
+                icon={<X />}
+                size="xs"
+                variant="ghost"
+                colorScheme="red"
+                onClick={handleDelete}
+                bg="white"
+                border="1px solid"
+                borderColor="red.300"
+                _hover={{ bg: "red.50" }}
+              />
+            </HStack>
           )}
         </Box>
       </EdgeLabelRenderer>
