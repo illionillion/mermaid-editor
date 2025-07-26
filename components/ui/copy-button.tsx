@@ -1,3 +1,5 @@
+"use client";
+
 import type { ButtonProps } from "@yamada-ui/react"
 import { CheckIcon, CopyIcon } from "@yamada-ui/lucide"
 import { forwardRef, IconButton, Tooltip, useClipboard } from "@yamada-ui/react"

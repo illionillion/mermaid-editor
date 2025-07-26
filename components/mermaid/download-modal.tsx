@@ -3,7 +3,7 @@
 import { Modal, ModalHeader, ModalBody, ModalCloseButton, HStack, Text, Button } from '@yamada-ui/react';
 import { DownloadIcon } from '@yamada-ui/lucide';
 import { useCallback } from 'react';
-import { CopyButton } from './copy-button';
+import { CopyButton } from '../ui';
 import { MermaidHighlight } from './mermaid-highlight';
 
 interface DownloadModalProps {

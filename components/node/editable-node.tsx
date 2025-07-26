@@ -4,8 +4,7 @@ import { Handle, Position } from '@xyflow/react';
 import { Box } from '@yamada-ui/react';
 import { useState, useRef, MouseEvent, ChangeEvent, KeyboardEvent } from 'react';
 import { NodeMenu } from './node-menu';
-import { VariableNameEditor } from './variable-name-editor';
-import { LabelEditor } from './label-editor';
+import { VariableNameEditor, LabelEditor } from '../editor';
 
 interface EditableNodeProps {
     data: {

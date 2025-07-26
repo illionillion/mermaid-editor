@@ -5,8 +5,8 @@ import { Box, useDisclosure, useToken } from '@yamada-ui/react';
 import { useCallback, useState, useRef, useEffect } from 'react';
 import { nodeTypes } from './node-types';
 import { FlowPanel } from './flow-panel';
-import { DownloadModal } from './download-modal';
-import { getSafeVariableName, formatMermaidShape } from '../utils/mermaid';
+import { DownloadModal } from '../mermaid';
+import { getSafeVariableName, formatMermaidShape } from '../../utils/mermaid';
 
 const initialNodes: Node[] = [
   {

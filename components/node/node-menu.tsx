@@ -1,3 +1,5 @@
+"use client";
+
 import { GripIcon, SquarePenIcon, TrashIcon, TagIcon } from "@yamada-ui/lucide";
 import { IconButton, Menu, MenuButton, MenuItem, MenuList, MenuSeparator } from "@yamada-ui/react";
 import { ShapeSelector } from "./shape-selector";

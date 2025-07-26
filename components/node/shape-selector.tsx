@@ -1,3 +1,5 @@
+"use client";
+
 import { ShapesIcon } from "@yamada-ui/lucide";
 import { Menu, MenuButton, MenuItem, MenuList, Box, Text } from "@yamada-ui/react";
 
