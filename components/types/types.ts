@@ -4,7 +4,6 @@ export type MermaidArrowType =
   | "arrow"           // -->
   | "thick"           // ==>
   | "dotted"          // -.->
-  | "dotted-thick"    // =.=>
   | "invisible"       // ~~~
   | "bidirectional"   // <-->
   | "bidirectional-thick"; // <==>

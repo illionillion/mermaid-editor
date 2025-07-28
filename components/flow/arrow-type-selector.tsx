@@ -14,7 +14,6 @@ const ARROW_TYPES: MermaidArrowType[] = [
   "arrow",
   "thick", 
   "dotted",
-  "dotted-thick",
   "invisible",
   "bidirectional",
   "bidirectional-thick"

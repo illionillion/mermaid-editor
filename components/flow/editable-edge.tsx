@@ -30,6 +30,7 @@ export function EditableEdge({
 }: EditableEdgeProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [edgeLabel, setEdgeLabel] = useState(data?.label || "");
+  const [isComposing, setIsComposing] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const [edgePath, labelX, labelY] = getBezierPath({
@@ -62,12 +63,20 @@ export function EditableEdge({
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter") {
+    if (e.key === "Enter" && !isComposing) {
       handleSubmit();
     } else if (e.key === "Escape") {
       setIsEditing(false);
       setEdgeLabel(data?.label || "");
     }
+  };
+
+  const handleCompositionStart = () => {
+    setIsComposing(true);
+  };
+
+  const handleCompositionEnd = () => {
+    setIsComposing(false);
   };
 
   const handleBlur = () => {
@@ -105,6 +114,8 @@ export function EditableEdge({
               onChange={(e) => setEdgeLabel(e.target.value)}
               onKeyDown={handleKeyDown}
               onBlur={handleBlur}
+              onCompositionStart={handleCompositionStart}
+              onCompositionEnd={handleCompositionEnd}
               size="sm"
               w="120px"
               bg="white"
