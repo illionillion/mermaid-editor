@@ -3,8 +3,9 @@
 import { ReactFlow, Node, Edge, addEdge, Controls, Background, useNodesState, useEdgesState, useReactFlow, Connection, OnConnectStartParams, OnConnectEnd } from "@xyflow/react";
 import { Box, useDisclosure, useToken } from "@yamada-ui/react";
 import { useCallback, useState, useRef, useEffect } from "react";
-import { getSafeVariableName, formatMermaidShape } from "../../utils/mermaid";
+import { getSafeVariableName, formatMermaidShape, formatMermaidArrow } from "../../utils/mermaid";
 import { DownloadModal } from "../mermaid";
+import { MermaidArrowType } from "../types/types";
 import { edgeTypes } from "./edge-types";
 import { FlowPanel } from "./flow-panel";
 import { nodeTypes } from "./node-types";
@@ -21,7 +22,7 @@ const initialNodes: Node[] = [
         // ノードの形状タイプ
         shapeType: "rectangle",
         // 削除機能は後でuseEffectで追加される
-    },
+    }
   },
 ];
 
@@ -105,6 +106,17 @@ export function FlowEditor() {
     setEdges((eds) => eds.filter((edge) => edge.id !== edgeId));
   }, [setEdges]);
 
+  // エッジ矢印タイプ変更のハンドラー
+  const handleEdgeArrowTypeChange = useCallback((edgeId: string, arrowType: MermaidArrowType) => {
+    setEdges((eds) =>
+      eds.map((edge) =>
+        edge.id === edgeId
+          ? { ...edge, data: { ...edge.data, arrowType } }
+          : edge
+      )
+    );
+  }, [setEdges]);
+
   // 初期ノードにhandleLabelChangeとhandleNodeDeleteを追加
   useEffect(() => {
     setNodes((nds) =>
@@ -130,11 +142,12 @@ export function FlowEditor() {
         data: {
           ...edge.data,
           onLabelChange: handleEdgeLabelChange,
+          onArrowTypeChange: handleEdgeArrowTypeChange,
           onDelete: handleEdgeDelete,
         },
       }))
     );
-  }, [handleEdgeLabelChange, handleEdgeDelete, setEdges]);
+  }, [handleEdgeLabelChange, handleEdgeArrowTypeChange, handleEdgeDelete, setEdges]);
 
   const onConnect = useCallback(
     (params: Connection) => {
@@ -143,7 +156,9 @@ export function FlowEditor() {
         type: "editableEdge",
         data: {
           label: "",
+          arrowType: "arrow" as MermaidArrowType,
           onLabelChange: handleEdgeLabelChange,
+          onArrowTypeChange: handleEdgeArrowTypeChange,
           onDelete: handleEdgeDelete,
         },
       };
@@ -151,7 +166,7 @@ export function FlowEditor() {
       // 既存のノードに接続された場合、フラグを設定
       connectingNodeId.current = "connected";
     },
-    [setEdges, handleEdgeLabelChange, handleEdgeDelete]
+    [setEdges, handleEdgeLabelChange, handleEdgeArrowTypeChange, handleEdgeDelete]
   );
 
   const onConnectStart = useCallback((_: MouseEvent | TouchEvent | null, params: OnConnectStartParams) => {
@@ -217,7 +232,9 @@ export function FlowEditor() {
           target: handleType === "source" ? nodeId.toString() : sourceNodeId,
           data: {
             label: "",
+            arrowType: "arrow" as MermaidArrowType,
             onLabelChange: handleEdgeLabelChange,
+            onArrowTypeChange: handleEdgeArrowTypeChange,
             onDelete: handleEdgeDelete,
           },
         };
@@ -228,7 +245,7 @@ export function FlowEditor() {
 
       connectingNodeId.current = null;
     },
-    [nodeId, setNodes, setEdges, screenToFlowPosition, handleLabelChange, handleVariableNameChange, handleShapeTypeChange, handleNodeDelete, handleEdgeLabelChange, handleEdgeDelete, nodes, nodeWidth, nodeHeight]
+    [nodeId, setNodes, setEdges, screenToFlowPosition, handleLabelChange, handleVariableNameChange, handleShapeTypeChange, handleNodeDelete, handleEdgeLabelChange, handleEdgeArrowTypeChange, handleEdgeDelete, nodes, nodeWidth, nodeHeight]
   );
 
   const addNode = useCallback(() => {
@@ -273,12 +290,10 @@ export function FlowEditor() {
         const sourceVariableName = getSafeVariableName((sourceNode.data.variableName as string) || `node${sourceNode.id}`);
         const targetVariableName = getSafeVariableName((targetNode.data.variableName as string) || `node${targetNode.id}`);
         const edgeLabel = edge.data?.label as string | undefined;
+        const arrowType = edge.data?.arrowType as MermaidArrowType || "arrow";
         
-        if (edgeLabel && edgeLabel.trim() !== "") {
-          code += `    ${sourceVariableName} -->|${edgeLabel}| ${targetVariableName}\n`;
-        } else {
-          code += `    ${sourceVariableName} --> ${targetVariableName}\n`;
-        }
+        const arrowCode = formatMermaidArrow(arrowType, edgeLabel);
+        code += `    ${sourceVariableName}${arrowCode}${targetVariableName}\n`;
       }
     });
     

@@ -1,3 +1,5 @@
+import { MermaidArrowType } from "../components/types/types";
+
 // Mermaidの予約語リスト
 const RESERVED_WORDS = new Set([
   "end", "start", "subgraph", "class", "classDef", "click", "style",
@@ -68,5 +70,60 @@ export const formatMermaidShape = (shapeType: string, label: string): string => 
       return `([${label}])`;
     default:
       return `[${label}]`; // デフォルトは四角形
+  }
+};
+
+/**
+ * 矢印タイプをMermaidの記法に変換する
+ * @param arrowType 矢印タイプ
+ * @param label エッジラベル
+ * @returns Mermaidの矢印記法
+ */
+export const formatMermaidArrow = (arrowType: MermaidArrowType = "arrow", label?: string): string => {
+  const labelPart = label && label.trim() !== "" ? `|${label}|` : "";
+  
+  switch (arrowType) {
+    case "arrow":
+      return ` -->${labelPart} `;
+    case "thick":
+      return ` ==>${labelPart} `;
+    case "dotted":
+      return ` -.${labelPart}-> `;
+    case "dotted-thick":
+      return ` =.${labelPart}=> `;
+    case "invisible":
+      return ` ~~~${labelPart} `;
+    case "bidirectional":
+      return ` <-->${labelPart} `;
+    case "bidirectional-thick":
+      return ` <==>${labelPart} `;
+    default:
+      return ` -->${labelPart} `;
+  }
+};
+
+/**
+ * 矢印タイプの表示名を取得する
+ * @param arrowType 矢印タイプ
+ * @returns 表示名
+ */
+export const getArrowTypeDisplayName = (arrowType: MermaidArrowType): string => {
+  switch (arrowType) {
+    case "arrow":
+      return "通常の矢印 (→)";
+    case "thick":
+      return "太い矢印 (⟹)";
+    case "dotted":
+      return "点線矢印 (⋯→)";
+    case "dotted-thick":
+      return "太い点線矢印 (⋯⟹)";
+    case "invisible":
+      return "非表示 (~)";
+    case "bidirectional":
+      return "双方向矢印 (↔)";
+    case "bidirectional-thick":
+      return "太い双方向矢印 (⟸⟹)";
+    default:
+      return "通常の矢印 (→)";
   }
 };
