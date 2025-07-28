@@ -1,7 +1,7 @@
 "use client";
 
 import { ChevronDownIcon } from "@yamada-ui/lucide";
-import { Menu, MenuButton, MenuList, MenuItem, IconButton } from "@yamada-ui/react";
+import { Menu, MenuButton, MenuList, MenuItem, IconButton, Portal } from "@yamada-ui/react";
 import { getArrowTypeDisplayName } from "../../utils/mermaid";
 import { MermaidArrowType } from "../types/types";
 
@@ -22,12 +22,9 @@ const ARROW_TYPES: MermaidArrowType[] = [
 
 export function ArrowTypeSelector({ currentArrowType, onArrowTypeChange }: ArrowTypeSelectorProps) {
   return (
-    <Menu __styles={{
-        ".ui-popover": {
-            // zIndex: 1000, 効かない
-        }
-    }}>
+    <Menu>
       <MenuButton
+        className="arrow-type-selector-button"
         as={IconButton}
         aria-label="Select arrow type"
         icon={<ChevronDownIcon />}
@@ -38,19 +35,21 @@ export function ArrowTypeSelector({ currentArrowType, onArrowTypeChange }: Arrow
         borderColor="gray.300"
         _hover={{ bg: "gray.50" }}
       />
-      <MenuList>
-        {ARROW_TYPES.map((arrowType) => (
-          <MenuItem 
-            key={arrowType}
-            onClick={() => onArrowTypeChange(arrowType)}
-            bg={currentArrowType === arrowType ? "blue.50" : "white"}
-            color={currentArrowType === arrowType ? "blue.600" : "gray.700"}
-            fontSize="sm"
-          >
-            {getArrowTypeDisplayName(arrowType)}
-          </MenuItem>
-        ))}
-      </MenuList>
+      <Portal>
+        <MenuList bg="white" boxShadow="lg" border="1px solid" borderColor="gray.200">
+          {ARROW_TYPES.map((arrowType) => (
+            <MenuItem 
+              key={arrowType}
+              onClick={() => onArrowTypeChange(arrowType)}
+              bg={currentArrowType === arrowType ? "blue.50" : "white"}
+              color={currentArrowType === arrowType ? "blue.600" : "gray.700"}
+              fontSize="sm"
+            >
+              {getArrowTypeDisplayName(arrowType)}
+            </MenuItem>
+          ))}
+        </MenuList>
+      </Portal>
     </Menu>
   );
 }
