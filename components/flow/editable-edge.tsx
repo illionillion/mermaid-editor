@@ -4,11 +4,15 @@ import { BaseEdge, EdgeLabelRenderer, EdgeProps, getBezierPath } from "@xyflow/r
 import { X } from "@yamada-ui/lucide";
 import { Input, Box, IconButton, HStack } from "@yamada-ui/react";
 import { useState, useRef, useEffect } from "react";
+import { MermaidArrowType } from "../types/types";
+import { ArrowTypeSelector } from "./arrow-type-selector";
 
 interface EditableEdgeProps extends EdgeProps {
   data?: {
     label?: string;
+    arrowType?: MermaidArrowType;
     onLabelChange?: (edgeId: string, newLabel: string) => void;
+    onArrowTypeChange?: (edgeId: string, arrowType: MermaidArrowType) => void;
     onDelete?: (edgeId: string) => void;
   };
 }
@@ -26,6 +30,7 @@ export function EditableEdge({
 }: EditableEdgeProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [edgeLabel, setEdgeLabel] = useState(data?.label || "");
+  const [isComposing, setIsComposing] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const [edgePath, labelX, labelY] = getBezierPath({
@@ -58,7 +63,7 @@ export function EditableEdge({
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter") {
+    if (e.key === "Enter" && !isComposing) {
       handleSubmit();
     } else if (e.key === "Escape") {
       setIsEditing(false);
@@ -66,8 +71,22 @@ export function EditableEdge({
     }
   };
 
+  const handleCompositionStart = () => {
+    setIsComposing(true);
+  };
+
+  const handleCompositionEnd = () => {
+    setIsComposing(false);
+  };
+
   const handleBlur = () => {
     handleSubmit();
+  };
+
+  const handleArrowTypeChange = (arrowType: MermaidArrowType) => {
+    if (data?.onArrowTypeChange) {
+      data.onArrowTypeChange(id, arrowType);
+    }
   };
 
   const handleDelete = (e: React.MouseEvent) => {
@@ -95,6 +114,8 @@ export function EditableEdge({
               onChange={(e) => setEdgeLabel(e.target.value)}
               onKeyDown={handleKeyDown}
               onBlur={handleBlur}
+              onCompositionStart={handleCompositionStart}
+              onCompositionEnd={handleCompositionEnd}
               size="sm"
               w="120px"
               bg="white"
@@ -120,6 +141,10 @@ export function EditableEdge({
               >
                 {edgeLabel || "..."}
               </Box>
+              <ArrowTypeSelector 
+                currentArrowType={data?.arrowType || "arrow"}
+                onArrowTypeChange={handleArrowTypeChange}
+              />
               <IconButton
                 aria-label="Delete edge"
                 icon={<X />}
