@@ -41,12 +41,15 @@ yarn dev
 ## 📦 ビルド・デプロイ
 
 ### ローカルビルド
+
 ```bash
 pnpm build
 ```
 
 ### 自動デプロイ
+
 mainブランチにプッシュすると、GitHub Actionsが自動的に：
+
 1. アプリケーションをビルド
 2. `docs`フォルダに静的ファイルを出力
 3. GitHub Pagesにデプロイ

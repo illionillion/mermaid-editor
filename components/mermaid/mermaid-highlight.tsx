@@ -11,20 +11,14 @@ interface MermaidHighlightProps {
   fontSize?: string;
 }
 
-export function MermaidHighlight({ 
-  code, 
-  showLineNumbers = true, 
+export function MermaidHighlight({
+  code,
+  showLineNumbers = true,
   minHeight = "400px",
-  fontSize = "14px"
+  fontSize = "14px",
 }: MermaidHighlightProps) {
   return (
-    <Box
-      w="full"
-      borderRadius="md"
-      overflow="hidden"
-      border="1px solid"
-      borderColor="border"
-    >
+    <Box w="full" borderRadius="md" overflow="hidden" border="1px solid" borderColor="border">
       <SyntaxHighlighter
         language="mermaid"
         style={vscDarkPlus}

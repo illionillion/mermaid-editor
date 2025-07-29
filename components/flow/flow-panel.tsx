@@ -21,20 +21,10 @@ export function FlowPanel({ onAddNode, onGenerateCode }: FlowPanelProps) {
             💡 ヒント: ノードをダブルクリックで編集、ドラッグして空の場所で新ノード作成
           </Text>
           <HStack gap={2}>
-            <Button
-              startIcon={<PlusIcon />}
-              colorScheme="blue"
-              size="sm"
-              onClick={onAddNode}
-            >
+            <Button startIcon={<PlusIcon />} colorScheme="blue" size="sm" onClick={onAddNode}>
               ノード追加
             </Button>
-            <Button
-              startIcon={<CodeIcon />}
-              colorScheme="green"
-              size="sm"
-              onClick={onGenerateCode}
-            >
+            <Button startIcon={<CodeIcon />} colorScheme="green" size="sm" onClick={onGenerateCode}>
               コード生成
             </Button>
           </HStack>

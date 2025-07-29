@@ -1,17 +1,17 @@
 "use client";
 
-import { CheckIcon, CopyIcon } from "@yamada-ui/lucide"
-import type { ButtonProps } from "@yamada-ui/react"
-import { forwardRef, IconButton, Tooltip, useClipboard } from "@yamada-ui/react"
-import { memo } from "react"
+import { CheckIcon, CopyIcon } from "@yamada-ui/lucide";
+import type { ButtonProps } from "@yamada-ui/react";
+import { forwardRef, IconButton, Tooltip, useClipboard } from "@yamada-ui/react";
+import { memo } from "react";
 
 export interface CopyButtonProps extends Omit<ButtonProps, "value"> {
-  value: string
+  value: string;
 }
 
 export const CopyButton = memo(
   forwardRef<CopyButtonProps, "button">(({ value, ...rest }, ref) => {
-    const { hasCopied, onCopy } = useClipboard(value)
+    const { hasCopied, onCopy } = useClipboard(value);
 
     return (
       <Tooltip
@@ -35,9 +35,7 @@ export const CopyButton = memo(
           borderColor={hasCopied ? "success" : "whiteAlpha.600"}
           color={hasCopied ? "success" : "whiteAlpha.600"}
           display="flex"
-          icon={
-            hasCopied ? <CheckIcon fontSize="lg" /> : <CopyIcon fontSize="md" />
-          }
+          icon={hasCopied ? <CheckIcon fontSize="lg" /> : <CopyIcon fontSize="md" />}
           justifyContent="center"
           _hover={{
             borderColor: hasCopied ? "success" : "whiteAlpha.800",
@@ -47,6 +45,6 @@ export const CopyButton = memo(
           onClick={onCopy}
         />
       </Tooltip>
-    )
-  }),
-)
+    );
+  })
+);

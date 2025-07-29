@@ -141,7 +141,7 @@ export function EditableEdge({
               >
                 {edgeLabel || "..."}
               </Box>
-              <ArrowTypeSelector 
+              <ArrowTypeSelector
                 currentArrowType={data?.arrowType || "arrow"}
                 onArrowTypeChange={handleArrowTypeChange}
               />

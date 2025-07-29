@@ -1,6 +1,19 @@
 "use client";
 
-import { ReactFlow, Node, Edge, addEdge, Controls, Background, useNodesState, useEdgesState, useReactFlow, Connection, OnConnectStartParams, OnConnectEnd } from "@xyflow/react";
+import {
+  ReactFlow,
+  Node,
+  Edge,
+  addEdge,
+  Controls,
+  Background,
+  useNodesState,
+  useEdgesState,
+  useReactFlow,
+  Connection,
+  OnConnectStartParams,
+  OnConnectEnd,
+} from "@xyflow/react";
 import { Box, useDisclosure, useToken } from "@yamada-ui/react";
 import { useCallback, useState, useRef, useEffect } from "react";
 import { getSafeVariableName, formatMermaidShape, formatMermaidArrow } from "../../utils/mermaid";
@@ -15,14 +28,14 @@ const initialNodes: Node[] = [
     id: "1",
     type: "editableNode",
     position: { x: 250, y: 5 },
-    data: { 
-        label: "Start",
-        // 表示名と変数名を持ちたい
-        variableName: "startNode",
-        // ノードの形状タイプ
-        shapeType: "rectangle",
-        // 削除機能は後でuseEffectで追加される
-    }
+    data: {
+      label: "Start",
+      // 表示名と変数名を持ちたい
+      variableName: "startNode",
+      // ノードの形状タイプ
+      shapeType: "rectangle",
+      // 削除機能は後でuseEffectで追加される
+    },
   },
 ];
 
@@ -40,82 +53,95 @@ export function FlowEditor() {
   // ノードサイズをトークンから取得（フォールバック値あり）
   const nodeWidthToken = useToken("sizes", "xs");
   const nodeHeightToken = useToken("sizes", "6xs");
-  
+
   // 文字列から数値に変換（pxを取り除いて数値化）
   const parseSize = (sizeStr: string | undefined, fallback: number): number => {
     if (!sizeStr) return fallback;
     const numValue = parseFloat(sizeStr.replace("px", "").replace("rem", ""));
-    return isNaN(numValue) ? fallback : (sizeStr.includes("rem") ? numValue * 16 : numValue);
+    return isNaN(numValue) ? fallback : sizeStr.includes("rem") ? numValue * 16 : numValue;
   };
-  
+
   const nodeWidth = parseSize(nodeWidthToken, 80); // フォールバック: 80px
   const nodeHeight = parseSize(nodeHeightToken, 48); // フォールバック: 48px
 
   // ノードラベル変更のハンドラー
-  const handleLabelChange = useCallback((nodeId: string, newLabel: string) => {
-    setNodes((nds) =>
-      nds.map((node) =>
-        node.id === nodeId
-          ? { ...node, data: { ...node.data, label: newLabel } }
-          : node
-      )
-    );
-  }, [setNodes]);
+  const handleLabelChange = useCallback(
+    (nodeId: string, newLabel: string) => {
+      setNodes((nds) =>
+        nds.map((node) =>
+          node.id === nodeId ? { ...node, data: { ...node.data, label: newLabel } } : node
+        )
+      );
+    },
+    [setNodes]
+  );
 
   // ノード変数名変更のハンドラー
-  const handleVariableNameChange = useCallback((nodeId: string, newVariableName: string) => {
-    setNodes((nds) =>
-      nds.map((node) =>
-        node.id === nodeId
-          ? { ...node, data: { ...node.data, variableName: newVariableName } }
-          : node
-      )
-    );
-  }, [setNodes]);
+  const handleVariableNameChange = useCallback(
+    (nodeId: string, newVariableName: string) => {
+      setNodes((nds) =>
+        nds.map((node) =>
+          node.id === nodeId
+            ? { ...node, data: { ...node.data, variableName: newVariableName } }
+            : node
+        )
+      );
+    },
+    [setNodes]
+  );
 
   // ノード形状変更のハンドラー
-  const handleShapeTypeChange = useCallback((nodeId: string, newShapeType: string) => {
-    setNodes((nds) =>
-      nds.map((node) =>
-        node.id === nodeId
-          ? { ...node, data: { ...node.data, shapeType: newShapeType } }
-          : node
-      )
-    );
-  }, [setNodes]);
+  const handleShapeTypeChange = useCallback(
+    (nodeId: string, newShapeType: string) => {
+      setNodes((nds) =>
+        nds.map((node) =>
+          node.id === nodeId ? { ...node, data: { ...node.data, shapeType: newShapeType } } : node
+        )
+      );
+    },
+    [setNodes]
+  );
 
   // ノード削除のハンドラー
-  const handleNodeDelete = useCallback((nodeId: string) => {
-    setNodes((nds) => nds.filter((node) => node.id !== nodeId));
-    setEdges((eds) => eds.filter((edge) => edge.source !== nodeId && edge.target !== nodeId));
-  }, [setNodes, setEdges]);
+  const handleNodeDelete = useCallback(
+    (nodeId: string) => {
+      setNodes((nds) => nds.filter((node) => node.id !== nodeId));
+      setEdges((eds) => eds.filter((edge) => edge.source !== nodeId && edge.target !== nodeId));
+    },
+    [setNodes, setEdges]
+  );
 
   // エッジラベル変更のハンドラー
-  const handleEdgeLabelChange = useCallback((edgeId: string, newLabel: string) => {
-    setEdges((eds) =>
-      eds.map((edge) =>
-        edge.id === edgeId
-          ? { ...edge, data: { ...edge.data, label: newLabel } }
-          : edge
-      )
-    );
-  }, [setEdges]);
+  const handleEdgeLabelChange = useCallback(
+    (edgeId: string, newLabel: string) => {
+      setEdges((eds) =>
+        eds.map((edge) =>
+          edge.id === edgeId ? { ...edge, data: { ...edge.data, label: newLabel } } : edge
+        )
+      );
+    },
+    [setEdges]
+  );
 
   // エッジ削除のハンドラー
-  const handleEdgeDelete = useCallback((edgeId: string) => {
-    setEdges((eds) => eds.filter((edge) => edge.id !== edgeId));
-  }, [setEdges]);
+  const handleEdgeDelete = useCallback(
+    (edgeId: string) => {
+      setEdges((eds) => eds.filter((edge) => edge.id !== edgeId));
+    },
+    [setEdges]
+  );
 
   // エッジ矢印タイプ変更のハンドラー
-  const handleEdgeArrowTypeChange = useCallback((edgeId: string, arrowType: MermaidArrowType) => {
-    setEdges((eds) =>
-      eds.map((edge) =>
-        edge.id === edgeId
-          ? { ...edge, data: { ...edge.data, arrowType } }
-          : edge
-      )
-    );
-  }, [setEdges]);
+  const handleEdgeArrowTypeChange = useCallback(
+    (edgeId: string, arrowType: MermaidArrowType) => {
+      setEdges((eds) =>
+        eds.map((edge) =>
+          edge.id === edgeId ? { ...edge, data: { ...edge.data, arrowType } } : edge
+        )
+      );
+    },
+    [setEdges]
+  );
 
   // 初期ノードにhandleLabelChangeとhandleNodeDeleteを追加
   useEffect(() => {
@@ -131,7 +157,13 @@ export function FlowEditor() {
         },
       }))
     );
-  }, [handleLabelChange, handleVariableNameChange, handleShapeTypeChange, handleNodeDelete, setNodes]);
+  }, [
+    handleLabelChange,
+    handleVariableNameChange,
+    handleShapeTypeChange,
+    handleNodeDelete,
+    setNodes,
+  ]);
 
   // エッジにハンドラーを追加
   useEffect(() => {
@@ -169,16 +201,19 @@ export function FlowEditor() {
     [setEdges, handleEdgeLabelChange, handleEdgeArrowTypeChange, handleEdgeDelete]
   );
 
-  const onConnectStart = useCallback((_: MouseEvent | TouchEvent | null, params: OnConnectStartParams) => {
-    connectingNodeId.current = params.nodeId;
-    // ハンドルタイプも保存
-    connectingNodeId.current = `${params.nodeId}-${params.handleType}`;
-  }, []);
+  const onConnectStart = useCallback(
+    (_: MouseEvent | TouchEvent | null, params: OnConnectStartParams) => {
+      connectingNodeId.current = params.nodeId;
+      // ハンドルタイプも保存
+      connectingNodeId.current = `${params.nodeId}-${params.handleType}`;
+    },
+    []
+  );
 
   const onConnectEnd: OnConnectEnd = useCallback(
     (event) => {
       if (!connectingNodeId.current) return;
-      
+
       // 既存のノードに接続された場合は新しいノードを作成しない
       if (connectingNodeId.current === "connected") {
         connectingNodeId.current = null;
@@ -190,9 +225,9 @@ export function FlowEditor() {
       if (targetIsPane && event) {
         // 接続情報を解析
         const [sourceNodeId, handleType] = connectingNodeId.current.split("-");
-        
+
         // 元のノードの位置を取得
-        const sourceNode = nodes.find(node => node.id === sourceNodeId);
+        const sourceNode = nodes.find((node) => node.id === sourceNodeId);
         if (!sourceNode) return;
 
         // マウス位置を取得
@@ -211,7 +246,7 @@ export function FlowEditor() {
           id: nodeId.toString(),
           type: "editableNode",
           position: newPosition,
-          data: { 
+          data: {
             label: `Node ${nodeId}`,
             variableName: `node${nodeId}`,
             shapeType: "rectangle",
@@ -223,7 +258,7 @@ export function FlowEditor() {
         };
 
         setNodes((nds) => nds.concat(newNode));
-        
+
         // 新しいノードへのエッジを作成（方向を考慮）
         const newEdge: Edge = {
           id: `${sourceNodeId}-${nodeId}`,
@@ -245,7 +280,22 @@ export function FlowEditor() {
 
       connectingNodeId.current = null;
     },
-    [nodeId, setNodes, setEdges, screenToFlowPosition, handleLabelChange, handleVariableNameChange, handleShapeTypeChange, handleNodeDelete, handleEdgeLabelChange, handleEdgeArrowTypeChange, handleEdgeDelete, nodes, nodeWidth, nodeHeight]
+    [
+      nodeId,
+      setNodes,
+      setEdges,
+      screenToFlowPosition,
+      handleLabelChange,
+      handleVariableNameChange,
+      handleShapeTypeChange,
+      handleNodeDelete,
+      handleEdgeLabelChange,
+      handleEdgeArrowTypeChange,
+      handleEdgeDelete,
+      nodes,
+      nodeWidth,
+      nodeHeight,
+    ]
   );
 
   const addNode = useCallback(() => {
@@ -253,7 +303,7 @@ export function FlowEditor() {
       id: nodeId.toString(),
       type: "editableNode",
       position: { x: Math.random() * 500, y: Math.random() * 500 },
-      data: { 
+      data: {
         label: `Node ${nodeId}`,
         variableName: `node${nodeId}`,
         shapeType: "rectangle",
@@ -265,7 +315,14 @@ export function FlowEditor() {
     };
     setNodes((nds) => nds.concat(newNode));
     setNodeId(nodeId + 1);
-  }, [nodeId, setNodes, handleLabelChange, handleVariableNameChange, handleShapeTypeChange, handleNodeDelete]);
+  }, [
+    nodeId,
+    setNodes,
+    handleLabelChange,
+    handleVariableNameChange,
+    handleShapeTypeChange,
+    handleNodeDelete,
+  ]);
 
   const generateMermaidCode = useCallback(() => {
     let code = "flowchart TD\n";
@@ -279,24 +336,28 @@ export function FlowEditor() {
       const shapeCode = formatMermaidShape(shapeType, label);
       code += `    ${safeVariableName}${shapeCode}\n`;
     });
-    
+
     // エッジの定義
     edges.forEach((edge) => {
       // ノードIDから変数名を取得
-      const sourceNode = nodes.find(node => node.id === edge.source);
-      const targetNode = nodes.find(node => node.id === edge.target);
-      
+      const sourceNode = nodes.find((node) => node.id === edge.source);
+      const targetNode = nodes.find((node) => node.id === edge.target);
+
       if (sourceNode && targetNode) {
-        const sourceVariableName = getSafeVariableName((sourceNode.data.variableName as string) || `node${sourceNode.id}`);
-        const targetVariableName = getSafeVariableName((targetNode.data.variableName as string) || `node${targetNode.id}`);
+        const sourceVariableName = getSafeVariableName(
+          (sourceNode.data.variableName as string) || `node${sourceNode.id}`
+        );
+        const targetVariableName = getSafeVariableName(
+          (targetNode.data.variableName as string) || `node${targetNode.id}`
+        );
         const edgeLabel = edge.data?.label as string | undefined;
-        const arrowType = edge.data?.arrowType as MermaidArrowType || "arrow";
-        
+        const arrowType = (edge.data?.arrowType as MermaidArrowType) || "arrow";
+
         const arrowCode = formatMermaidArrow(arrowType, edgeLabel);
         code += `    ${sourceVariableName}${arrowCode}${targetVariableName}\n`;
       }
     });
-    
+
     setMermaidCode(code);
     onOpen();
   }, [nodes, edges, onOpen]);
@@ -320,11 +381,7 @@ export function FlowEditor() {
         <FlowPanel onAddNode={addNode} onGenerateCode={generateMermaidCode} />
       </ReactFlow>
 
-      <DownloadModal 
-        open={open} 
-        onClose={onClose} 
-        mermaidCode={mermaidCode} 
-      />
+      <DownloadModal open={open} onClose={onClose} mermaidCode={mermaidCode} />
     </Box>
   );
 }

@@ -12,11 +12,11 @@ interface ArrowTypeSelectorProps {
 
 const ARROW_TYPES: MermaidArrowType[] = [
   "arrow",
-  "thick", 
+  "thick",
   "dotted",
   "invisible",
   "bidirectional",
-  "bidirectional-thick"
+  "bidirectional-thick",
 ];
 
 export function ArrowTypeSelector({ currentArrowType, onArrowTypeChange }: ArrowTypeSelectorProps) {
@@ -37,7 +37,7 @@ export function ArrowTypeSelector({ currentArrowType, onArrowTypeChange }: Arrow
       <Portal>
         <MenuList bg="white" boxShadow="lg" border="1px solid" borderColor="gray.200">
           {ARROW_TYPES.map((arrowType) => (
-            <MenuItem 
+            <MenuItem
               key={arrowType}
               onClick={() => onArrowTypeChange(arrowType)}
               bg={currentArrowType === arrowType ? "blue.50" : "white"}

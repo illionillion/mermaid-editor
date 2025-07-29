@@ -1,11 +1,11 @@
 import { Node, Edge } from "@xyflow/react";
 
-export type MermaidArrowType = 
-  | "arrow"           // -->
-  | "thick"           // ==>
-  | "dotted"          // -.->
-  | "invisible"       // ~~~
-  | "bidirectional"   // <-->
+export type MermaidArrowType =
+  | "arrow" // -->
+  | "thick" // ==>
+  | "dotted" // -.->
+  | "invisible" // ~~~
+  | "bidirectional" // <-->
   | "bidirectional-thick"; // <==>
 
 export interface MermaidNode extends Node {
