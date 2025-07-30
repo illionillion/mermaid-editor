@@ -4,6 +4,7 @@ import { BaseEdge, EdgeLabelRenderer, EdgeProps, getBezierPath } from "@xyflow/r
 import { X } from "@yamada-ui/lucide";
 import { Input, Box, IconButton, HStack } from "@yamada-ui/react";
 import { useState, useRef, useEffect } from "react";
+import { getArrowTypeSymbol } from "../../utils/mermaid";
 import { MermaidArrowType } from "../types/types";
 import { ArrowTypeSelector } from "./arrow-type-selector";
 
@@ -138,8 +139,14 @@ export function EditableEdge({
                 cursor="pointer"
                 minW="20px"
                 textAlign="center"
+                display="flex"
+                alignItems="center"
+                gap="1"
               >
-                {edgeLabel || "..."}
+                <Box as="span" color="blue.600" fontWeight="bold">
+                  {getArrowTypeSymbol(data?.arrowType || "arrow")}
+                </Box>
+                <Box as="span">{edgeLabel || "..."}</Box>
               </Box>
               <ArrowTypeSelector
                 currentArrowType={data?.arrowType || "arrow"}

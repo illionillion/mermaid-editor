@@ -148,6 +148,30 @@ export const formatMermaidArrow = (
 };
 
 /**
+ * 矢印タイプの記号を取得する
+ * @param arrowType 矢印タイプ
+ * @returns 矢印記号
+ */
+export const getArrowTypeSymbol = (arrowType: MermaidArrowType): string => {
+  switch (arrowType) {
+    case "arrow":
+      return "→";
+    case "thick":
+      return "⇒";
+    case "dotted":
+      return "⇢";
+    case "invisible":
+      return "～";
+    case "bidirectional":
+      return "↔";
+    case "bidirectional-thick":
+      return "⇔";
+    default:
+      return "→";
+  }
+};
+
+/**
  * 矢印タイプの表示名を取得する
  * @param arrowType 矢印タイプ
  * @returns 表示名
