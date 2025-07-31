@@ -1,19 +1,37 @@
 # Mermaid フローチャート エディター
 
-ReactFlowを使ったMermaidフローチャートのGUIエディターです。ドラッグ&ドロップでフローチャートを作成し、Mermaid形式のコードとして出力できます。
+ReactFlowを使った高機能なMermaidフローチャートのGUIエディターです。直感的なドラッグ&ドロップ操作でフローチャートを作成し、Mermaid形式のコードとして出力できます。
 
 ## 🌐 Live Demo
 
 GitHub Pagesで公開されています：
-**[https://github.com/illionillion/mermaid-editor/](https://github.com/illionillion/mermaid-editor/)**
+**[https://illionillion.github.io/mermaid-editor/](https://illionillion.github.io/mermaid-editor/)**
 
-## ✨ 機能
+## ✨ 主要機能
 
-- 📝 ノードをダブルクリックでテキスト編集
-- 🔗 ドラッグ&ドロップでノード間を接続
-- ➕ エッジを空の場所にドロップして新しいノード作成
-- 📋 Mermaidコードの生成・コピー・ダウンロード
-- 🎨 直感的なビジュアルインターフェース
+### 📝 ノード編集機能
+- **ダブルクリック編集**: ノードラベルをダブルクリックで直接編集
+- **変数名編集**: ノード左上の変数名をクリックして編集
+- **図形変更**: ノードメニューから矩形、円形、菱形、六角形を選択可能
+- **ノード削除**: 右クリックメニューまたはノードメニューから削除
+
+### 🔗 接続・フロー機能
+- **ドラッグ接続**: ノード間をドラッグして矢印で接続
+- **エッジタイプ**: 実線、点線、太線の矢印タイプを選択可能
+- **自動ノード作成**: エッジを空の場所にドロップして新しいノード作成
+- **エッジ削除**: エッジをクリックして削除
+
+### 📋 コード生成・エクスポート
+- **Mermaidコード生成**: リアルタイムでMermaid形式のコードを生成
+- **コピー機能**: ワンクリックでクリップボードにコピー
+- **ダウンロード**: `.mmd`ファイルとしてダウンロード
+- **シンタックスハイライト**: 生成されたコードを見やすく表示
+
+### 🎨 UI・UX
+- **直感的操作**: マウス操作だけでフローチャート作成
+- **日本語対応**: 完全日本語インターフェース
+- **レスポンシブ**: デスクトップ・タブレット対応
+- **リアルタイムプレビュー**: 編集内容を即座に反映
 
 ## 🚀 Getting Started
 
@@ -31,12 +49,14 @@ yarn dev
 
 ## 🛠️ 技術スタック
 
-- **Next.js 14** (App Router)
-- **ReactFlow** - フローチャート作成
-- **Yamada UI** - UIコンポーネント
-- **TypeScript** - 型安全性
-- **GitHub Actions** - 自動デプロイ
-- **GitHub Pages** - ホスティング
+- **Next.js 14** (App Router) - フルスタックReactフレームワーク
+- **ReactFlow** - 高性能フローチャートライブラリ
+- **Yamada UI** - モダンなReact UIコンポーネント
+- **TypeScript** - 型安全な開発環境
+- **React Syntax Highlighter** - コードシンタックスハイライト
+- **GitHub Actions** - CI/CD パイプライン
+- **GitHub Pages** - 静的サイトホスティング
+- **pnpm** - 高速パッケージマネージャー
 
 ## 📦 ビルド・デプロイ
 
@@ -48,38 +68,152 @@ pnpm build
 
 ### 自動デプロイ
 
-mainブランチにプッシュすると、GitHub Actionsが自動的に：
+## 🚀 デプロイ
 
-1. アプリケーションをビルド
-2. `docs`フォルダに静的ファイルを出力
-3. GitHub Pagesにデプロイ
+### GitHub Pages 自動デプロイ
+
+このプロジェクトは GitHub Actions を使用して自動デプロイされます：
+
+1. **mainブランチにプッシュ**すると自動的に：
+   - Next.js アプリケーションをビルド
+   - 静的ファイルを `docs/` フォルダに出力
+   - GitHub Pages にデプロイ
+
+2. **デプロイ設定**:
+   - `next.config.mjs` でstatic export設定
+   - `.github/workflows/deploy.yml` でCI/CD設定
+   - GitHub Pages settings で `docs/` フォルダを配信元に設定
+
+### 手動デプロイ
+
+```bash
+# プロダクションビルド
+pnpm build
+
+# ローカルで確認
+pnpm start
+```
+
+## 🤝 コントリビューション
+
+プルリクエストやイシューの報告を歓迎します！
+
+1. このリポジトリをフォーク
+2. 機能ブランチを作成 (`git checkout -b feature/amazing-feature`)
+3. 変更をコミット (`git commit -m 'Add some amazing feature'`)
+4. ブランチにプッシュ (`git push origin feature/amazing-feature`)
+5. プルリクエストを作成
+
+## 📄 ライセンス
+
+このプロジェクトはMITライセンスの下で公開されています。
+
+## 👨‍💻 作者
+
+**illionillion**
+- GitHub: [@illionillion](https://github.com/illionillion)
+
+---
+
+⭐ このプロジェクトが役に立った場合は、スターをつけていただけると嬉しいです！
 
 ## 🎯 使い方
 
-1. **ノード追加**: 左上の「ノード追加」ボタンまたはエッジを空の場所にドロップ
-2. **ノード編集**: ノードをダブルクリックしてテキストを編集
-3. **ノード接続**: ノードの端点をドラッグして他のノードに接続
-4. **コード生成**: 「コード生成」ボタンでMermaidコードを表示
-5. **ダウンロード**: 生成されたコードをファイルとして保存
+### 基本操作
+1. **ノード追加**: 
+   - 左パネルの「ノード追加」ボタンをクリック
+   - または既存のエッジを空の場所にドロップ
+
+2. **ノード編集**:
+   - **ラベル編集**: ノードをダブルクリックしてテキストを編集
+   - **変数名編集**: ノード左上の変数名をクリックして編集
+   - **図形変更**: ノード右上のメニューから形状を選択
+
+3. **ノード接続**: 
+   - ノードの端点（ハンドル）をドラッグして他のノードに接続
+   - エッジタイプ（実線・点線・太線）を選択可能
+
+4. **削除操作**:
+   - **ノード削除**: ノードメニューの削除ボタン
+   - **エッジ削除**: エッジをクリックして選択後削除
+
+### コード出力
+1. **コード生成**: 右パネルの「コード生成」ボタンでMermaidコードを表示
+2. **コピー**: 「コピー」ボタンでクリップボードに保存
+3. **ダウンロード**: 「ダウンロード」ボタンで`.mmd`ファイルとして保存
+
+### 対応図形
+- **矩形** (`[]`): 標準的な処理ブロック
+- **円形** (`(())`): 開始・終了ノード
+- **菱形** (`{}`): 判定・分岐ノード  
+- **六角形** (`{{}}`): 準備・前処理ノード
 
 ## 📁 プロジェクト構成
 
 ```
-├── app/
-│   ├── layout.tsx
-│   └── page.tsx
-├── components/
-│   ├── editable-node.tsx
-│   ├── flow-editor.tsx
-│   ├── flow-panel.tsx
-│   ├── download-modal.tsx
-│   ├── copy-button.tsx
-│   ├── node-types.tsx
-│   └── types.ts
-├── .github/
-│   └── workflows/
-│       └── deploy.yml
-└── docs/ (自動生成)
+├── app/                      # Next.js App Router
+│   ├── layout.tsx           # ルートレイアウト
+│   ├── page.tsx             # メインページ
+│   └── sample/              # サンプルページ
+├── components/              # Reactコンポーネント
+│   ├── editor/              # テキスト編集コンポーネント
+│   │   ├── label-editor.tsx
+│   │   └── variable-name-editor.tsx
+│   ├── flow/                # フローチャート関連
+│   │   ├── flow-editor.tsx  # メインエディター
+│   │   ├── flow-panel.tsx   # サイドパネル
+│   │   ├── editable-edge.tsx
+│   │   ├── edge-types.tsx
+│   │   └── node-types.tsx
+│   ├── mermaid/             # Mermaid関連
+│   │   ├── download-modal.tsx
+│   │   └── mermaid-highlight.tsx
+│   ├── node/                # ノード関連
+│   │   ├── editable-node.tsx
+│   │   ├── node-menu.tsx
+│   │   └── shape-selector.tsx
+│   ├── ui/                  # 共通UIコンポーネント
+│   │   └── copy-button.tsx
+│   └── types/               # 型定義
+│       └── types.ts
+├── utils/                   # ユーティリティ関数
+│   └── mermaid.ts          # Mermaid変換ロジック
+├── .github/workflows/       # GitHub Actions
+│   └── deploy.yml          # 自動デプロイ設定
+└── docs/                   # GitHub Pages出力 (自動生成)
+```
+
+## 🔧 開発環境
+
+### 必要な環境
+- **Node.js** 18.0.0 以上
+- **pnpm** 8.0.0 以上 (推奨)
+
+### セットアップ
+```bash
+# リポジトリをクローン
+git clone https://github.com/illionillion/mermaid-editor.git
+cd mermaid-editor
+
+# 依存関係をインストール
+pnpm install
+
+# 開発サーバー起動
+pnpm dev
+```
+
+### 利用可能なスクリプト
+```bash
+pnpm dev          # 開発サーバー起動
+pnpm build        # プロダクションビルド
+pnpm start        # プロダクションサーバー起動
+pnpm lint         # ESLintチェック
+pnpm lint:fix     # ESLint自動修正
+pnpm format       # Prettier実行
+pnpm format:check # Prettierチェック
+pnpm type-check   # TypeScript型チェック
+pnpm check        # 全チェック実行
+pnpm fix          # 全自動修正実行
 ```
 
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
