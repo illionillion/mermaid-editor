@@ -8,6 +8,7 @@ on:
     branches: ["main", "dev"]
 
 jobs:
+  # Stage 1: Code Quality (parallel)
   eslint:
     name: ESLint
     runs-on: ubuntu-latest
@@ -58,9 +59,11 @@ jobs:
       - name: Check code formatting
         run: pnpm format:check
 
+  # Stage 2: Type Check (depends on code quality)
   type_script:
     name: TypeScript
     runs-on: ubuntu-latest
+    needs: [eslint, prettier]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -83,9 +86,51 @@ jobs:
       - name: Run TypeScript type check
         run: pnpm type-check
 
+  # Stage 3: Test (depends on type check)
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    needs: [type_script]
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup PNPM
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          registry-url: "https://registry.npmjs.org"
+          cache: "pnpm"
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Run tests
+        run: pnpm test:run
+
+      - name: Run tests with coverage
+        run: pnpm test:coverage
+
+      - name: Coverage Report as Comment
+        uses: davelosert/vitest-coverage-report-action@v2
+        if: github.event_name == 'pull_request'
+        with:
+          json-summary-path: "./coverage/coverage-summary.json"
+          json-final-path: "./coverage/coverage-final.json"
+
+  # Stage 4: Build (depends on tests)
   build:
     name: Build
     runs-on: ubuntu-latest
+    needs: [test]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4

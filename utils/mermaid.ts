@@ -1,3 +1,4 @@
+import { FlowData } from "../components/flow/flow-helpers";
 import { MermaidArrowType } from "../components/types/types";
 
 // Mermaidの予約語リスト
@@ -200,7 +201,7 @@ export const getArrowTypeDisplayName = (arrowType: MermaidArrowType): string => 
  * @param flowData ノードとエッジのデータ
  * @returns Mermaidコード
  */
-export const generateMermaidCode = (flowData: { nodes: any[]; edges: any[] }): string => {
+export const generateMermaidCode = (flowData: FlowData): string => {
   let code = "flowchart TD\n";
 
   // ノードの定義
