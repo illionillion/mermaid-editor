@@ -12,7 +12,7 @@
   "bugs": {
     "url": "https://github.com/illionillion/mermaid-editor/issues"
   },
-  "homepage": "https://github.com/illionillion/mermaid-editor",
+  "homepage": "https://illionillion.github.io/mermaid-editor/",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
