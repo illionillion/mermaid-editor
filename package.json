@@ -14,7 +14,11 @@
     "check": "pnpm type-check && pnpm lint && pnpm format:check",
     "fix": "pnpm format && pnpm lint:fix && pnpm type-check",
     "prepare": "lefthook install",
-    "commitlint": "commitlint --edit"
+    "commitlint": "commitlint --edit",
+    "test": "vitest",
+    "test:ui": "vitest --ui",
+    "test:run": "vitest run",
+    "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
     "@types/react-syntax-highlighter": "^15.5.13",
@@ -36,6 +40,7 @@
     "@types/react-dom": "^18",
     "@typescript-eslint/eslint-plugin": "^8.38.0",
     "@typescript-eslint/parser": "^8.38.0",
+    "@vitest/ui": "^3.2.4",
     "eslint": "^9.32.0",
     "eslint-config-next": "14.1.0",
     "eslint-config-prettier": "^10.1.8",
@@ -50,6 +55,7 @@
     "lefthook": "^1.12.2",
     "prettier": "^3.6.2",
     "typescript": "^5",
-    "typescript-eslint": "^8.38.0"
+    "typescript-eslint": "^8.38.0",
+    "vitest": "^3.2.4"
   }
 }
