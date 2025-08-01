@@ -2,6 +2,17 @@
   "name": "mermaid-editor",
   "version": "0.1.0",
   "private": true,
+  "description": "React-based Mermaid flowchart editor with visual node editing",
+  "license": "MIT",
+  "author": "illionillion",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/illionillion/mermaid-editor.git"
+  },
+  "bugs": {
+    "url": "https://github.com/illionillion/mermaid-editor/issues"
+  },
+  "homepage": "https://illionillion.github.io/mermaid-editor/",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
