@@ -1,6 +1,7 @@
 # Mermaid フローチャート エディター
 
 [![Test](https://github.com/illionillion/mermaid-editor/actions/workflows/ci.yml/badge.svg)](https://github.com/illionillion/mermaid-editor/actions/workflows/ci.yml)
+[![Coverage](https://img.shields.io/badge/Coverage-97.5%25-brightgreen)](https://github.com/illionillion/mermaid-editor)
 [![GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-Live%20Demo-blue)](https://illionillion.github.io/mermaid-editor/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
 
