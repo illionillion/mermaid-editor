@@ -275,12 +275,13 @@ const sanitizeLabel = (label: string): string => {
 - [React Flow](https://reactflow.dev/)
 - [Yamada UI](https://yamada-ui.com/)
 - [Mermaid](https://mermaid.js.org/)
+- [Vitest](https://vitest.dev/)
 
-### 社内リソース
+### 関連記事
 
-- [コーディング規約](./CODING_STANDARDS.md)
-- [API仕様書](./API.md)
-- [アーキテクチャ決定記録](./ADR.md)
+- [React Flow カスタムノード作成](https://reactflow.dev/learn/customization/custom-nodes)
+- [Next.js 静的サイトエクスポート](https://nextjs.org/docs/app/building-your-application/deploying/static-exports)
+- [TypeScript プロジェクトのベストプラクティス](https://www.typescriptlang.org/docs/handbook/declaration-files/do-s-and-don-ts.html)
 
 ## 🤝 コントリビューション
 
