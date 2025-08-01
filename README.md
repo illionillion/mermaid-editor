@@ -53,11 +53,23 @@ yarn dev
 
 ## 🛠️ 技術スタック
 
+### フロントエンド・フレームワーク
+
 - **Next.js 14** (App Router) - フルスタックReactフレームワーク
 - **ReactFlow** - 高性能フローチャートライブラリ
 - **Yamada UI** - モダンなReact UIコンポーネント
 - **TypeScript** - 型安全な開発環境
 - **React Syntax Highlighter** - コードシンタックスハイライト
+
+### 開発ツール・品質管理
+
+- **ESLint** - コード品質チェック
+- **Prettier** - コードフォーマット
+- **lefthook** - Git hooksマネージャー
+- **commitlint** - コミットメッセージ規約チェック
+
+### インフラ・デプロイ
+
 - **GitHub Actions** - CI/CD パイプライン
 - **GitHub Pages** - 静的サイトホスティング
 - **pnpm** - 高速パッケージマネージャー
@@ -102,11 +114,26 @@ pnpm start
 
 プルリクエストやイシューの報告を歓迎します！
 
+### 開発の流れ
+
 1. このリポジトリをフォーク
 2. 機能ブランチを作成 (`git checkout -b feature/amazing-feature`)
-3. 変更をコミット (`git commit -m 'Add some amazing feature'`)
+3. 変更をコミット
+   - lefthookにより自動でlint・format実行
+   - Conventional Commitsに準拠したメッセージを使用
+   - 例: `git commit -m 'feat: add some amazing feature'`
 4. ブランチにプッシュ (`git push origin feature/amazing-feature`)
 5. プルリクエストを作成
+
+### コミットメッセージガイドライン
+
+このプロジェクトでは[Conventional Commits](https://www.conventionalcommits.org/)を採用しています。コミット時にcommitlintが自動でメッセージをチェックします。
+
+正しい例:
+
+- `feat: 新しい図形タイプを追加`
+- `fix: ノード削除時のバグを修正`
+- `docs: READMEを更新`
 
 ## 📄 ライセンス
 
@@ -170,6 +197,7 @@ pnpm start
 │   ├── flow/                # フローチャート関連
 │   │   ├── flow-editor.tsx  # メインエディター
 │   │   ├── flow-panel.tsx   # サイドパネル
+│   │   ├── flow-helpers.ts  # ビジネスロジック
 │   │   ├── editable-edge.tsx
 │   │   ├── edge-types.tsx
 │   │   └── node-types.tsx
@@ -188,6 +216,10 @@ pnpm start
 │   └── mermaid.ts          # Mermaid変換ロジック
 ├── .github/workflows/       # GitHub Actions
 │   └── deploy.yml          # 自動デプロイ設定
+├── .commitlintrc           # commitlint設定
+├── lefthook.yml            # Git hooks設定
+├── eslint.config.ts        # ESLint設定
+├── .prettierrc             # Prettier設定
 └── docs/                   # GitHub Pages出力 (自動生成)
 ```
 
@@ -212,6 +244,8 @@ pnpm install
 pnpm dev
 ```
 
+**注意**: 初回のpnpm install時に、lefthookが自動的にGit hooksをインストールします。これにより、コミット時の品質チェックが有効になります。
+
 ### 利用可能なスクリプト
 
 ```bash
@@ -225,6 +259,39 @@ pnpm format:check # Prettierチェック
 pnpm type-check   # TypeScript型チェック
 pnpm check        # 全チェック実行
 pnpm fix          # 全自動修正実行
+pnpm prepare      # lefthookインストール
+pnpm commitlint   # コミットメッセージ検証
+```
+
+### 🔧 開発ツール
+
+このプロジェクトでは以下の開発ツールが設定されています：
+
+#### Git Hooks (lefthook)
+
+- **pre-commit**: コミット前に自動でESLintとPrettierを実行
+- **commit-msg**: コミットメッセージがConventional Commitsに準拠しているかチェック
+- **post-merge/post-checkout/post-rewrite**: package.jsonやpnpm-lock.yamlの変更時に自動でpnpm install
+
+#### Conventional Commits
+
+コミットメッセージは以下の形式に従ってください：
+
+```
+<type>: <description>
+
+例:
+feat: 新機能を追加
+fix: バグを修正
+docs: ドキュメントを更新
+style: コードスタイルを修正
+refactor: リファクタリング
+perf: パフォーマンス改善
+test: テストを追加・修正
+chore: その他の作業
+ci: CI/CD設定を変更
+build: ビルド設定を変更
+revert: 変更を取り消し
 ```
 
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
