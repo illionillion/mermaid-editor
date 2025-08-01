@@ -12,7 +12,9 @@
     "format:check": "prettier --check .",
     "type-check": "tsc --noEmit",
     "check": "pnpm type-check && pnpm lint && pnpm format:check",
-    "fix": "pnpm format && pnpm lint:fix && pnpm type-check"
+    "fix": "pnpm format && pnpm lint:fix && pnpm type-check",
+    "prepare": "lefthook install",
+    "commitlint": "commitlint --edit"
   },
   "dependencies": {
     "@types/react-syntax-highlighter": "^15.5.13",
@@ -25,6 +27,8 @@
     "react-syntax-highlighter": "^15.6.1"
   },
   "devDependencies": {
+    "@commitlint/cli": "^19.8.1",
+    "@commitlint/config-conventional": "^19.8.1",
     "@eslint/eslintrc": "^3.3.1",
     "@eslint/js": "^9.32.0",
     "@types/node": "^20",
@@ -43,6 +47,7 @@
     "eslint-plugin-unused-imports": "^4.1.4",
     "globals": "^16.3.0",
     "jiti": "^2.5.1",
+    "lefthook": "^1.12.2",
     "prettier": "^3.6.2",
     "typescript": "^5",
     "typescript-eslint": "^8.38.0"

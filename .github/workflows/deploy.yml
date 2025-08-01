@@ -50,4 +50,4 @@ jobs:
         with:
           add: "docs"
           default_author: github_actions
-          message: ":rocket: Deploy to GitHub Pages"
+          message: "docs: deploy to GitHub Pages"
