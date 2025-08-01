@@ -194,3 +194,44 @@ export const getArrowTypeDisplayName = (arrowType: MermaidArrowType): string => 
       return "通常の矢印 (->)";
   }
 };
+
+/**
+ * FlowDataからMermaidコードを生成する
+ * @param flowData ノードとエッジのデータ
+ * @returns Mermaidコード
+ */
+export const generateMermaidCode = (flowData: { nodes: any[]; edges: any[] }): string => {
+  let code = "flowchart TD\n";
+
+  // ノードの定義
+  flowData.nodes.forEach((node) => {
+    const variableName = (node.data.variableName as string) || `node${node.id}`;
+    const safeVariableName = getSafeVariableName(variableName);
+    const shapeType = (node.data.shapeType as string) || "rectangle";
+    const label = (node.data.label as string) || "";
+    const shapeCode = formatMermaidShape(shapeType, label);
+    code += `    ${safeVariableName}${shapeCode}\n`;
+  });
+
+  // エッジの定義
+  flowData.edges.forEach((edge) => {
+    const sourceNode = flowData.nodes.find((node) => node.id === edge.source);
+    const targetNode = flowData.nodes.find((node) => node.id === edge.target);
+
+    if (sourceNode && targetNode) {
+      const sourceVariableName = getSafeVariableName(
+        (sourceNode.data.variableName as string) || `node${sourceNode.id}`
+      );
+      const targetVariableName = getSafeVariableName(
+        (targetNode.data.variableName as string) || `node${targetNode.id}`
+      );
+      const edgeLabel = edge.data?.label as string | undefined;
+      const arrowType = (edge.data?.arrowType as MermaidArrowType) || "arrow";
+
+      const arrowCode = formatMermaidArrow(arrowType, edgeLabel);
+      code += `    ${sourceVariableName}${arrowCode}${targetVariableName}\n`;
+    }
+  });
+
+  return code;
+};

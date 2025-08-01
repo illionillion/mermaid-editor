@@ -16,10 +16,17 @@ import {
 } from "@xyflow/react";
 import { Box, useDisclosure, useToken } from "@yamada-ui/react";
 import { useCallback, useState, useRef, useEffect } from "react";
-import { getSafeVariableName, formatMermaidShape, formatMermaidArrow } from "../../utils/mermaid";
+import { generateMermaidCode } from "../../utils/mermaid";
 import { DownloadModal } from "../mermaid";
 import { MermaidArrowType } from "../types/types";
 import { edgeTypes } from "./edge-types";
+import {
+  calculateNodePosition,
+  createNewNode,
+  createNewEdge,
+  parseConnectingNodeId,
+  FlowData,
+} from "./flow-helpers";
 import { FlowPanel } from "./flow-panel";
 import { nodeTypes } from "./node-types";
 
@@ -224,7 +231,7 @@ export function FlowEditor() {
 
       if (targetIsPane && event) {
         // 接続情報を解析
-        const [sourceNodeId, handleType] = connectingNodeId.current.split("-");
+        const { sourceNodeId, handleType } = parseConnectingNodeId(connectingNodeId.current);
 
         // 元のノードの位置を取得
         const sourceNode = nodes.find((node) => node.id === sourceNodeId);
@@ -237,42 +244,23 @@ export function FlowEditor() {
         });
 
         // 新しいノードの位置はマウス位置を使用
-        const newPosition = {
-          x: mousePosition.x - nodeWidth / 2, // ノード幅の半分を引いて中央に配置
-          y: mousePosition.y - nodeHeight / 2, // ノード高さの半分を引いて中央に配置
-        };
+        const newPosition = calculateNodePosition(mousePosition, nodeWidth, nodeHeight);
 
-        const newNode: Node = {
-          id: nodeId.toString(),
-          type: "editableNode",
-          position: newPosition,
-          data: {
-            label: `Node ${nodeId}`,
-            variableName: `node${nodeId}`,
-            shapeType: "rectangle",
-            onLabelChange: handleLabelChange,
-            onVariableNameChange: handleVariableNameChange,
-            onShapeTypeChange: handleShapeTypeChange,
-            onDelete: handleNodeDelete,
-          },
-        };
+        const newNode = createNewNode(nodeId, newPosition, {
+          onLabelChange: handleLabelChange,
+          onVariableNameChange: handleVariableNameChange,
+          onShapeTypeChange: handleShapeTypeChange,
+          onDelete: handleNodeDelete,
+        });
 
         setNodes((nds) => nds.concat(newNode));
 
         // 新しいノードへのエッジを作成（方向を考慮）
-        const newEdge: Edge = {
-          id: `${sourceNodeId}-${nodeId}`,
-          type: "editableEdge",
-          source: handleType === "source" ? sourceNodeId : nodeId.toString(),
-          target: handleType === "source" ? nodeId.toString() : sourceNodeId,
-          data: {
-            label: "",
-            arrowType: "arrow" as MermaidArrowType,
-            onLabelChange: handleEdgeLabelChange,
-            onArrowTypeChange: handleEdgeArrowTypeChange,
-            onDelete: handleEdgeDelete,
-          },
-        };
+        const newEdge = createNewEdge(sourceNodeId, nodeId.toString(), handleType, {
+          onLabelChange: handleEdgeLabelChange,
+          onArrowTypeChange: handleEdgeArrowTypeChange,
+          onDelete: handleEdgeDelete,
+        });
         setEdges((eds) => [...eds, newEdge]);
 
         setNodeId(nodeId + 1);
@@ -299,20 +287,16 @@ export function FlowEditor() {
   );
 
   const addNode = useCallback(() => {
-    const newNode: Node = {
-      id: nodeId.toString(),
-      type: "editableNode",
-      position: { x: Math.random() * 500, y: Math.random() * 500 },
-      data: {
-        label: `Node ${nodeId}`,
-        variableName: `node${nodeId}`,
-        shapeType: "rectangle",
+    const newNode = createNewNode(
+      nodeId,
+      { x: Math.random() * 500, y: Math.random() * 500 },
+      {
         onLabelChange: handleLabelChange,
         onVariableNameChange: handleVariableNameChange,
         onShapeTypeChange: handleShapeTypeChange,
         onDelete: handleNodeDelete,
-      },
-    };
+      }
+    );
     setNodes((nds) => nds.concat(newNode));
     setNodeId(nodeId + 1);
   }, [
@@ -324,40 +308,9 @@ export function FlowEditor() {
     handleNodeDelete,
   ]);
 
-  const generateMermaidCode = useCallback(() => {
-    let code = "flowchart TD\n";
-
-    // ノードの定義
-    nodes.forEach((node) => {
-      const variableName = (node.data.variableName as string) || `node${node.id}`;
-      const safeVariableName = getSafeVariableName(variableName);
-      const shapeType = (node.data.shapeType as string) || "rectangle";
-      const label = (node.data.label as string) || "";
-      const shapeCode = formatMermaidShape(shapeType, label);
-      code += `    ${safeVariableName}${shapeCode}\n`;
-    });
-
-    // エッジの定義
-    edges.forEach((edge) => {
-      // ノードIDから変数名を取得
-      const sourceNode = nodes.find((node) => node.id === edge.source);
-      const targetNode = nodes.find((node) => node.id === edge.target);
-
-      if (sourceNode && targetNode) {
-        const sourceVariableName = getSafeVariableName(
-          (sourceNode.data.variableName as string) || `node${sourceNode.id}`
-        );
-        const targetVariableName = getSafeVariableName(
-          (targetNode.data.variableName as string) || `node${targetNode.id}`
-        );
-        const edgeLabel = edge.data?.label as string | undefined;
-        const arrowType = (edge.data?.arrowType as MermaidArrowType) || "arrow";
-
-        const arrowCode = formatMermaidArrow(arrowType, edgeLabel);
-        code += `    ${sourceVariableName}${arrowCode}${targetVariableName}\n`;
-      }
-    });
-
+  const generateMermaidCodeCallback = useCallback(() => {
+    const flowData: FlowData = { nodes, edges };
+    const code = generateMermaidCode(flowData);
     setMermaidCode(code);
     onOpen();
   }, [nodes, edges, onOpen]);
@@ -378,7 +331,7 @@ export function FlowEditor() {
       >
         <Controls />
         <Background />
-        <FlowPanel onAddNode={addNode} onGenerateCode={generateMermaidCode} />
+        <FlowPanel onAddNode={addNode} onGenerateCode={generateMermaidCodeCallback} />
       </ReactFlow>
 
       <DownloadModal open={open} onClose={onClose} mermaidCode={mermaidCode} />

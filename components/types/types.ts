@@ -1,4 +1,3 @@
-
 export type MermaidArrowType =
   | "arrow" // -->
   | "thick" // ==>
