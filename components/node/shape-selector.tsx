@@ -2,6 +2,7 @@
 
 import { ShapesIcon } from "@yamada-ui/lucide";
 import { Menu, MenuButton, MenuItem, MenuList, Box, Text } from "@yamada-ui/react";
+import { SHAPE_OPTIONS } from "../types/types";
 
 interface ShapeSelectorProps {
   currentShape?: string;
@@ -9,22 +10,13 @@ interface ShapeSelectorProps {
 }
 
 export const ShapeSelector = ({ currentShape, onShapeChange }: ShapeSelectorProps) => {
-  const shapeOptions = [
-    { type: "rectangle", label: "四角形", symbol: "[ ]" },
-    { type: "diamond", label: "菱形", symbol: "{ }" },
-    { type: "rounded", label: "角丸四角", symbol: "( )" },
-    { type: "circle", label: "円形", symbol: "(( ))" },
-    { type: "hexagon", label: "六角形", symbol: "{{ }}" },
-    { type: "stadium", label: "スタジアム", symbol: "([ ])" },
-  ];
-
   return (
     <Menu>
       <MenuButton as={MenuItem} icon={<ShapesIcon fontSize="xl" />}>
         ノード形状
       </MenuButton>
       <MenuList>
-        {shapeOptions.map((shape) => (
+        {SHAPE_OPTIONS.map((shape) => (
           <MenuItem
             key={shape.type}
             onClick={() => onShapeChange?.(shape.type)}
