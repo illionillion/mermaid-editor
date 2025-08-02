@@ -22,14 +22,14 @@ interface EditableNodeProps {
 export function EditableNode(props: EditableNodeProps) {
   return (
     <>
-      <EditableContent {...props} />
+      <NodeContent {...props} />
       <Handle type="target" position={Position.Top} />
       <Handle type="source" position={Position.Bottom} />
     </>
   );
 }
 
-export function EditableContent({ data, id }: EditableNodeProps) {
+export function NodeContent({ data, id }: EditableNodeProps) {
   const [isEditingLabel, setIsEditingLabel] = useState(false);
   const [isEditingVariableName, setIsEditingVariableName] = useState(false);
   const [label, setLabel] = useState(data.label);
