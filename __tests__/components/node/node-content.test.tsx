@@ -125,27 +125,15 @@ describe("NodeContent", () => {
       const variableNameElement = screen.getByText("[testNode]");
       await user.click(variableNameElement);
 
-      // 複数の入力フィールドがある場合、変数名用のものを特定
-      const inputs = screen.getAllByRole("textbox");
-      const variableInput = inputs.find(
-        (input) => (input as HTMLInputElement).value === "testNode"
-      );
+      // 変数名入力フィールドを直接的に取得（位置的に上部にある）
+      // まず編集モードになっているかを確認
+      const variableInput = await screen.findByDisplayValue("testNode");
 
-      if (variableInput) {
-        await user.clear(variableInput);
-        await user.type(variableInput, "newNode");
-        await user.click(document.body); // フォーカスを外す
+      await user.clear(variableInput);
+      await user.type(variableInput, "newNode");
+      await user.click(document.body); // フォーカスを外す
 
-        expect(defaultProps.data.onVariableNameChange).toHaveBeenCalledWith("1", "newNode");
-      } else {
-        // フォールバック: 最初の入力フィールドを使用
-        const firstInput = inputs[0];
-        await user.clear(firstInput);
-        await user.type(firstInput, "newNode");
-        await user.click(document.body);
-
-        expect(defaultProps.data.onVariableNameChange).toHaveBeenCalledWith("1", "newNode");
-      }
+      expect(defaultProps.data.onVariableNameChange).toHaveBeenCalledWith("1", "newNode");
     });
   });
 
