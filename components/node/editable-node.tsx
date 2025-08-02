@@ -19,7 +19,17 @@ interface EditableNodeProps {
   id: string;
 }
 
-export function EditableNode({ data, id }: EditableNodeProps) {
+export function EditableNode(props: EditableNodeProps) {
+  return (
+    <>
+      <EditableContent {...props} />
+      <Handle type="target" position={Position.Top} />
+      <Handle type="source" position={Position.Bottom} />
+    </>
+  );
+}
+
+export function EditableContent({ data, id }: EditableNodeProps) {
   const [isEditingLabel, setIsEditingLabel] = useState(false);
   const [isEditingVariableName, setIsEditingVariableName] = useState(false);
   const [label, setLabel] = useState(data.label);
@@ -142,58 +152,54 @@ export function EditableNode({ data, id }: EditableNodeProps) {
   };
 
   return (
-    <>
-      <Box
-        bg="white"
-        border="2px solid #1a365d"
-        borderRadius="md"
-        p={2}
-        w="xs"
-        minH="6xs"
-        display="flex"
-        alignItems="center"
-        justifyContent="center"
-        textAlign="center"
-        cursor="pointer"
+    <Box
+      bg="white"
+      border="2px solid #1a365d"
+      borderRadius="md"
+      p={2}
+      w="xs"
+      minH="6xs"
+      display="flex"
+      alignItems="center"
+      justifyContent="center"
+      textAlign="center"
+      cursor="pointer"
+      onDoubleClick={handleLabelDoubleClick}
+      _hover={{ boxShadow: "md" }}
+      position="relative"
+    >
+      {/* 変数名を左上に表示 */}
+      <VariableNameEditor
+        value={variableName}
+        isEditing={isEditingVariableName}
+        shapeType={data.shapeType}
+        onClick={handleVariableNameClick}
+        onChange={handleVariableNameChange}
+        onKeyDown={handleVariableNameKeyPress}
+        onCompositionStart={handleCompositionStart}
+        onCompositionEnd={handleCompositionEnd}
+        onBlur={handleVariableNameSave}
+      />
+
+      <NodeMenu
+        onDelete={handleDelete}
+        onEdit={handleEdit}
+        onEditVariableName={handleEditVariableName}
+        onShapeChange={handleShapeChange}
+        currentShape={data.shapeType || "rectangle"}
+      />
+
+      {/* メインのラベル表示・編集エリア */}
+      <LabelEditor
+        value={label}
+        isEditing={isEditingLabel}
         onDoubleClick={handleLabelDoubleClick}
-        _hover={{ boxShadow: "md" }}
-        position="relative"
-      >
-        {/* 変数名を左上に表示 */}
-        <VariableNameEditor
-          value={variableName}
-          isEditing={isEditingVariableName}
-          shapeType={data.shapeType}
-          onClick={handleVariableNameClick}
-          onChange={handleVariableNameChange}
-          onKeyDown={handleVariableNameKeyPress}
-          onCompositionStart={handleCompositionStart}
-          onCompositionEnd={handleCompositionEnd}
-          onBlur={handleVariableNameSave}
-        />
-
-        <NodeMenu
-          onDelete={handleDelete}
-          onEdit={handleEdit}
-          onEditVariableName={handleEditVariableName}
-          onShapeChange={handleShapeChange}
-          currentShape={data.shapeType || "rectangle"}
-        />
-
-        {/* メインのラベル表示・編集エリア */}
-        <LabelEditor
-          value={label}
-          isEditing={isEditingLabel}
-          onDoubleClick={handleLabelDoubleClick}
-          onChange={handleLabelChange}
-          onKeyDown={handleLabelKeyPress}
-          onCompositionStart={handleCompositionStart}
-          onCompositionEnd={handleCompositionEnd}
-          onBlur={handleLabelSave}
-        />
-      </Box>
-      <Handle type="target" position={Position.Top} />
-      <Handle type="source" position={Position.Bottom} />
-    </>
+        onChange={handleLabelChange}
+        onKeyDown={handleLabelKeyPress}
+        onCompositionStart={handleCompositionStart}
+        onCompositionEnd={handleCompositionEnd}
+        onBlur={handleLabelSave}
+      />
+    </Box>
   );
 }
