@@ -4,6 +4,7 @@ import { Handle, Position } from "@xyflow/react";
 import { Box } from "@yamada-ui/react";
 import { useState, useRef, MouseEvent, ChangeEvent, KeyboardEvent } from "react";
 import { VariableNameEditor, LabelEditor } from "../editor";
+import { UI_CONSTANTS } from "../types/types";
 import { NodeMenu } from "./node-menu";
 
 interface EditableNodeProps {
@@ -38,9 +39,9 @@ export function NodeContent({ data, id }: EditableNodeProps) {
   const lastVariableClickTime = useRef<number>(0); // 変数名クリック時刻を記録
 
   const handleLabelDoubleClick = () => {
-    // 変数名クリック直後（300ms以内）はダブルクリックを無視
+    // 変数名クリック直後（DOUBLE_CLICK_THRESHOLD ms以内）はダブルクリックを無視
     const now = Date.now();
-    if (now - lastVariableClickTime.current < 300) {
+    if (now - lastVariableClickTime.current < UI_CONSTANTS.DOUBLE_CLICK_THRESHOLD) {
       return;
     }
 

@@ -3,21 +3,12 @@
 import { ChevronDownIcon } from "@yamada-ui/lucide";
 import { Menu, MenuButton, MenuList, MenuItem, IconButton, Portal } from "@yamada-ui/react";
 import { getArrowTypeDisplayName } from "../../utils/mermaid";
-import { MermaidArrowType } from "../types/types";
+import { MermaidArrowType, ARROW_TYPES } from "../types/types";
 
 interface ArrowTypeSelectorProps {
   currentArrowType: MermaidArrowType;
   onArrowTypeChange: (arrowType: MermaidArrowType) => void;
 }
-
-const ARROW_TYPES: MermaidArrowType[] = [
-  "arrow",
-  "thick",
-  "dotted",
-  "invisible",
-  "bidirectional",
-  "bidirectional-thick",
-];
 
 export function ArrowTypeSelector({ currentArrowType, onArrowTypeChange }: ArrowTypeSelectorProps) {
   return (
