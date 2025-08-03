@@ -16,16 +16,6 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ja">
-      <head>
-        <style>{`
-          .react-flow__attribution {
-            display: none !important;
-          }
-          .react-flow__panel.react-flow__attribution {
-            display: none !important;
-          }
-        `}</style>
-      </head>
       <body className={inter.className}>
         <UIProvider>{children}</UIProvider>
       </body>
