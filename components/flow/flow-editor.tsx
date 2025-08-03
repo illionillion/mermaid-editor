@@ -318,11 +318,79 @@ export function FlowEditor() {
 
   const handleImportMermaid = useCallback(
     (data: ParsedMermaidData) => {
+      // ノードの階層構造を分析してレイアウトを決定
+      const layoutNodes = (
+        nodes: ParsedMermaidData["nodes"],
+        edges: ParsedMermaidData["edges"]
+      ) => {
+        // ルートノード（入力エッジがないノード）を見つける
+        const hasIncomingEdge = new Set(edges.map((edge) => edge.target));
+        const rootNodes = nodes.filter((node) => !hasIncomingEdge.has(node.id));
+
+        // 各ノードのレベル（階層）を計算
+        const levels = new Map<string, number>();
+        const visited = new Set<string>();
+
+        const calculateLevel = (nodeId: string, level: number = 0): void => {
+          if (visited.has(nodeId)) return;
+          visited.add(nodeId);
+
+          const currentLevel = levels.get(nodeId) ?? 0;
+          levels.set(nodeId, Math.max(currentLevel, level));
+
+          // 子ノードのレベルを計算
+          const outgoingEdges = edges.filter((edge) => edge.source === nodeId);
+          outgoingEdges.forEach((edge) => {
+            calculateLevel(edge.target, level + 1);
+          });
+        };
+
+        // ルートノードから階層を計算
+        rootNodes.forEach((node) => calculateLevel(node.id, 0));
+
+        // 残りのノードも処理（循環参照などがある場合）
+        nodes.forEach((node) => {
+          if (!levels.has(node.id)) {
+            levels.set(node.id, 0);
+          }
+        });
+
+        // レベルごとにノードをグループ化
+        const nodesByLevel = new Map<number, string[]>();
+        levels.forEach((level, nodeId) => {
+          if (!nodesByLevel.has(level)) {
+            nodesByLevel.set(level, []);
+          }
+          nodesByLevel.get(level)!.push(nodeId);
+        });
+
+        // 位置を計算
+        const positions = new Map<string, { x: number; y: number }>();
+        const levelHeight = 150; // レベル間の縦幅
+        const nodeSpacing = 250; // 同レベル内のノード間隔（横方向）を少し広げる
+
+        nodesByLevel.forEach((nodeIds, level) => {
+          const levelWidth = nodeIds.length * nodeSpacing;
+          const startX = -levelWidth / 2; // 中央揃え
+
+          nodeIds.forEach((nodeId, index) => {
+            positions.set(nodeId, {
+              x: startX + index * nodeSpacing + 300, // 左から右へノード配置（中央揃え）
+              y: level * levelHeight + 50, // 上から下へレベル配置
+            });
+          });
+        });
+
+        return positions;
+      };
+
+      const positions = layoutNodes(data.nodes, data.edges);
+
       // ParsedMermaidNodeをReactFlowのNode型に変換
-      const convertedNodes: Node[] = data.nodes.map((parsedNode, index) => ({
+      const convertedNodes: Node[] = data.nodes.map((parsedNode) => ({
         id: parsedNode.id,
         type: "editableNode",
-        position: { x: 100 + index * 200, y: 100 + (index % 3) * 100 }, // 仮の位置
+        position: positions.get(parsedNode.id) || { x: 250, y: 50 }, // フォールバック位置
         data: {
           label: parsedNode.label,
           variableName: parsedNode.variableName,
