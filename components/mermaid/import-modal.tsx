@@ -24,6 +24,9 @@ interface ImportModalProps {
   onImport: (data: ParsedMermaidData) => void;
 }
 
+// ヘルプテキストの定数
+const HELP_TEXT = `💡 対応しているノード形状: 四角形[label], ダイヤモンド{label}, 円((label)), 六角形{{label}}, スタジアム([label]), 角丸(label)`;
+
 export function ImportModal({ isOpen, onClose, onImport }: ImportModalProps) {
   const [mermaidCode, setMermaidCode] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -102,10 +105,7 @@ export function ImportModal({ isOpen, onClose, onImport }: ImportModalProps) {
             )}
 
             <Text fontSize="xs" color="gray.500">
-              💡 対応しているノード形状: 四角形[label], ダイヤモンド{"{label}"}, 円((label)), 六角形
-              {"{"}
-              {"{label}"}
-              {"}"}, スタジアム([label]), 角丸(label)
+              {HELP_TEXT}
             </Text>
           </VStack>
         </ModalBody>
