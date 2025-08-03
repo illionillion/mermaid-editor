@@ -448,19 +448,11 @@ const parseNodeDefinition = (line: string): ParsedMermaidNode | null => {
  * @param line 行文字列
  * @returns パースされたエッジ情報またはnull
  */
-// 正規表現の共通パターン定数
-const REGEX_PATTERNS = {
-  // ノードID: 英数字、アンダースコア、日本語（ひらがな、カタカナ、漢字）
-  NODE_ID: "[a-zA-Z0-9_\\u3040-\\u309F\\u30A0-\\u30FF\\u4E00-\\u9FAF]+",
-  // ノード形状: [label], (label), {label}, ((label)), {{label}}, ([label])
-  NODE_SHAPE:
-    "(?:\\[[^\\]]*\\]|\\([^)]*\\)|\\{[^}]*\\}|\\(\\([^)]*\\)\\)|\\{\\{[^}]*\\}\\}|\\(\\[[^\\]]*\\]\\))?",
-} as const;
-
 const parseEdgeDefinition = (line: string): ParsedMermaidEdge | null => {
-  // 共通パターンを使用してより読みやすい正規表現を構築
-  const nodeId = REGEX_PATTERNS.NODE_ID;
-  const nodeShape = REGEX_PATTERNS.NODE_SHAPE;
+  // 正規表現パターンの定義
+  const nodeId = "[a-zA-Z0-9_\\u3040-\\u309F\\u30A0-\\u30FF\\u4E00-\\u9FAF]+";
+  const nodeShape =
+    "(?:\\[[^\\]]*\\]|\\([^)]*\\)|\\{[^}]*\\}|\\(\\([^)]*\\)\\)|\\{\\{[^}]*\\}\\}|\\(\\[[^\\]]*\\]\\))?";
 
   // 様々な矢印パターン
   const patterns: {
