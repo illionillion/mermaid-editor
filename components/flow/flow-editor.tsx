@@ -426,8 +426,12 @@ export function FlowEditor() {
       setNodes(convertedNodes);
       setEdges(convertedEdges);
 
-      // インポートしたノードの数だけnodeIdをインクリメント
-      setNodeId(nodeId + data.nodes.length);
+      // インポートしたノードの数だけnodeIdをインクリメント（空配列の場合は0を返す）
+      const maxNodeId =
+        data.nodes.length > 0
+          ? Math.max(...data.nodes.map((node) => parseInt(node.id, 10) || 0))
+          : 0;
+      setNodeId(Math.max(nodeId, maxNodeId + 1));
     },
     [
       setNodes,

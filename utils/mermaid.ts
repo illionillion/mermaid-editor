@@ -291,13 +291,13 @@ export const parseMermaidCode = (mermaidCode: string): ParsedMermaidData => {
     (line) => !line.startsWith("flowchart") && !line.startsWith("graph")
   );
 
-  const nodeMap = new Map<string, ParsedMermaidNode>();
+  const nodeRegistry = new Map<string, ParsedMermaidNode>();
 
   // 最初にノード定義のみを処理
   for (const line of contentLines) {
     const nodeMatch = parseNodeDefinition(line);
     if (nodeMatch) {
-      nodeMap.set(nodeMatch.id, nodeMatch);
+      nodeRegistry.set(nodeMatch.id, nodeMatch);
     }
   }
 
@@ -306,22 +306,22 @@ export const parseMermaidCode = (mermaidCode: string): ParsedMermaidData => {
     const edgeMatch = parseEdgeDefinition(line);
     if (edgeMatch) {
       // エッジの両端のノードが存在しない場合は作成
-      if (!nodeMap.has(edgeMatch.source)) {
+      if (!nodeRegistry.has(edgeMatch.source)) {
         // エッジからノード情報を抽出（ラベル付きノード定義を探す）
         const sourceNodeInfo = extractNodeFromEdgeLine(line, edgeMatch.source);
-        nodeMap.set(edgeMatch.source, sourceNodeInfo);
+        nodeRegistry.set(edgeMatch.source, sourceNodeInfo);
       }
-      if (!nodeMap.has(edgeMatch.target)) {
+      if (!nodeRegistry.has(edgeMatch.target)) {
         // エッジからノード情報を抽出（ラベル付きノード定義を探す）
         const targetNodeInfo = extractNodeFromEdgeLine(line, edgeMatch.target);
-        nodeMap.set(edgeMatch.target, targetNodeInfo);
+        nodeRegistry.set(edgeMatch.target, targetNodeInfo);
       }
 
       result.edges.push(edgeMatch);
     }
   }
 
-  result.nodes = Array.from(nodeMap.values());
+  result.nodes = Array.from(nodeRegistry.values());
   return result;
 };
 
@@ -335,23 +335,25 @@ const extractNodeFromEdgeLine = (line: string, nodeId: string): ParsedMermaidNod
   // エッジ行からノードのラベルを抽出しようとする
   // 例: A[開始] --> B[終了] の場合、A[開始]からラベル「開始」を抽出
 
-  const nodeWithShapeRegex: { regex: RegExp; shape: MermaidShapeType }[] = [
-    { regex: new RegExp(`${nodeId}\\[([^\\]]*)\\]`), shape: "rectangle" },
-    { regex: new RegExp(`${nodeId}\\(\\(([^\\)]*)\\)\\)`), shape: "circle" },
-    { regex: new RegExp(`${nodeId}\\{\\{([^\\}]*)\\}\\}`), shape: "hexagon" },
-    { regex: new RegExp(`${nodeId}\\(\\[([^\\]]*)\\]\\)`), shape: "stadium" },
-    { regex: new RegExp(`${nodeId}\\(([^\\)]*)\\)`), shape: "rounded" },
-    { regex: new RegExp(`${nodeId}\\{([^\\}]*)\\}`), shape: "diamond" },
+  // 形状パターンの定義（より効率的に）
+  const shapePatterns: Array<{ pattern: string; shape: MermaidShapeType }> = [
+    { pattern: `\\[([^\\]]*)\\]`, shape: "rectangle" },
+    { pattern: `\\(\\(([^\\)]*)\\)\\)`, shape: "circle" },
+    { pattern: `\\{\\{([^\\}]*)\\}\\}`, shape: "hexagon" },
+    { pattern: `\\(\\[([^\\]]*)\\]\\)`, shape: "stadium" },
+    { pattern: `\\(([^\\)]*)\\)`, shape: "rounded" },
+    { pattern: `\\{([^\\}]*)\\}`, shape: "diamond" },
   ];
 
-  for (const pattern of nodeWithShapeRegex) {
-    const match = line.match(pattern.regex);
+  for (const { pattern, shape } of shapePatterns) {
+    const regex = new RegExp(`${nodeId}${pattern}`);
+    const match = line.match(regex);
     if (match) {
       return {
         id: nodeId,
         variableName: nodeId,
         label: match[1] || nodeId,
-        shapeType: pattern.shape,
+        shapeType: shape,
       };
     }
   }
@@ -415,8 +417,8 @@ const parseNodeDefinition = (line: string): ParsedMermaidNode | null => {
       regex: /^([a-zA-Z0-9_\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FAF]+)\{([^}]*)\}$/,
       shape: "diamond",
     },
-    // ラベルなしノード: A（日本語文字のみの場合は無効な行として扱う）
-    { regex: /^([a-zA-Z0-9_]+)$/, shape: "rectangle" },
+    // ラベルなしノード: 英数字とアンダースコア、日本語文字のみ
+    { regex: /^([a-zA-Z0-9_\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FAF]+)$/, shape: "rectangle" },
   ];
 
   for (const pattern of patterns) {
