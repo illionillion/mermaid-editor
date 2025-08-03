@@ -31,6 +31,14 @@ import {
 import { FlowPanel } from "./flow-panel";
 import { nodeTypes } from "./node-types";
 
+// レイアウト定数
+const LAYOUT_CONSTANTS = {
+  LEVEL_HEIGHT: 150, // レベル間の縦幅
+  NODE_SPACING: 250, // 同レベル内のノード間隔（横方向）
+  CENTER_OFFSET: 300, // 中央揃えのためのオフセット
+  VERTICAL_OFFSET: 50, // 上部からの初期オフセット
+} as const;
+
 const initialNodes: Node[] = [
   {
     id: "1",
@@ -366,17 +374,15 @@ export function FlowEditor() {
 
         // 位置を計算
         const positions = new Map<string, { x: number; y: number }>();
-        const levelHeight = 150; // レベル間の縦幅
-        const nodeSpacing = 250; // 同レベル内のノード間隔（横方向）を少し広げる
 
         nodesByLevel.forEach((nodeIds, level) => {
-          const levelWidth = nodeIds.length * nodeSpacing;
+          const levelWidth = nodeIds.length * LAYOUT_CONSTANTS.NODE_SPACING;
           const startX = -levelWidth / 2; // 中央揃え
 
           nodeIds.forEach((nodeId, index) => {
             positions.set(nodeId, {
-              x: startX + index * nodeSpacing + 300, // 左から右へノード配置（中央揃え）
-              y: level * levelHeight + 50, // 上から下へレベル配置
+              x: startX + index * LAYOUT_CONSTANTS.NODE_SPACING + LAYOUT_CONSTANTS.CENTER_OFFSET, // 左から右へノード配置（中央揃え）
+              y: level * LAYOUT_CONSTANTS.LEVEL_HEIGHT + LAYOUT_CONSTANTS.VERTICAL_OFFSET, // 上から下へレベル配置
             });
           });
         });
