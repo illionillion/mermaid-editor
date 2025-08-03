@@ -361,7 +361,7 @@ const extractNodeFromEdgeLine = (line: string, nodeId: string): ParsedMermaidNod
     id: nodeId,
     variableName: nodeId,
     label: nodeId,
-    shapeType: "rectangle" as MermaidShapeType,
+    shapeType: "rectangle",
   };
 };
 
