@@ -78,50 +78,48 @@ export function ImportModal({ isOpen, onClose, onImport }: ImportModalProps) {
   return (
     <Modal open={isOpen} onClose={handleClose} size="2xl">
       <ModalOverlay />
+      <ModalHeader>Mermaidコードインポート</ModalHeader>
       <ModalBody>
-        <ModalHeader>Mermaidコードインポート</ModalHeader>
-        <ModalBody>
-          <VStack gap={4}>
-            <Text fontSize="sm" color="gray.600">
-              Mermaidのフローチャートコードを貼り付けてインポートできます
-            </Text>
+        <VStack gap={4}>
+          <Text fontSize="sm" color="gray.600">
+            Mermaidのフローチャートコードを貼り付けてインポートできます
+          </Text>
 
-            <Textarea
-              value={mermaidCode}
-              onChange={(e) => {
-                setMermaidCode(e.target.value);
-                setError(null);
-              }}
-              placeholder={`例:\n${exampleCode}`}
-              rows={10}
-              resize="vertical"
-            />
+          <Textarea
+            value={mermaidCode}
+            onChange={(e) => {
+              setMermaidCode(e.target.value);
+              setError(null);
+            }}
+            placeholder={`例:\n${exampleCode}`}
+            rows={10}
+            resize="vertical"
+          />
 
-            {error && (
-              <Alert status="error">
-                <AlertIcon />
-                <AlertDescription>{error}</AlertDescription>
-              </Alert>
-            )}
+          {error && (
+            <Alert status="error">
+              <AlertIcon />
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          )}
 
-            <Text fontSize="xs" color="gray.500">
-              {HELP_TEXT}
-            </Text>
-          </VStack>
-        </ModalBody>
-        <ModalFooter w="full">
-          <Button onClick={handleClose}>キャンセル</Button>
-          <Button
-            colorScheme="blue"
-            onClick={handleImport}
-            loading={isLoading}
-            loadingText="インポート中..."
-            disabled={!mermaidCode.trim()}
-          >
-            インポート
-          </Button>
-        </ModalFooter>
+          <Text fontSize="xs" color="gray.500">
+            {HELP_TEXT}
+          </Text>
+        </VStack>
       </ModalBody>
+      <ModalFooter>
+        <Button onClick={handleClose}>キャンセル</Button>
+        <Button
+          colorScheme="blue"
+          onClick={handleImport}
+          loading={isLoading}
+          loadingText="インポート中..."
+          disabled={!mermaidCode.trim()}
+        >
+          インポート
+        </Button>
+      </ModalFooter>
     </Modal>
   );
 }
