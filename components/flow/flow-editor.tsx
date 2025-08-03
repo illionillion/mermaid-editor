@@ -419,9 +419,9 @@ export function FlowEditor() {
 
       setNodes(convertedNodes);
       setEdges(convertedEdges);
-      // 新しく追加されたノードのIDの最大値を取得して、次のIDを設定
-      const maxId = Math.max(...data.nodes.map((node) => parseInt(node.id) || 0), nodeId);
-      setNodeId(maxId + 1);
+
+      // インポートしたノードの数だけnodeIdをインクリメント
+      setNodeId(nodeId + data.nodes.length);
     },
     [
       setNodes,
