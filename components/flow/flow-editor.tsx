@@ -16,9 +16,10 @@ import {
 } from "@xyflow/react";
 import { Box, useDisclosure, useToken } from "@yamada-ui/react";
 import { useCallback, useState, useRef, useEffect } from "react";
-import { generateMermaidCode } from "../../utils/mermaid";
+import { generateMermaidCode, ParsedMermaidData } from "../../utils/mermaid";
 import { DownloadModal } from "../mermaid";
 import { MermaidArrowType } from "../types/types";
+import { ContributionPanel } from "./contribution-panel";
 import { edgeTypes } from "./edge-types";
 import {
   calculateNodePosition,
@@ -315,6 +316,59 @@ export function FlowEditor() {
     onOpen();
   }, [nodes, edges, onOpen]);
 
+  const handleImportMermaid = useCallback(
+    (data: ParsedMermaidData) => {
+      // ParsedMermaidNodeをReactFlowのNode型に変換
+      const convertedNodes: Node[] = data.nodes.map((parsedNode, index) => ({
+        id: parsedNode.id,
+        type: "editableNode",
+        position: { x: 100 + index * 200, y: 100 + (index % 3) * 100 }, // 仮の位置
+        data: {
+          label: parsedNode.label,
+          variableName: parsedNode.variableName,
+          shapeType: parsedNode.shapeType,
+          onLabelChange: handleLabelChange,
+          onVariableNameChange: handleVariableNameChange,
+          onShapeTypeChange: handleShapeTypeChange,
+          onDelete: handleNodeDelete,
+        },
+      }));
+
+      // ParsedMermaidEdgeをReactFlowのEdge型に変換
+      const convertedEdges: Edge[] = data.edges.map((parsedEdge) => ({
+        id: parsedEdge.id,
+        source: parsedEdge.source,
+        target: parsedEdge.target,
+        type: "editableEdge",
+        data: {
+          label: parsedEdge.label,
+          arrowType: parsedEdge.arrowType,
+          onLabelChange: handleEdgeLabelChange,
+          onArrowTypeChange: handleEdgeArrowTypeChange,
+          onDelete: handleEdgeDelete,
+        },
+      }));
+
+      setNodes(convertedNodes);
+      setEdges(convertedEdges);
+      // 新しく追加されたノードのIDの最大値を取得して、次のIDを設定
+      const maxId = Math.max(...data.nodes.map((node) => parseInt(node.id) || 0), nodeId);
+      setNodeId(maxId + 1);
+    },
+    [
+      setNodes,
+      setEdges,
+      nodeId,
+      handleLabelChange,
+      handleVariableNameChange,
+      handleShapeTypeChange,
+      handleNodeDelete,
+      handleEdgeLabelChange,
+      handleEdgeArrowTypeChange,
+      handleEdgeDelete,
+    ]
+  );
+
   return (
     <Box h="100vh" w="full">
       <ReactFlow
@@ -327,11 +381,17 @@ export function FlowEditor() {
         onConnectEnd={onConnectEnd}
         nodeTypes={nodeTypes}
         edgeTypes={edgeTypes}
+        proOptions={{ hideAttribution: true }}
         fitView
       >
         <Controls />
         <Background />
-        <FlowPanel onAddNode={addNode} onGenerateCode={generateMermaidCodeCallback} />
+        <FlowPanel
+          onAddNode={addNode}
+          onGenerateCode={generateMermaidCodeCallback}
+          onImportMermaid={handleImportMermaid}
+        />
+        <ContributionPanel />
       </ReactFlow>
 
       <DownloadModal open={open} onClose={onClose} mermaidCode={mermaidCode} />

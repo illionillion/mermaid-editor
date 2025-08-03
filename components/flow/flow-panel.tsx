@@ -1,28 +1,38 @@
 "use client";
 
 import { Panel } from "@xyflow/react";
-import { PlusIcon, CodeIcon, GithubIcon } from "@yamada-ui/lucide";
-import { VStack, HStack, Text, Button, Link } from "@yamada-ui/react";
+import { PlusIcon, CodeIcon, UploadIcon } from "@yamada-ui/lucide";
+import { VStack, HStack, Text, Button, useDisclosure } from "@yamada-ui/react";
+import { ParsedMermaidData } from "../../utils/mermaid";
+import { ImportModal } from "../mermaid";
 
 interface FlowPanelProps {
   onAddNode: () => void;
   onGenerateCode: () => void;
+  onImportMermaid: (data: ParsedMermaidData) => void;
 }
 
 interface PanelContentProps {
   onAddNode: () => void;
   onGenerateCode: () => void;
+  onImportMermaid: (data: ParsedMermaidData) => void;
 }
 
-export function FlowPanel({ onAddNode, onGenerateCode }: FlowPanelProps) {
+export function FlowPanel({ onAddNode, onGenerateCode, onImportMermaid }: FlowPanelProps) {
   return (
     <Panel position="top-left">
-      <PanelContent onAddNode={onAddNode} onGenerateCode={onGenerateCode} />
+      <PanelContent
+        onAddNode={onAddNode}
+        onGenerateCode={onGenerateCode}
+        onImportMermaid={onImportMermaid}
+      />
     </Panel>
   );
 }
 
-export function PanelContent({ onAddNode, onGenerateCode }: PanelContentProps) {
+export function PanelContent({ onAddNode, onGenerateCode, onImportMermaid }: PanelContentProps) {
+  const { isOpen, onOpen, onClose } = useDisclosure();
+
   return (
     <VStack gap={4} p={4} bg="white" borderRadius="md" boxShadow="md">
       <Text fontSize="lg" fontWeight="bold">
@@ -39,25 +49,12 @@ export function PanelContent({ onAddNode, onGenerateCode }: PanelContentProps) {
           <Button startIcon={<CodeIcon />} colorScheme="green" size="sm" onClick={onGenerateCode}>
             コード生成
           </Button>
-          <Button
-            size="sm"
-            as={Link}
-            href="https://github.com/illionillion/mermaid-editor"
-            target="_blank"
-            rel="noopener noreferrer"
-            display="flex"
-            alignItems="center"
-            gap={1}
-            fontSize="sm"
-            bg="gray.600"
-            color="white"
-            _hover={{ bg: "black", textDecoration: "none" }}
-            startIcon={<GithubIcon />}
-          >
-            <Text>コントリビューションはこちら</Text>
+          <Button startIcon={<UploadIcon />} colorScheme="purple" size="sm" onClick={onOpen}>
+            インポート
           </Button>
         </HStack>
       </VStack>
+      <ImportModal isOpen={isOpen} onClose={onClose} onImport={onImportMermaid} />
     </VStack>
   );
 }

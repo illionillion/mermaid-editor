@@ -1,11 +1,13 @@
 import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, test, expect, vi, beforeEach } from "vitest";
+import { ContributionPanelContent } from "../../../components/flow/contribution-panel";
 import { PanelContent } from "../../../components/flow/flow-panel";
 
 describe("PanelContent", () => {
   const defaultProps = {
     onAddNode: vi.fn(),
     onGenerateCode: vi.fn(),
+    onImportMermaid: vi.fn(),
   };
 
   beforeEach(() => {
@@ -30,7 +32,7 @@ describe("PanelContent", () => {
 
       expect(screen.getByText("ノード追加")).toBeInTheDocument();
       expect(screen.getByText("コード生成")).toBeInTheDocument();
-      expect(screen.getByText("コントリビューションはこちら")).toBeInTheDocument();
+      expect(screen.getByText("インポート")).toBeInTheDocument();
     });
   });
 
@@ -53,15 +55,74 @@ describe("PanelContent", () => {
       expect(defaultProps.onGenerateCode).toHaveBeenCalledTimes(1);
     });
 
-    test("GitHubリンクが正しいURLを持つ", () => {
+    test("インポートボタンクリックでモーダルが開く", () => {
       render(<PanelContent {...defaultProps} />);
 
-      const githubLink = screen.getByText("コントリビューションはこちら");
-      const linkElement = githubLink.closest("a");
+      const importButton = screen.getByText("インポート");
+      fireEvent.click(importButton);
 
-      expect(linkElement).toHaveAttribute("href", "https://github.com/illionillion/mermaid-editor");
-      expect(linkElement).toHaveAttribute("target", "_blank");
-      expect(linkElement).toHaveAttribute("rel", "noopener noreferrer");
+      // モーダルが開いていることを確認（ImportModalコンポーネント内のテキストで判定）
+      expect(screen.getByText("Mermaidコードインポート")).toBeInTheDocument();
+    });
+
+    test("Mermaidコードを入力してインポートできる", () => {
+      render(<PanelContent {...defaultProps} />);
+
+      // モーダルを開く
+      const importButton = screen.getByText("インポート");
+      fireEvent.click(importButton);
+
+      // テキストエリアに有効なMermaidコードを入力
+      const textarea = screen.getByPlaceholderText(/例:/);
+      const validMermaidCode = `flowchart TD
+    A[Start] --> B{Decision}
+    B -->|Yes| C[Process]
+    B -->|No| D[End]
+    C --> D`;
+
+      fireEvent.change(textarea, { target: { value: validMermaidCode } });
+
+      // モーダル内のインポートボタンをクリック（getAllByTextで取得し、モーダル内のものを選択）
+      const importButtons = screen.getAllByText("インポート");
+      const modalImportButton = importButtons[1]; // モーダル内のボタンは2番目
+      fireEvent.click(modalImportButton);
+
+      // onImportMermaidが呼ばれることを確認
+      expect(defaultProps.onImportMermaid).toHaveBeenCalledTimes(1);
+    });
+
+    test("不正なMermaidコードでエラーが表示される", () => {
+      render(<PanelContent {...defaultProps} />);
+
+      // モーダルを開く
+      const importButton = screen.getByText("インポート");
+      fireEvent.click(importButton);
+
+      // テキストエリアに無効なコードを入力
+      const textarea = screen.getByPlaceholderText(/例:/);
+      fireEvent.change(textarea, { target: { value: "invalid mermaid code" } });
+
+      // モーダル内のインポートボタンをクリック
+      const importButtons = screen.getAllByText("インポート");
+      const modalImportButton = importButtons[1]; // モーダル内のボタンは2番目
+      fireEvent.click(modalImportButton);
+
+      // エラーメッセージが表示されることを確認
+      expect(screen.getByText(/有効なMermaidコードが見つかりませんでした/)).toBeInTheDocument();
+      // onImportMermaidが呼ばれないことを確認
+      expect(defaultProps.onImportMermaid).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("GitHubリンク", () => {
+    test("GitHubリンクが正しいURLを持つ", () => {
+      render(<ContributionPanelContent />);
+
+      const githubLink = screen.getByRole("link");
+
+      expect(githubLink).toHaveAttribute("href", "https://github.com/illionillion/mermaid-editor");
+      expect(githubLink).toHaveAttribute("target", "_blank");
+      expect(githubLink).toHaveAttribute("rel", "noopener noreferrer");
     });
   });
 
@@ -73,13 +134,12 @@ describe("PanelContent", () => {
       expect(buttons.length).toBeGreaterThan(0);
     });
 
-    test("リンクが適切な属性を持つ", () => {
-      render(<PanelContent {...defaultProps} />);
+    test("GitHubリンクが適切な属性を持つ", () => {
+      render(<ContributionPanelContent />);
 
-      const githubLink = screen.getByText("コントリビューションはこちら");
-      const linkElement = githubLink.closest("a");
+      const githubLink = screen.getByRole("link");
 
-      expect(linkElement).toHaveAttribute("rel", "noopener noreferrer");
+      expect(githubLink).toHaveAttribute("rel", "noopener noreferrer");
     });
   });
 
