@@ -459,7 +459,6 @@ export function FlowEditor() {
         onConnectEnd={onConnectEnd}
         nodeTypes={nodeTypes}
         edgeTypes={edgeTypes}
-        proOptions={{ hideAttribution: true }}
         fitView
       >
         <Controls />
