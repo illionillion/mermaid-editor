@@ -3,11 +3,12 @@
 import { Box, Input } from "@yamada-ui/react";
 import { MouseEvent, ChangeEvent, KeyboardEvent } from "react";
 import { formatMermaidShape } from "../../utils/mermaid";
+import { MermaidShapeType } from "../types/types";
 
 interface VariableNameEditorProps {
   value: string;
   isEditing: boolean;
-  shapeType?: string;
+  shapeType?: MermaidShapeType;
   onClick: (e: MouseEvent) => void;
   onChange: (e: ChangeEvent<HTMLInputElement>) => void;
   onKeyDown: (e: KeyboardEvent) => void;

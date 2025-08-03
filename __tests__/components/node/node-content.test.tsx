@@ -2,13 +2,14 @@ import { render, screen, fireEvent } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, test, expect, vi, beforeEach } from "vitest";
 import { NodeContent } from "../../../components/node/editable-node";
+import { SHAPE_OPTIONS } from "../../../components/types/types";
 
 describe("NodeContent", () => {
   const defaultProps = {
     data: {
       label: "テストノード",
       variableName: "testNode",
-      shapeType: "rectangle",
+      shapeType: SHAPE_OPTIONS[0].type,
       onLabelChange: vi.fn(),
       onVariableNameChange: vi.fn(),
       onShapeTypeChange: vi.fn(),
@@ -143,7 +144,7 @@ describe("NodeContent", () => {
         data: {
           label: "テストノード",
           variableName: "testNode",
-          shapeType: "rectangle",
+          shapeType: SHAPE_OPTIONS[0].type,
         },
         id: "1",
       };

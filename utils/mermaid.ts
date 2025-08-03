@@ -1,5 +1,34 @@
 import { FlowData } from "../components/flow/flow-helpers";
-import { MermaidArrowType } from "../components/types/types";
+import { MermaidArrowType, MermaidShapeType } from "../components/types/types";
+
+/**
+ * パースされたMermaidデータの型定義
+ */
+export interface ParsedMermaidData {
+  nodes: ParsedMermaidNode[];
+  edges: ParsedMermaidEdge[];
+}
+
+/**
+ * パースされたMermaidノードの型定義
+ */
+export interface ParsedMermaidNode {
+  id: string;
+  variableName: string;
+  label: string;
+  shapeType: MermaidShapeType;
+}
+
+/**
+ * パースされたMermaidエッジの型定義
+ */
+export interface ParsedMermaidEdge {
+  id: string;
+  source: string;
+  target: string;
+  label: string;
+  arrowType: MermaidArrowType;
+}
 
 // Mermaidの予約語リスト
 const RESERVED_WORDS = new Set([
@@ -72,7 +101,7 @@ export const getReservedWords = (): Set<string> => {
  * @param label ノードラベル
  * @returns Mermaidの形状記法
  */
-export const formatMermaidShape = (shapeType: string, label: string): string => {
+export const formatMermaidShape = (shapeType: MermaidShapeType, label: string): string => {
   switch (shapeType) {
     case "rectangle":
       return `[${label}]`;
@@ -208,7 +237,7 @@ export const generateMermaidCode = (flowData: FlowData): string => {
   flowData.nodes.forEach((node) => {
     const variableName = (node.data.variableName as string) || `node${node.id}`;
     const safeVariableName = getSafeVariableName(variableName);
-    const shapeType = (node.data.shapeType as string) || "rectangle";
+    const shapeType = (node.data.shapeType as MermaidShapeType) || "rectangle";
     const label = (node.data.label as string) || "";
     const shapeCode = formatMermaidShape(shapeType, label);
     code += `    ${safeVariableName}${shapeCode}\n`;
@@ -235,4 +264,303 @@ export const generateMermaidCode = (flowData: FlowData): string => {
   });
 
   return code;
+};
+
+/**
+ * Mermaidコードをパースしてデータ構造に変換する
+ * @param mermaidCode Mermaidコード文字列
+ * @returns パースされたデータ
+ */
+export const parseMermaidCode = (mermaidCode: string): ParsedMermaidData => {
+  const result: ParsedMermaidData = {
+    nodes: [],
+    edges: [],
+  };
+
+  if (!mermaidCode || mermaidCode.trim() === "") {
+    return result;
+  }
+
+  const lines = mermaidCode
+    .split("\n")
+    .map((line) => line.trim())
+    .filter((line) => line);
+
+  // flowchartヘッダーをスキップ
+  const contentLines = lines.filter(
+    (line) => !line.startsWith("flowchart") && !line.startsWith("graph")
+  );
+
+  const nodeMap = new Map<string, ParsedMermaidNode>();
+
+  // 最初にノード定義のみを処理
+  for (const line of contentLines) {
+    const nodeMatch = parseNodeDefinition(line);
+    if (nodeMatch) {
+      nodeMap.set(nodeMatch.id, nodeMatch);
+    }
+  }
+
+  // 次にエッジ定義を処理
+  for (const line of contentLines) {
+    const edgeMatch = parseEdgeDefinition(line);
+    if (edgeMatch) {
+      // エッジの両端のノードが存在しない場合は作成
+      if (!nodeMap.has(edgeMatch.source)) {
+        // エッジからノード情報を抽出（ラベル付きノード定義を探す）
+        const sourceNodeInfo = extractNodeFromEdgeLine(line, edgeMatch.source);
+        nodeMap.set(edgeMatch.source, sourceNodeInfo);
+      }
+      if (!nodeMap.has(edgeMatch.target)) {
+        // エッジからノード情報を抽出（ラベル付きノード定義を探す）
+        const targetNodeInfo = extractNodeFromEdgeLine(line, edgeMatch.target);
+        nodeMap.set(edgeMatch.target, targetNodeInfo);
+      }
+
+      result.edges.push(edgeMatch);
+    }
+  }
+
+  result.nodes = Array.from(nodeMap.values());
+  return result;
+};
+
+/**
+ * エッジ行からノード情報を抽出する
+ * @param line エッジ定義行
+ * @param nodeId ノードID
+ * @returns ノード情報
+ */
+const extractNodeFromEdgeLine = (line: string, nodeId: string): ParsedMermaidNode => {
+  // エッジ行からノードのラベルを抽出しようとする
+  // 例: A[開始] --> B[終了] の場合、A[開始]からラベル「開始」を抽出
+
+  const nodeWithShapeRegex: { regex: RegExp; shape: MermaidShapeType }[] = [
+    { regex: new RegExp(`${nodeId}\\[([^\\]]*)\\]`), shape: "rectangle" },
+    { regex: new RegExp(`${nodeId}\\(\\(([^\\)]*)\\)\\)`), shape: "circle" },
+    { regex: new RegExp(`${nodeId}\\{\\{([^\\}]*)\\}\\}`), shape: "hexagon" },
+    { regex: new RegExp(`${nodeId}\\(\\[([^\\]]*)\\]\\)`), shape: "stadium" },
+    { regex: new RegExp(`${nodeId}\\(([^\\)]*)\\)`), shape: "rounded" },
+    { regex: new RegExp(`${nodeId}\\{([^\\}]*)\\}`), shape: "diamond" },
+  ];
+
+  for (const pattern of nodeWithShapeRegex) {
+    const match = line.match(pattern.regex);
+    if (match) {
+      return {
+        id: nodeId,
+        variableName: nodeId,
+        label: match[1] || nodeId,
+        shapeType: pattern.shape,
+      };
+    }
+  }
+
+  // パターンにマッチしない場合はデフォルト
+  return {
+    id: nodeId,
+    variableName: nodeId,
+    label: nodeId,
+    shapeType: "rectangle" as MermaidShapeType,
+  };
+};
+
+/**
+ * ノード定義行をパースする
+ * @param line 行文字列
+ * @returns パースされたノード情報またはnull
+ */
+const parseNodeDefinition = (line: string): ParsedMermaidNode | null => {
+  // 矢印が含まれている場合はノード定義ではない
+  if (
+    line.includes("-->") ||
+    line.includes("==>") ||
+    line.includes("-.->") ||
+    line.includes("~~~") ||
+    line.includes("<-->") ||
+    line.includes("<==>")
+  ) {
+    return null;
+  }
+
+  // 各形状パターンのマッチング（より具体的なパターンを先に）
+  const patterns: { regex: RegExp; shape: MermaidShapeType }[] = [
+    // 四角形: A[label] または A[]
+    {
+      regex: /^([a-zA-Z0-9_\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FAF]+)\[([^\]]*)\]$/,
+      shape: "rectangle",
+    },
+    // 円: A((label))
+    {
+      regex: /^([a-zA-Z0-9_\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FAF]+)\(\(([^)]*)\)\)$/,
+      shape: "circle",
+    },
+    // 六角形: A{{label}}
+    {
+      regex: /^([a-zA-Z0-9_\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FAF]+)\{\{([^}]*)\}\}$/,
+      shape: "hexagon",
+    },
+    // スタジアム: A([label]) - 角丸よりも先にチェック
+    {
+      regex: /^([a-zA-Z0-9_\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FAF]+)\(\[([^\]]*)\]\)$/,
+      shape: "stadium",
+    },
+    // 角丸四角形: A(label)
+    {
+      regex: /^([a-zA-Z0-9_\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FAF]+)\(([^)]*)\)$/,
+      shape: "rounded",
+    },
+    // ダイアモンド: A{label}
+    {
+      regex: /^([a-zA-Z0-9_\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FAF]+)\{([^}]*)\}$/,
+      shape: "diamond",
+    },
+    // ラベルなしノード: A（日本語文字のみの場合は無効な行として扱う）
+    { regex: /^([a-zA-Z0-9_]+)$/, shape: "rectangle" },
+  ];
+
+  for (const pattern of patterns) {
+    const match = line.match(pattern.regex);
+    if (match) {
+      const id = match[1];
+      const label = match[2] !== undefined ? match[2] : id; // ラベルなしの場合はIDをラベルにする
+
+      // 変数名にスペースが含まれている場合は無効
+      if (id.includes(" ")) {
+        continue;
+      }
+
+      return {
+        id,
+        variableName: id,
+        label,
+        shapeType: pattern.shape,
+      };
+    }
+  }
+
+  return null;
+};
+
+/**
+ * エッジ定義行をパースする
+ * @param line 行文字列
+ * @returns パースされたエッジ情報またはnull
+ */
+const parseEdgeDefinition = (line: string): ParsedMermaidEdge | null => {
+  // 様々な矢印パターン
+  const patterns: {
+    regex: RegExp;
+    arrowType: MermaidArrowType;
+    labelPosition?: "middle" | "sides";
+  }[] = [
+    // 太い双方向矢印（ラベル付き）: A <==label==> B
+    {
+      regex:
+        /^([a-zA-Z0-9_\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FAF]+)(?:\[[^\]]*\]|\([^)]*\)|\{[^}]*\}|\(\([^)]*\)\)|\{\{[^}]*\}\}|\(\[[^\]]*\]\))?\s*<==(.+)==>\s*([a-zA-Z0-9_\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FAF]+)(?:\[[^\]]*\]|\([^)]*\)|\{[^}]*\}|\(\([^)]*\)\)|\{\{[^}]*\}\}|\(\[[^\]]*\]\))?$/,
+      arrowType: "bidirectional-thick",
+      labelPosition: "middle",
+    },
+    // 太い双方向矢印（ラベルなし）: A <==> B
+    {
+      regex:
+        /^([a-zA-Z0-9_\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FAF]+)(?:\[[^\]]*\]|\([^)]*\)|\{[^}]*\}|\(\([^)]*\)\)|\{\{[^}]*\}\}|\(\[[^\]]*\]\))?\s*<==>\s*([a-zA-Z0-9_\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FAF]+)(?:\[[^\]]*\]|\([^)]*\)|\{[^}]*\}|\(\([^)]*\)\)|\{\{[^}]*\}\}|\(\[[^\]]*\]\))?$/,
+      arrowType: "bidirectional-thick",
+    },
+    // 双方向矢印（ラベル付き）: A <-->|label| B
+    {
+      regex:
+        /^([a-zA-Z0-9_\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FAF]+)(?:\[[^\]]*\]|\([^)]*\)|\{[^}]*\}|\(\([^)]*\)\)|\{\{[^}]*\}\}|\(\[[^\]]*\]\))?\s*<-->\s*\|\s*([^|]*)\s*\|\s*([a-zA-Z0-9_\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FAF]+)(?:\[[^\]]*\]|\([^)]*\)|\{[^}]*\}|\(\([^)]*\)\)|\{\{[^}]*\}\}|\(\[[^\]]*\]\))?$/,
+      arrowType: "bidirectional",
+    },
+    // 双方向矢印（ラベルなし）: A <--> B
+    {
+      regex:
+        /^([a-zA-Z0-9_\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FAF]+)(?:\[[^\]]*\]|\([^)]*\)|\{[^}]*\}|\(\([^)]*\)\)|\{\{[^}]*\}\}|\(\[[^\]]*\]\))?\s*<-->\s*([a-zA-Z0-9_\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FAF]+)(?:\[[^\]]*\]|\([^)]*\)|\{[^}]*\}|\(\([^)]*\)\)|\{\{[^}]*\}\}|\(\[[^\]]*\]\))?$/,
+      arrowType: "bidirectional",
+    },
+    // 点線矢印（ラベル付き）: A -. label .-> B
+    {
+      regex:
+        /^([a-zA-Z0-9_\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FAF]+)(?:\[[^\]]*\]|\([^)]*\)|\{[^}]*\}|\(\([^)]*\)\)|\{\{[^}]*\}\}|\(\[[^\]]*\]\))?\s*-\.\s*(.+?)\s*\.->\s*([a-zA-Z0-9_\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FAF]+)(?:\[[^\]]*\]|\([^)]*\)|\{[^}]*\}|\(\([^)]*\)\)|\{\{[^}]*\}\}|\(\[[^\]]*\]\))?$/,
+      arrowType: "dotted",
+      labelPosition: "sides",
+    },
+    // 点線矢印（ラベルなし）: A -.-> B
+    {
+      regex:
+        /^([a-zA-Z0-9_\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FAF]+)(?:\[[^\]]*\]|\([^)]*\)|\{[^}]*\}|\(\([^)]*\)\)|\{\{[^}]*\}\}|\(\[[^\]]*\]\))?\s*-\.->\s*([a-zA-Z0-9_\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FAF]+)(?:\[[^\]]*\]|\([^)]*\)|\{[^}]*\}|\(\([^)]*\)\)|\{\{[^}]*\}\}|\(\[[^\]]*\]\))?$/,
+      arrowType: "dotted",
+    },
+    // 太い矢印（ラベル付き）: A ==>|label| B
+    {
+      regex:
+        /^([a-zA-Z0-9_\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FAF]+)(?:\[[^\]]*\]|\([^)]*\)|\{[^}]*\}|\(\([^)]*\)\)|\{\{[^}]*\}\}|\(\[[^\]]*\]\))?\s*==>\s*\|\s*([^|]*)\s*\|\s*([a-zA-Z0-9_\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FAF]+)(?:\[[^\]]*\]|\([^)]*\)|\{[^}]*\}|\(\([^)]*\)\)|\{\{[^}]*\}\}|\(\[[^\]]*\]\))?$/,
+      arrowType: "thick",
+    },
+    // 太い矢印（ラベルなし）: A ==> B
+    {
+      regex:
+        /^([a-zA-Z0-9_\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FAF]+)(?:\[[^\]]*\]|\([^)]*\)|\{[^}]*\}|\(\([^)]*\)\)|\{\{[^}]*\}\}|\(\[[^\]]*\]\))?\s*==>\s*([a-zA-Z0-9_\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FAF]+)(?:\[[^\]]*\]|\([^)]*\)|\{[^}]*\}|\(\([^)]*\)\)|\{\{[^}]*\}\}|\(\[[^\]]*\]\))?$/,
+      arrowType: "thick",
+    },
+    // 通常の矢印（ラベル付き）: A -->|label| B
+    {
+      regex:
+        /^([a-zA-Z0-9_\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FAF]+)(?:\[[^\]]*\]|\([^)]*\)|\{[^}]*\}|\(\([^)]*\)\)|\{\{[^}]*\}\}|\(\[[^\]]*\]\))?\s*-->\s*\|\s*([^|]*)\s*\|\s*([a-zA-Z0-9_\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FAF]+)(?:\[[^\]]*\]|\([^)]*\)|\{[^}]*\}|\(\([^)]*\)\)|\{\{[^}]*\}\}|\(\[[^\]]*\]\))?$/,
+      arrowType: "arrow",
+    },
+    // 通常の矢印（ラベルなし）: A --> B
+    {
+      regex:
+        /^([a-zA-Z0-9_\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FAF]+)(?:\[[^\]]*\]|\([^)]*\)|\{[^}]*\}|\(\([^)]*\)\)|\{\{[^}]*\}\}|\(\[[^\]]*\]\))?\s*-->\s*([a-zA-Z0-9_\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FAF]+)(?:\[[^\]]*\]|\([^)]*\)|\{[^}]*\}|\(\([^)]*\)\)|\{\{[^}]*\}\}|\(\[[^\]]*\]\))?$/,
+      arrowType: "arrow",
+    },
+  ];
+
+  for (const pattern of patterns) {
+    const match = line.match(pattern.regex);
+    if (match) {
+      let source: string;
+      let target: string;
+      let label = "";
+
+      // 双方向矢印（太い）の特殊な記法に対応
+      if (
+        pattern.arrowType === "bidirectional-thick" &&
+        match.length >= 4 &&
+        match[2] &&
+        match[2].trim() !== ""
+      ) {
+        // 太い双方向矢印（ラベル付き）: A <==label==> B
+        source = match[1];
+        label = match[2].trim();
+        target = match[3];
+      } else if (pattern.labelPosition === "sides" && match.length >= 4) {
+        // 点線矢印（ラベル付き）: A -. label .-> B
+        source = match[1];
+        label = match[2].trim();
+        target = match[3];
+      } else if (match.length === 4) {
+        // 一般的なラベル付きパターン
+        source = match[1];
+        label = match[2].trim();
+        target = match[3];
+      } else {
+        // ラベルなしパターン
+        source = match[1];
+        target = match[2];
+      }
+
+      return {
+        id: `${source}-${target}`,
+        source,
+        target,
+        label,
+        arrowType: pattern.arrowType,
+      };
+    }
+  }
+
+  return null;
 };

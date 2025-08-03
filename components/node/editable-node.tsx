@@ -4,14 +4,14 @@ import { Handle, Position } from "@xyflow/react";
 import { Box } from "@yamada-ui/react";
 import { useState, useRef, MouseEvent, ChangeEvent, KeyboardEvent } from "react";
 import { VariableNameEditor, LabelEditor } from "../editor";
-import { UI_CONSTANTS } from "../types/types";
+import { UI_CONSTANTS, MermaidShapeType } from "../types/types";
 import { NodeMenu } from "./node-menu";
 
 interface EditableNodeProps {
   data: {
     label: string;
     variableName?: string;
-    shapeType?: string;
+    shapeType?: MermaidShapeType;
     onLabelChange?: (nodeId: string, newLabel: string) => void;
     onVariableNameChange?: (nodeId: string, newVariableName: string) => void;
     onShapeTypeChange?: (nodeId: string, newShapeType: string) => void;
