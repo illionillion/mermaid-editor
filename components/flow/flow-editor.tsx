@@ -16,9 +16,10 @@ import {
 } from "@xyflow/react";
 import { Box, useDisclosure, useToken } from "@yamada-ui/react";
 import { useCallback, useState, useRef, useEffect } from "react";
-import { generateMermaidCode } from "../../utils/mermaid";
+import { generateMermaidCode, ParsedMermaidData } from "../../utils/mermaid";
 import { DownloadModal } from "../mermaid";
 import { MermaidArrowType } from "../types/types";
+import { ContributionPanel } from "./contribution-panel";
 import { edgeTypes } from "./edge-types";
 import {
   calculateNodePosition,
@@ -29,6 +30,14 @@ import {
 } from "./flow-helpers";
 import { FlowPanel } from "./flow-panel";
 import { nodeTypes } from "./node-types";
+
+// レイアウト定数
+const LAYOUT_CONSTANTS = {
+  LEVEL_HEIGHT: 150, // レベル間の縦幅
+  NODE_SPACING: 250, // 同レベル内のノード間隔（横方向）
+  CENTER_OFFSET: 300, // 中央揃えのためのオフセット
+  VERTICAL_OFFSET: 50, // 上部からの初期オフセット
+} as const;
 
 const initialNodes: Node[] = [
   {
@@ -315,6 +324,125 @@ export function FlowEditor() {
     onOpen();
   }, [nodes, edges, onOpen]);
 
+  const handleImportMermaid = useCallback(
+    (data: ParsedMermaidData) => {
+      // ノードの階層構造を分析してレイアウトを決定
+      const layoutNodes = (
+        nodes: ParsedMermaidData["nodes"],
+        edges: ParsedMermaidData["edges"]
+      ) => {
+        // ルートノード（入力エッジがないノード）を見つける
+        const hasIncomingEdge = new Set(edges.map((edge) => edge.target));
+        const rootNodes = nodes.filter((node) => !hasIncomingEdge.has(node.id));
+
+        // 各ノードのレベル（階層）を計算
+        const levels = new Map<string, number>();
+        const visited = new Set<string>();
+
+        const calculateLevel = (nodeId: string, level: number = 0): void => {
+          if (visited.has(nodeId)) return;
+          visited.add(nodeId);
+
+          const currentLevel = levels.get(nodeId) ?? 0;
+          levels.set(nodeId, Math.max(currentLevel, level));
+
+          // 子ノードのレベルを計算
+          const outgoingEdges = edges.filter((edge) => edge.source === nodeId);
+          outgoingEdges.forEach((edge) => {
+            calculateLevel(edge.target, level + 1);
+          });
+        };
+
+        // ルートノードから階層を計算
+        rootNodes.forEach((node) => calculateLevel(node.id, 0));
+
+        // 残りのノードも処理（循環参照などがある場合）
+        nodes.forEach((node) => {
+          if (!levels.has(node.id)) {
+            levels.set(node.id, 0);
+          }
+        });
+
+        // レベルごとにノードをグループ化
+        const nodesByLevel = new Map<number, string[]>();
+        levels.forEach((level, nodeId) => {
+          if (!nodesByLevel.has(level)) {
+            nodesByLevel.set(level, []);
+          }
+          nodesByLevel.get(level)!.push(nodeId);
+        });
+
+        // 位置を計算
+        const positions = new Map<string, { x: number; y: number }>();
+
+        nodesByLevel.forEach((nodeIds, level) => {
+          const levelWidth = nodeIds.length * LAYOUT_CONSTANTS.NODE_SPACING;
+          const startX = -levelWidth / 2; // 中央揃え
+
+          nodeIds.forEach((nodeId, index) => {
+            positions.set(nodeId, {
+              x: startX + index * LAYOUT_CONSTANTS.NODE_SPACING + LAYOUT_CONSTANTS.CENTER_OFFSET, // 左から右へノード配置（中央揃え）
+              y: level * LAYOUT_CONSTANTS.LEVEL_HEIGHT + LAYOUT_CONSTANTS.VERTICAL_OFFSET, // 上から下へレベル配置
+            });
+          });
+        });
+
+        return positions;
+      };
+
+      const positions = layoutNodes(data.nodes, data.edges);
+
+      // ParsedMermaidNodeをReactFlowのNode型に変換
+      const convertedNodes: Node[] = data.nodes.map((parsedNode) => ({
+        id: parsedNode.id,
+        type: "editableNode",
+        position: positions.get(parsedNode.id) || { x: 250, y: 50 }, // フォールバック位置
+        data: {
+          label: parsedNode.label,
+          variableName: parsedNode.variableName,
+          shapeType: parsedNode.shapeType,
+          onLabelChange: handleLabelChange,
+          onVariableNameChange: handleVariableNameChange,
+          onShapeTypeChange: handleShapeTypeChange,
+          onDelete: handleNodeDelete,
+        },
+      }));
+
+      // ParsedMermaidEdgeをReactFlowのEdge型に変換
+      const convertedEdges: Edge[] = data.edges.map((parsedEdge) => ({
+        id: parsedEdge.id,
+        source: parsedEdge.source,
+        target: parsedEdge.target,
+        type: "editableEdge",
+        data: {
+          label: parsedEdge.label,
+          arrowType: parsedEdge.arrowType,
+          onLabelChange: handleEdgeLabelChange,
+          onArrowTypeChange: handleEdgeArrowTypeChange,
+          onDelete: handleEdgeDelete,
+        },
+      }));
+
+      setNodes(convertedNodes);
+      setEdges(convertedEdges);
+
+      // インポートされたノード数を次のnodeIdに設定
+      setNodeId(data.nodes.length + 1);
+    },
+    [
+      setNodes,
+      setEdges,
+      nodeId,
+      handleLabelChange,
+      handleVariableNameChange,
+      handleShapeTypeChange,
+      handleNodeDelete,
+      handleEdgeLabelChange,
+      handleEdgeArrowTypeChange,
+      handleEdgeDelete,
+    ]
+  );
+
   return (
     <Box h="100vh" w="full">
       <ReactFlow
@@ -331,7 +459,12 @@ export function FlowEditor() {
       >
         <Controls />
         <Background />
-        <FlowPanel onAddNode={addNode} onGenerateCode={generateMermaidCodeCallback} />
+        <FlowPanel
+          onAddNode={addNode}
+          onGenerateCode={generateMermaidCodeCallback}
+          onImportMermaid={handleImportMermaid}
+        />
+        <ContributionPanel />
       </ReactFlow>
 
       <DownloadModal open={open} onClose={onClose} mermaidCode={mermaidCode} />
