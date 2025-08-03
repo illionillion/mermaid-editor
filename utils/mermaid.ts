@@ -431,7 +431,6 @@ const parseNodeDefinition = (line: string): ParsedMermaidNode | null => {
       if (id.includes(" ")) {
         continue;
       }
-
       return {
         id,
         variableName: id,
