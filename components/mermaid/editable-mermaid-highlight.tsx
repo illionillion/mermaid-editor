@@ -4,6 +4,7 @@ import { Box } from "@yamada-ui/react";
 import { highlight, languages } from "prismjs";
 import Editor from "react-simple-code-editor";
 import "prismjs/themes/prism-dark.css";
+import "prismjs/components/prism-mermaid";
 
 interface EditableMermaidHighlightProps {
   value: string;
@@ -22,13 +23,20 @@ export function EditableMermaidHighlight({
 }: EditableMermaidHighlightProps) {
   const highlightCode = (code: string) => {
     try {
-      // PrismJS does not support Mermaid syntax highlighting out of the box.
-      // Using plain text highlighting to avoid syntax errors while maintaining
-      // the code editor functionality and consistent styling.
-      return highlight(code, languages.text, "text");
+      // Now using Mermaid syntax highlighting with PrismJS
+      return highlight(code, languages.mermaid, "mermaid");
     } catch {
-      // フォールバック: ハイライトに失敗した場合はプレーンテキスト
-      return code;
+      // フォールバック: ハイライトに失敗した場合はHTMLエスケープしたプレーンテキスト
+      return code.replace(/[&<>"']/g, (match) => {
+        const escapeMap: Record<string, string> = {
+          "&": "&amp;",
+          "<": "&lt;",
+          ">": "&gt;",
+          '"': "&quot;",
+          "'": "&#x27;",
+        };
+        return escapeMap[match];
+      });
     }
   };
 
