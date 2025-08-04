@@ -23,12 +23,11 @@ export function EditableMermaidHighlight({
   const highlightCode = (code: string) => {
     try {
       // PrismJS does not support Mermaid syntax highlighting out of the box.
-      // This will render the code as plain text.
+      // Using plain text highlighting to avoid syntax errors while maintaining
+      // the code editor functionality and consistent styling.
       return highlight(code, languages.text, "text");
-    } catch (err) {
+    } catch {
       // フォールバック: ハイライトに失敗した場合はプレーンテキスト
-      console.error("Highlight error:", err);
-
       return code;
     }
   };
