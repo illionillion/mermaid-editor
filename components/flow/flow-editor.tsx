@@ -241,7 +241,8 @@ export function FlowEditor() {
       // スマホでタッチイベントの場合、targetが期待される要素でない可能性があるため、
       // react-flow__pane またはその子要素の場合に新しいノードを作成
       const shouldCreateNode =
-        targetIsPane || (event && (event.target as Element)?.closest?.(".react-flow__pane"));
+        targetIsPane ||
+        (event && event.target instanceof Element && event.target.closest(".react-flow__pane"));
 
       if (shouldCreateNode && event) {
         // 接続情報を解析
@@ -254,7 +255,7 @@ export function FlowEditor() {
         // マウス位置またはタッチ位置を取得
         let clientX: number, clientY: number;
 
-        if ("changedTouches" in event && event.changedTouches.length > 0) {
+        if (event instanceof TouchEvent && event.changedTouches.length > 0) {
           // タッチエンドイベントの場合
           clientX = event.changedTouches[0].clientX;
           clientY = event.changedTouches[0].clientY;
