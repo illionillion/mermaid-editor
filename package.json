@@ -38,8 +38,10 @@
     "@yamada-ui/lucide": "^1.10.5",
     "@yamada-ui/react": "^1.7.7",
     "next": "14.1.0",
+    "prismjs": "^1.30.0",
     "react": "^18",
     "react-dom": "^18",
+    "react-simple-code-editor": "^0.14.1",
     "react-syntax-highlighter": "^15.6.1"
   },
   "devDependencies": {
@@ -51,6 +53,7 @@
     "@testing-library/react": "^16.3.0",
     "@testing-library/user-event": "^14.6.1",
     "@types/node": "^20",
+    "@types/prismjs": "^1.26.5",
     "@types/react": "^18",
     "@types/react-dom": "^18",
     "@typescript-eslint/eslint-plugin": "^8.38.0",

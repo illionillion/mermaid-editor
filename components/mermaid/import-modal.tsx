@@ -7,7 +7,6 @@ import {
   ModalBody,
   ModalFooter,
   Button,
-  Textarea,
   VStack,
   Text,
   Alert,
@@ -17,6 +16,7 @@ import {
 import { useState } from "react";
 import { parseMermaidCode } from "../../utils/mermaid";
 import type { ParsedMermaidData } from "../../utils/mermaid";
+import { EditableMermaidHighlight } from "./editable-mermaid-highlight";
 
 interface ImportModalProps {
   isOpen: boolean;
@@ -80,28 +80,21 @@ export function ImportModal({ isOpen, onClose, onImport }: ImportModalProps) {
       <ModalOverlay />
       <ModalHeader>Mermaidコードインポート</ModalHeader>
       <ModalBody>
-        <VStack gap={4}>
+        <VStack gap={2}>
           <Text fontSize="sm" color="gray.600">
             Mermaidのフローチャートコードを貼り付けてインポートできます
           </Text>
 
-          <Textarea
+          <EditableMermaidHighlight
             value={mermaidCode}
-            onChange={(e) => {
-              setMermaidCode(e.target.value);
+            onChange={(value) => {
+              setMermaidCode(value);
               setError(null);
             }}
             placeholder={`例:\n${exampleCode}`}
-            rows={10}
-            resize="vertical"
+            minHeight="300px"
           />
-
-          {error && (
-            <Alert status="error">
-              <AlertIcon />
-              <AlertDescription>{error}</AlertDescription>
-            </Alert>
-          )}
+          {error && <ErrorAlert message={error} />}
 
           <Text fontSize="xs" color="gray.500">
             {HELP_TEXT}
@@ -123,3 +116,10 @@ export function ImportModal({ isOpen, onClose, onImport }: ImportModalProps) {
     </Modal>
   );
 }
+
+const ErrorAlert = ({ message }: { message: string }) => (
+  <Alert status="error">
+    <AlertIcon />
+    <AlertDescription>{message}</AlertDescription>
+  </Alert>
+);
