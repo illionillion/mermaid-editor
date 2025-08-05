@@ -1,7 +1,7 @@
 "use client";
 
 import { BaseEdge, EdgeLabelRenderer, EdgeProps, getBezierPath } from "@xyflow/react";
-import { X } from "@yamada-ui/lucide";
+import { XIcon } from "@yamada-ui/lucide";
 import { Input, Box, IconButton, HStack } from "@yamada-ui/react";
 import { useState, useRef, useEffect } from "react";
 import { getArrowTypeSymbol } from "../../utils/mermaid";
@@ -139,7 +139,7 @@ export function EdgeContent({ id, labelX, labelY, data }: EdgeContentProps) {
           />
           <IconButton
             aria-label="Delete edge"
-            icon={<X />}
+            icon={<XIcon />}
             size="xs"
             variant="ghost"
             colorScheme="red"
