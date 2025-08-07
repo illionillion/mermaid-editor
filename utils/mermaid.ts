@@ -228,10 +228,14 @@ export const getArrowTypeDisplayName = (arrowType: MermaidArrowType): string => 
 /**
  * FlowDataからMermaidコードを生成する
  * @param flowData ノードとエッジのデータ
+ * @param direction フローチャートの方向 (TD, LR, RL, BT)
  * @returns Mermaidコード
  */
-export const generateMermaidCode = (flowData: FlowData): string => {
-  let code = "flowchart TD\n";
+export const generateMermaidCode = (
+  flowData: FlowData,
+  direction: "TD" | "LR" | "RL" | "BT" = "TD"
+): string => {
+  let code = `flowchart ${direction}\n`;
 
   // ノードの定義
   flowData.nodes.forEach((node) => {
