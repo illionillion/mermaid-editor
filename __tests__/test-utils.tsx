@@ -9,7 +9,6 @@ import { userEvent } from "@testing-library/user-event";
 import type { UIProviderProps } from "@yamada-ui/react";
 import { UIProvider } from "@yamada-ui/react";
 import type { PropsWithChildren, ReactNode } from "react";
-import "@testing-library/jest-dom/vitest";
 
 export interface RenderOptions extends OriginalRenderOptions {
   withProvider?: boolean;
