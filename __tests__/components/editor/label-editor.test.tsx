@@ -1,6 +1,7 @@
-import { render, screen, fireEvent } from "@testing-library/react";
+import { screen, fireEvent } from "@testing-library/react";
 import { describe, test, expect, vi, beforeEach } from "vitest";
 import { LabelEditor } from "../../../components/editor/label-editor";
+import { render } from "../../test-utils";
 
 describe("LabelEditor", () => {
   const defaultProps = {
