@@ -1,7 +1,8 @@
-import { render, screen, fireEvent } from "@testing-library/react";
+import { screen, fireEvent } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, test, expect, vi, beforeEach } from "vitest";
 import { EdgeContent } from "../../../components/flow/editable-edge";
+import { render } from "../../test-utils";
 
 describe("EdgeContent", () => {
   const defaultProps = {

@@ -1,8 +1,9 @@
-import { render, screen } from "@testing-library/react";
+import { screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, test, expect, vi, beforeEach } from "vitest";
 import { ArrowTypeSelector } from "../../../components/flow/arrow-type-selector";
 import { MermaidArrowType, ARROW_TYPES } from "../../../components/types/types";
+import { render } from "../../test-utils";
 
 describe("ArrowTypeSelector", () => {
   const defaultProps = {

@@ -1,6 +1,7 @@
-import { render, screen, fireEvent } from "@testing-library/react";
+import { screen, fireEvent } from "@testing-library/react";
 import { describe, test, expect, vi, beforeEach } from "vitest";
 import { EditableMermaidHighlight } from "../../../components/mermaid/editable-mermaid-highlight";
+import { render } from "../../test-utils";
 
 // PrismJSのモック
 vi.mock("prismjs", () => ({

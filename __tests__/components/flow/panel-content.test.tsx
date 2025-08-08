@@ -1,7 +1,8 @@
-import { render, screen, fireEvent } from "@testing-library/react";
+import { screen, fireEvent } from "@testing-library/react";
 import { describe, test, expect, vi, beforeEach } from "vitest";
 import { ContributionPanelContent } from "../../../components/flow/contribution-panel";
 import { PanelContent } from "../../../components/flow/flow-panel";
+import { render } from "../../test-utils";
 
 describe("PanelContent", () => {
   const defaultProps = {
