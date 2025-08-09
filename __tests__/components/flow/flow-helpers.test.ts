@@ -91,7 +91,8 @@ describe("parseConnectingNodeId", () => {
     const connectingNodeId = "complex-node-id-target";
     const result = parseConnectingNodeId(connectingNodeId);
 
-    // split("-")は全てのハイフンで分割し、最初の2要素を取得
+    // split("-")は全てのハイフンで分割するが、分割代入で最初の2要素のみ取得
+    // ["complex", "node", "id", "target"] の最初の2つを取得
     expect(result.sourceNodeId).toBe("complex");
     expect(result.handleType).toBe("node");
   });
@@ -120,10 +121,11 @@ describe("parseConnectingNodeId", () => {
     expect(result.handleType).toBe("");
   });
 
-  test("複数のハイフンが含まれる場合（最初の2要素を取得）", () => {
+  test("複数のハイフンが含まれる場合（分割代入で最初の2要素を取得）", () => {
     const connectingNodeId = "node-1-source-handle";
     const result = parseConnectingNodeId(connectingNodeId);
 
+    // ["node", "1", "source", "handle"] の最初の2つを取得
     expect(result.sourceNodeId).toBe("node");
     expect(result.handleType).toBe("1");
   });
