@@ -33,7 +33,7 @@ describe("getArrowTypeSymbol", () => {
       expect(typeof symbol).toBe("string");
       expect(symbol.length).toBeGreaterThan(0);
       // Unicode文字であることを確認（基本的には非ASCII文字）
-      expect(symbol).toMatch(/[^\u0000-\u007F]/);
+      expect(symbol.charCodeAt(0)).toBeGreaterThan(127);
     });
   });
 
