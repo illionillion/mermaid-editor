@@ -27,6 +27,7 @@ import {
 import { useCallback, useState, useMemo } from "react";
 import { generateMermaidCode } from "../../utils/mermaid";
 import { FlowData } from "../flow/flow-helpers";
+import { GraphType } from "../types/types";
 import { CopyButton } from "../ui";
 import { MermaidHighlight } from "./mermaid-highlight";
 
@@ -36,7 +37,6 @@ interface DownloadModalProps {
   flowData: FlowData;
 }
 
-type GraphType = "TD" | "LR" | "RL" | "BT";
 type GraphTypeWithArrow = {
   type: GraphType;
   arrow: Component<"svg", IconProps>;
