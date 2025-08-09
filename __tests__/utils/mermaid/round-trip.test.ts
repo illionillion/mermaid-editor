@@ -1,5 +1,6 @@
 import { describe, test, expect } from "vitest";
 import type { FlowData } from "../../../components/flow/flow-helpers";
+import type { GraphType } from "../../../components/types/types";
 import { generateMermaidCode, parseMermaidCode } from "../../../utils/mermaid";
 
 describe("Mermaid round-trip test", () => {
@@ -180,5 +181,77 @@ describe("Mermaid round-trip test", () => {
     expect(parsedData.edges.find((e) => e.source === "hexagon")?.arrowType).toBe(
       "bidirectional-thick"
     );
+  });
+
+  test("異なる方向（direction）でのMermaidコード生成", () => {
+    const simpleFlowData: FlowData = {
+      nodes: [
+        {
+          id: "1",
+          type: "custom",
+          position: { x: 0, y: 0 },
+          data: { variableName: "A", label: "ノードA", shapeType: "rectangle" },
+        },
+        {
+          id: "2",
+          type: "custom",
+          position: { x: 100, y: 0 },
+          data: { variableName: "B", label: "ノードB", shapeType: "rectangle" },
+        },
+      ],
+      edges: [
+        {
+          id: "e1-2",
+          source: "1",
+          target: "2",
+          data: { label: "接続", arrowType: "arrow" },
+        },
+      ],
+    };
+
+    // すべての方向をテスト
+    const directions: GraphType[] = ["TD", "LR", "RL", "BT"];
+
+    directions.forEach((direction) => {
+      const generatedMermaid = generateMermaidCode(simpleFlowData, direction);
+
+      // 生成されたコードに正しい方向が含まれているかチェック
+      expect(generatedMermaid).toContain(`flowchart ${direction}`);
+
+      // パースできることを確認
+      const parsedData = parseMermaidCode(generatedMermaid);
+      expect(parsedData.nodes).toHaveLength(2);
+      expect(parsedData.edges).toHaveLength(1);
+
+      // ノードとエッジの内容は方向に関係なく同じ
+      expect(parsedData.nodes.find((n) => n.variableName === "A")?.label).toBe("ノードA");
+      expect(parsedData.nodes.find((n) => n.variableName === "B")?.label).toBe("ノードB");
+      expect(parsedData.edges[0].label).toBe("接続");
+    });
+  });
+
+  test("デフォルト方向（TD）でのMermaidコード生成", () => {
+    const simpleFlowData: FlowData = {
+      nodes: [
+        {
+          id: "1",
+          type: "custom",
+          position: { x: 0, y: 0 },
+          data: { variableName: "start", label: "開始", shapeType: "rectangle" },
+        },
+      ],
+      edges: [],
+    };
+
+    // 方向を指定しない場合
+    const generatedMermaidDefault = generateMermaidCode(simpleFlowData);
+    expect(generatedMermaidDefault).toContain("flowchart TD");
+
+    // 明示的にTDを指定した場合
+    const generatedMermaidTD = generateMermaidCode(simpleFlowData, "TD");
+    expect(generatedMermaidTD).toContain("flowchart TD");
+
+    // 両者は同じ結果になるべき
+    expect(generatedMermaidDefault).toBe(generatedMermaidTD);
   });
 });

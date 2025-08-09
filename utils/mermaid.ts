@@ -1,5 +1,5 @@
 import { FlowData } from "../components/flow/flow-helpers";
-import { MermaidArrowType, MermaidShapeType } from "../components/types/types";
+import { MermaidArrowType, MermaidShapeType, GraphType } from "../components/types/types";
 
 /**
  * パースされたMermaidデータの型定義
@@ -228,10 +228,11 @@ export const getArrowTypeDisplayName = (arrowType: MermaidArrowType): string => 
 /**
  * FlowDataからMermaidコードを生成する
  * @param flowData ノードとエッジのデータ
+ * @param direction フローチャートの方向 (TD, LR, RL, BT)
  * @returns Mermaidコード
  */
-export const generateMermaidCode = (flowData: FlowData): string => {
-  let code = "flowchart TD\n";
+export const generateMermaidCode = (flowData: FlowData, direction: GraphType = "TD"): string => {
+  let code = `flowchart ${direction}\n`;
 
   // ノードの定義
   flowData.nodes.forEach((node) => {

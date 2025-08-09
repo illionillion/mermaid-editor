@@ -14,6 +14,8 @@ export type MermaidShapeType =
   | "hexagon" // {{label}}
   | "stadium"; // ([label])
 
+export type GraphType = "TD" | "LR" | "RL" | "BT";
+
 // UI定数
 export const UI_CONSTANTS = {
   DOUBLE_CLICK_THRESHOLD: 300,

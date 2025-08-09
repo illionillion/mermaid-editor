@@ -16,7 +16,7 @@ import {
 } from "@xyflow/react";
 import { Box, useDisclosure, useToken } from "@yamada-ui/react";
 import { useCallback, useState, useRef, useEffect } from "react";
-import { generateMermaidCode, ParsedMermaidData } from "../../utils/mermaid";
+import { ParsedMermaidData } from "../../utils/mermaid";
 import { DownloadModal } from "../mermaid";
 import { MermaidArrowType } from "../types/types";
 import { ContributionPanel } from "./contribution-panel";
@@ -26,7 +26,6 @@ import {
   createNewNode,
   createNewEdge,
   parseConnectingNodeId,
-  FlowData,
 } from "./flow-helpers";
 import { FlowPanel } from "./flow-panel";
 import { nodeTypes } from "./node-types";
@@ -62,7 +61,6 @@ export function FlowEditor() {
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
   const [nodeId, setNodeId] = useState(2);
   const { open, onOpen, onClose } = useDisclosure();
-  const [mermaidCode, setMermaidCode] = useState("");
   const connectingNodeId = useRef<string | null>(null);
   const { screenToFlowPosition } = useReactFlow();
 
@@ -337,11 +335,8 @@ export function FlowEditor() {
   ]);
 
   const generateMermaidCodeCallback = useCallback(() => {
-    const flowData: FlowData = { nodes, edges };
-    const code = generateMermaidCode(flowData);
-    setMermaidCode(code);
     onOpen();
-  }, [nodes, edges, onOpen]);
+  }, [onOpen]);
 
   const handleImportMermaid = useCallback(
     (data: ParsedMermaidData) => {
@@ -486,7 +481,7 @@ export function FlowEditor() {
         <ContributionPanel />
       </ReactFlow>
 
-      <DownloadModal open={open} onClose={onClose} mermaidCode={mermaidCode} />
+      <DownloadModal open={open} onClose={onClose} flowData={{ nodes, edges }} />
     </Box>
   );
 }
