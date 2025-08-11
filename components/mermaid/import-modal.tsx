@@ -19,7 +19,7 @@ import type { ParsedMermaidData } from "../../utils/mermaid";
 import { EditableMermaidHighlight } from "./editable-mermaid-highlight";
 
 interface ImportModalProps {
-  isOpen: boolean;
+  open: boolean;
   onClose: () => void;
   onImport: (data: ParsedMermaidData) => void;
 }
@@ -27,7 +27,7 @@ interface ImportModalProps {
 // ヘルプテキストの定数
 const HELP_TEXT = `💡 対応しているノード形状: 四角形[label], ダイヤモンド{label}, 円((label)), 六角形{{label}}, スタジアム([label]), 角丸(label)`;
 
-export function ImportModal({ isOpen, onClose, onImport }: ImportModalProps) {
+export function ImportModal({ open, onClose, onImport }: ImportModalProps) {
   const [mermaidCode, setMermaidCode] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -76,7 +76,7 @@ export function ImportModal({ isOpen, onClose, onImport }: ImportModalProps) {
     D --> E`;
 
   return (
-    <Modal open={isOpen} onClose={handleClose} size="2xl">
+    <Modal open={open} onClose={handleClose} size="2xl">
       <ModalOverlay />
       <ModalHeader>Mermaidコードインポート</ModalHeader>
       <ModalBody>

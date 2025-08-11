@@ -31,7 +31,7 @@ export function FlowPanel({ onAddNode, onGenerateCode, onImportMermaid }: FlowPa
 }
 
 export function PanelContent({ onAddNode, onGenerateCode, onImportMermaid }: PanelContentProps) {
-  const { isOpen, onOpen, onClose } = useDisclosure();
+  const { open, onOpen, onClose } = useDisclosure();
 
   return (
     <VStack gap={4} p={4} bg="white" borderRadius="md" boxShadow="md">
@@ -54,7 +54,7 @@ export function PanelContent({ onAddNode, onGenerateCode, onImportMermaid }: Pan
           </Button>
         </HStack>
       </VStack>
-      <ImportModal isOpen={isOpen} onClose={onClose} onImport={onImportMermaid} />
+      <ImportModal open={open} onClose={onClose} onImport={onImportMermaid} />
     </VStack>
   );
 }
