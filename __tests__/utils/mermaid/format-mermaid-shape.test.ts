@@ -1,4 +1,5 @@
 import { describe, test, expect } from "vitest";
+import type { MermaidShapeType } from "../../../components/types/types";
 import { formatMermaidShape } from "../../../utils/mermaid";
 
 describe("formatMermaidShape", () => {
@@ -36,9 +37,9 @@ describe("formatMermaidShape", () => {
 
   describe("不正な図形タイプ", () => {
     test("未定義の図形タイプはrectangleとして扱う", () => {
-      expect(formatMermaidShape("unknown" as any, "テスト")).toBe("[テスト]");
-      expect(formatMermaidShape("invalid" as any, "Test")).toBe("[Test]");
-      expect(formatMermaidShape("" as any, "Empty")).toBe("[Empty]");
+      expect(formatMermaidShape("unknown" as MermaidShapeType, "テスト")).toBe("[テスト]");
+      expect(formatMermaidShape("invalid" as MermaidShapeType, "Test")).toBe("[Test]");
+      expect(formatMermaidShape("" as MermaidShapeType, "Empty")).toBe("[Empty]");
     });
   });
 

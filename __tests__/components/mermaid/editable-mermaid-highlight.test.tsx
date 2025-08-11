@@ -16,7 +16,17 @@ vi.mock("prismjs/components/prism-mermaid", () => ({}));
 
 // react-simple-code-editorのモック
 vi.mock("react-simple-code-editor", () => ({
-  default: ({ value, onValueChange, placeholder, highlight }: any) => {
+  default: ({
+    value,
+    onValueChange,
+    placeholder,
+    highlight,
+  }: {
+    value: string;
+    onValueChange: (value: string) => void;
+    placeholder?: string;
+    highlight?: (value: string) => string;
+  }) => {
     const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
       onValueChange(e.target.value);
     };
@@ -148,7 +158,7 @@ describe("EditableMermaidHighlight", () => {
     });
 
     test("undefinedが渡されても正常に動作する", () => {
-      render(<EditableMermaidHighlight {...defaultProps} value={undefined as any} />);
+      render(<EditableMermaidHighlight {...defaultProps} value={undefined as unknown as string} />);
 
       expect(screen.getByTestId("code-editor")).toBeInTheDocument();
     });
