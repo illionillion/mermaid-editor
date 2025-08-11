@@ -5,7 +5,6 @@ import type { FlowData } from "../../../components/flow/flow-helpers";
 import { DownloadModal } from "../../../components/mermaid/download-modal";
 import { generateMermaidCode } from "../../../utils/mermaid";
 import { render } from "../../test-utils";
-// モック関数の参照を取得
 
 // グローバルオブジェクトの設定
 Object.defineProperty(global, "URL", {

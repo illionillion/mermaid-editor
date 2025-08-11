@@ -37,11 +37,9 @@ describe("formatMermaidShape", () => {
 
   describe("不正な図形タイプ", () => {
     test("未定義の図形タイプはrectangleとして扱う", () => {
-      expect(formatMermaidShape("unknown" as unknown as MermaidShapeType, "テスト")).toBe(
-        "[テスト]"
-      );
-      expect(formatMermaidShape("invalid" as unknown as MermaidShapeType, "Test")).toBe("[Test]");
-      expect(formatMermaidShape("" as unknown as MermaidShapeType, "Empty")).toBe("[Empty]");
+      expect(formatMermaidShape("unknown" as MermaidShapeType, "テスト")).toBe("[テスト]");
+      expect(formatMermaidShape("invalid" as MermaidShapeType, "Test")).toBe("[Test]");
+      expect(formatMermaidShape("" as MermaidShapeType, "Empty")).toBe("[Empty]");
     });
   });
 
