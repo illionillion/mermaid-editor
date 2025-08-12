@@ -1,9 +1,17 @@
 "use client";
 
-import { BaseEdge, EdgeLabelRenderer, EdgeProps, getBezierPath } from "@xyflow/react";
+import {
+  BaseEdge,
+  EdgeLabelRenderer,
+  EdgeProps,
+  getBezierPath,
+  useReactFlow,
+  Edge,
+} from "@xyflow/react";
 import { XIcon } from "@yamada-ui/lucide";
 import { Input, Box, IconButton, HStack } from "@yamada-ui/react";
 import { useState, useRef, useEffect } from "react";
+import { adjustEdgeLabelPosition, getCyclicEdgeStyle } from "../../utils/edge-layout";
 import { getArrowTypeSymbol } from "../../utils/mermaid";
 import { MermaidArrowType } from "../types/types";
 import { ArrowTypeSelector } from "./arrow-type-selector";
@@ -15,6 +23,8 @@ interface EditableEdgeProps extends EdgeProps {
     onLabelChange?: (edgeId: string, newLabel: string) => void;
     onArrowTypeChange?: (edgeId: string, arrowType: MermaidArrowType) => void;
     onDelete?: (edgeId: string) => void;
+    allEdges?: Edge[]; // 全エッジの情報（循環参照検出用）
+    enableCyclicEdgeStyling?: boolean; // 循環参照エッジのスタイリングを有効にするか
   };
 }
 
@@ -165,7 +175,15 @@ export function EditableEdge({
   targetPosition,
   data,
   markerEnd,
+  source,
+  target,
 }: EditableEdgeProps) {
+  const { getEdges, getNodes } = useReactFlow();
+  const allEdges = getEdges();
+  const allNodes = getNodes();
+
+  const currentEdge = { id, source, target };
+
   const [edgePath, labelX, labelY] = getBezierPath({
     sourceX,
     sourceY,
@@ -175,11 +193,28 @@ export function EditableEdge({
     targetPosition,
   });
 
+  // 循環参照対応のラベル位置調整
+  const { adjustedX, adjustedY } = adjustEdgeLabelPosition(
+    currentEdge,
+    labelX,
+    labelY,
+    allEdges,
+    allNodes
+  );
+
+  // 循環参照対応のエッジスタイル（オプション）
+  // ラベル位置調整のみにしたい場合は enableCyclicEdgeStyling: false にする
+  const cyclicStyle = getCyclicEdgeStyle(
+    currentEdge,
+    allEdges,
+    data?.enableCyclicEdgeStyling ?? false
+  ); // ラベル位置のみ
+
   return (
     <>
-      <BaseEdge path={edgePath} markerEnd={markerEnd} />
+      <BaseEdge path={edgePath} markerEnd={markerEnd} style={cyclicStyle} />
       <EdgeLabelRenderer>
-        <EdgeContent id={id} labelX={labelX} labelY={labelY} data={data} />
+        <EdgeContent id={id} labelX={adjustedX} labelY={adjustedY} data={data} />
       </EdgeLabelRenderer>
     </>
   );

@@ -446,7 +446,6 @@ export function FlowEditor() {
     [
       setNodes,
       setEdges,
-      nodeId,
       handleLabelChange,
       handleVariableNameChange,
       handleShapeTypeChange,
