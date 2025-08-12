@@ -36,6 +36,27 @@ export function detectCyclicEdges(edges: Edge[]): Map<string, Edge[]> {
 }
 
 /**
+ * セルフループエッジのオフセットを計算する
+ */
+function calculateSelfLoopOffset(
+  edgeInGroup: Edge,
+  groupEdges: Edge[],
+  offsetDistance: number
+): { offsetX: number; offsetY: number } {
+  // Get all self-loops for this node in the group
+  const selfLoops = groupEdges.filter(
+    (e) => e.source === edgeInGroup.source && e.target === edgeInGroup.target
+  );
+  const selfLoopIndex = selfLoops.findIndex((e) => e.id === edgeInGroup.id);
+  // Distribute self-loops around the node in a circle
+  const angle = ((2 * Math.PI) / Math.max(selfLoops.length, 1)) * selfLoopIndex;
+  const radius = offsetDistance * (1 + selfLoopIndex); // Increase radius for each self-loop
+  const dx = Math.cos(angle) * radius;
+  const dy = Math.sin(angle) * radius;
+  return { offsetX: dx, offsetY: dy };
+}
+
+/**
  * エッジのオフセットを計算する（循環参照対応）
  */
 export function calculateEdgeOffset(
@@ -58,20 +79,14 @@ export function calculateEdgeOffset(
 
       // Handle self-loops differently: offset in a circular pattern around the node
       if (edgeInGroup.target === edgeInGroup.source) {
-        // Get all self-loops for this node in the group
-        const selfLoops = groupEdges.filter(
-          (e) => e.source === edgeInGroup.source && e.target === edgeInGroup.target
-        );
-        const selfLoopIndex = selfLoops.findIndex((e) => e.id === edgeInGroup.id);
-        // Distribute self-loops around the node in a circle
-        const angle = ((2 * Math.PI) / Math.max(selfLoops.length, 1)) * selfLoopIndex;
-        const radius = offsetDistance * (1 + selfLoopIndex); // Increase radius for each self-loop
-        const dx = Math.cos(angle) * radius;
-        const dy = Math.sin(angle) * radius;
-        return { offsetX: dx, offsetY: dy };
+        return calculateSelfLoopOffset(edgeInGroup, groupEdges, offsetDistance);
       } else {
         const dx =
-          String(edgeInGroup.target) > String(edgeInGroup.source) ? offsetAmount : -offsetAmount;
+          String(edgeInGroup.target).localeCompare(String(edgeInGroup.source), undefined, {
+            numeric: true,
+          }) > 0
+            ? offsetAmount
+            : -offsetAmount;
         const dy = offsetAmount;
         return { offsetX: dx, offsetY: dy };
       }
