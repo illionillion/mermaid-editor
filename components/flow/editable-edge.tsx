@@ -24,6 +24,7 @@ interface EditableEdgeProps extends EdgeProps {
     onArrowTypeChange?: (edgeId: string, arrowType: MermaidArrowType) => void;
     onDelete?: (edgeId: string) => void;
     allEdges?: Edge[]; // 全エッジの情報（循環参照検出用）
+    enableCyclicEdgeStyling?: boolean; // 循環参照エッジのスタイリングを有効にするか
   };
 }
 
@@ -202,8 +203,12 @@ export function EditableEdge({
   );
 
   // 循環参照対応のエッジスタイル（オプション）
-  // ラベル位置調整のみにしたい場合は enableStyling: false にする
-  const cyclicStyle = getCyclicEdgeStyle(currentEdge, allEdges, false); // ラベル位置のみ
+  // ラベル位置調整のみにしたい場合は enableCyclicEdgeStyling: false にする
+  const cyclicStyle = getCyclicEdgeStyle(
+    currentEdge,
+    allEdges,
+    data?.enableCyclicEdgeStyling ?? false
+  ); // ラベル位置のみ
 
   return (
     <>

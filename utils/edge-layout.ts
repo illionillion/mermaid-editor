@@ -45,7 +45,7 @@ export function calculateEdgeOffset(
 ): { offsetX: number; offsetY: number } {
   const cyclicGroups = detectCyclicEdges(allEdges);
 
-  // この エッジが循環参照グループに属するかチェック
+  // このエッジが循環参照グループに属するかチェック
   for (const [, groupEdges] of Array.from(cyclicGroups.entries())) {
     const edgeInGroup = groupEdges.find((e: Edge) => e.id === edge.id);
     if (edgeInGroup) {
@@ -60,7 +60,7 @@ export function calculateEdgeOffset(
       const dx =
         edgeInGroup.target === edgeInGroup.source
           ? 0
-          : parseInt(edgeInGroup.target) > parseInt(edgeInGroup.source)
+          : edgeInGroup.target.localeCompare(edgeInGroup.source) > 0
             ? offsetAmount
             : -offsetAmount;
       const dy = offsetAmount;
