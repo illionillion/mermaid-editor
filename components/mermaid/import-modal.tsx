@@ -54,9 +54,8 @@ export function ImportModal({ open, onClose, onImport }: ImportModalProps) {
       onImport(parsedData);
       setMermaidCode("");
       onClose();
-    } catch (err) {
+    } catch {
       setError("Mermaidコードの解析中にエラーが発生しました");
-      console.error("Import error:", err);
     } finally {
       setIsLoading(false);
     }
