@@ -56,16 +56,25 @@ export function calculateEdgeOffset(
       const offsetMultiplier = edgeIndex % 2 === 0 ? 1 : -1;
       const offsetAmount = Math.floor(edgeIndex / 2 + 1) * offsetDistance * offsetMultiplier;
 
-      // エッジの方向に応じてオフセット方向を決定
-      const dx =
-        edgeInGroup.target === edgeInGroup.source
-          ? 0
-          : edgeInGroup.target.localeCompare(edgeInGroup.source) > 0
-            ? offsetAmount
-            : -offsetAmount;
-      const dy = offsetAmount;
-
-      return { offsetX: dx, offsetY: dy };
+      // Handle self-loops differently: offset in a circular pattern around the node
+      if (edgeInGroup.target === edgeInGroup.source) {
+        // Get all self-loops for this node in the group
+        const selfLoops = groupEdges.filter(
+          (e) => e.source === edgeInGroup.source && e.target === edgeInGroup.target
+        );
+        const selfLoopIndex = selfLoops.findIndex((e) => e.id === edgeInGroup.id);
+        // Distribute self-loops around the node in a circle
+        const angle = ((2 * Math.PI) / Math.max(selfLoops.length, 1)) * selfLoopIndex;
+        const radius = offsetDistance * (1 + selfLoopIndex); // Increase radius for each self-loop
+        const dx = Math.cos(angle) * radius;
+        const dy = Math.sin(angle) * radius;
+        return { offsetX: dx, offsetY: dy };
+      } else {
+        const dx =
+          String(edgeInGroup.target) > String(edgeInGroup.source) ? offsetAmount : -offsetAmount;
+        const dy = offsetAmount;
+        return { offsetX: dx, offsetY: dy };
+      }
     }
   }
 

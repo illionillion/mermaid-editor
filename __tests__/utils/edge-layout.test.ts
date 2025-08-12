@@ -97,6 +97,21 @@ describe("edge-layout utility functions", () => {
       expect(offset.offsetX).toBe(0);
       expect(offset.offsetY).toBe(0);
     });
+
+    test("セルフループ（自己参照エッジ）の処理", () => {
+      const selfLoopEdges = [
+        { id: "self1", source: "A", target: "A" },
+        { id: "self2", source: "A", target: "A" },
+      ];
+
+      const offset1 = calculateEdgeOffset(selfLoopEdges[0], selfLoopEdges);
+      const offset2 = calculateEdgeOffset(selfLoopEdges[1], selfLoopEdges);
+
+      // セルフループは円形パターンで配置される
+      expect(offset1.offsetX !== 0 || offset1.offsetY !== 0).toBe(true);
+      expect(offset2.offsetX !== 0 || offset2.offsetY !== 0).toBe(true);
+      expect(offset1).not.toEqual(offset2);
+    });
   });
 
   describe("adjustEdgeLabelPosition", () => {
