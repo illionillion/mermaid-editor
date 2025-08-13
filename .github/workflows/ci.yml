@@ -73,11 +73,10 @@ jobs:
       - name: Check code formatting
         run: pnpm format:check
 
-  # Stage 2: Type Check (depends on code quality)
+  # Stage 1: Type Check (parallel with code quality)
   type_script:
     name: TypeScript
     runs-on: ubuntu-latest
-    needs: [eslint, prettier]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -107,11 +106,11 @@ jobs:
       - name: Run TypeScript type check
         run: pnpm type-check
 
-  # Stage 3: Test (depends on type check)
+  # Stage 2: Testing and Building (parallel, depends on code quality and type check)
   test:
     name: Test
     runs-on: ubuntu-latest
-    needs: [type_script]
+    needs: [eslint, prettier, type_script]
     permissions:
       contents: read
       pull-requests: write
@@ -154,11 +153,11 @@ jobs:
           json-summary-path: "./coverage/coverage-summary.json"
           json-final-path: "./coverage/coverage-final.json"
 
-  # Stage 4: Build (depends on tests)
+  # Stage 2: Testing and Building (parallel, depends on code quality and type check)
   build:
     name: Build
     runs-on: ubuntu-latest
-    needs: [test]
+    needs: [eslint, prettier, type_script]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
