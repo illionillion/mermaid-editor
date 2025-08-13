@@ -36,7 +36,7 @@ jobs:
             ${{ runner.os }}-node20-pnpm-
 
       - name: Install dependencies
-        run: pnpm ci
+        run: pnpm install --frozen-lockfile
 
       - name: Run ESLint
         run: pnpm lint
@@ -68,7 +68,7 @@ jobs:
             ${{ runner.os }}-node20-pnpm-
 
       - name: Install dependencies
-        run: pnpm ci
+        run: pnpm install --frozen-lockfile
 
       - name: Check code formatting
         run: pnpm format:check
@@ -102,7 +102,7 @@ jobs:
             ${{ runner.os }}-node20-pnpm-
 
       - name: Install dependencies
-        run: pnpm ci
+        run: pnpm install --frozen-lockfile
 
       - name: Run TypeScript type check
         run: pnpm type-check
@@ -139,7 +139,7 @@ jobs:
             ${{ runner.os }}-node20-pnpm-
 
       - name: Install dependencies
-        run: pnpm ci
+        run: pnpm install --frozen-lockfile
 
       - name: Run tests
         run: pnpm test:run
@@ -183,7 +183,7 @@ jobs:
             ${{ runner.os }}-node20-pnpm-
 
       - name: Install dependencies
-        run: pnpm ci
+        run: pnpm install --frozen-lockfile
 
       - name: Build application
         run: pnpm build
