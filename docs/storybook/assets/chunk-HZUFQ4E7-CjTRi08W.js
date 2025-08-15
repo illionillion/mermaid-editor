@@ -1,0 +1,1 @@
+import{f as p,e as f,o as l,a2 as u,j as T,u as d,c as _}from"./iframe-CSJgqtUE.js";var e=p((s,t)=>{const[a,o]=f("Text",s),{className:r,align:n,casing:i,decoration:x,...c}=l(o),m=u({textAlign:n,textDecoration:x,textTransform:i});return T.jsx(d.p,{ref:t,className:_("ui-text",r),__css:a,...m,...c})});e.displayName="Text";e.__ui__="Text";export{e as T};
