@@ -1,7 +1,7 @@
-/// <reference types="vitest" />
 import path from "path";
 import { defineConfig } from "vitest/config";
 
+// More info at: https://storybook.js.org/docs/next/writing-tests/integrations/vitest-addon
 export default defineConfig({
   esbuild: {
     jsx: "automatic",
@@ -33,6 +33,7 @@ export default defineConfig({
         },
       },
     },
+    // Storybook統合テストは一時的に除外
   },
   resolve: {
     alias: {

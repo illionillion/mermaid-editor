@@ -1,5 +1,3 @@
-"use client";
-
 import { ReactFlowProvider } from "@xyflow/react";
 import { UIProvider } from "@yamada-ui/react";
 import type { ReactNode } from "react";

@@ -1,8 +1,11 @@
+// For more info, see https://github.com/storybookjs/eslint-plugin-storybook#configuration-flat-config-format
+
 import js from "@eslint/js";
 import eslintConfigPrettier from "eslint-config-prettier";
 import importPlugin from "eslint-plugin-import";
 import react from "eslint-plugin-react";
 import reactHooks from "eslint-plugin-react-hooks";
+import storybook from "eslint-plugin-storybook";
 import unusedImports from "eslint-plugin-unused-imports";
 import globals from "globals";
 import tseslint from "typescript-eslint";
@@ -20,8 +23,8 @@ export default tseslint.config(
     ],
   },
   js.configs.recommended,
-  ...tseslint.configs.recommended,
-  eslintConfigPrettier, // Prettierとの競合を解決
+  ...tseslint.configs.recommended, // Prettierとの競合を解決
+  eslintConfigPrettier,
   {
     files: ["**/*.{js,jsx,ts,tsx}"],
     languageOptions: {
@@ -115,5 +118,6 @@ export default tseslint.config(
         },
       },
     },
-  }
+  },
+  storybook.configs["flat/recommended"]
 );
