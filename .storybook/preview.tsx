@@ -1,8 +1,8 @@
-import type { StoryFn } from "@storybook/react";
+import type { StoryContext, StoryFn } from "@storybook/react";
 import type { Preview } from "@storybook/react-vite";
 import { AppProviders } from "../components/providers";
 
-const withProviders = (Story: StoryFn, context: any) => (
+const withProviders = (Story: StoryFn, context: StoryContext) => (
   <AppProviders>{Story({}, context)}</AppProviders>
 );
 
