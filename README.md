@@ -55,6 +55,39 @@ pnpm dev
 
 [http://localhost:3000](http://localhost:3000) で確認できます。
 
+## 📚 Storybook（コンポーネントカタログ）
+
+本プロジェクトはStorybookによるUIコンポーネントのカタログ・ドキュメントを同梱しています。
+
+- **URL例**:  
+  [https://illionillion.github.io/mermaid-editor/storybook/](https://illionillion.github.io/mermaid-editor/storybook/)
+
+### 主な特徴
+
+- 主要UIコンポーネントの動作・APIをブラウザ上で確認可能
+- デザイン・実装の共通認識やレビューに活用
+- 各種Propsやイベントの挙動をインタラクティブにテスト
+
+### ローカルでの起動
+
+```bash
+pnpm storybook
+```
+
+→ [http://localhost:6006](http://localhost:6006) で確認
+
+### 静的ビルド
+
+```bash
+pnpm build-storybook
+# docs/storybook/ に静的ファイルが出力されます
+```
+
+### デプロイ
+
+- CIでNext.js静的サイト（docs/）とStorybook（docs/storybook/）を同時にGitHub Pagesへデプロイ
+- `/storybook/` サブパスでアクセス可能
+
 ## 🛠️ 技術スタック
 
 - **Frontend**: Next.js 14, ReactFlow, TypeScript
