@@ -23,7 +23,7 @@ jobs:
 
       - name: Build Next.js static site
         run: |
-          pnpm export
+          pnpm build
         env:
           NODE_ENV: production
 
