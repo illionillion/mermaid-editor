@@ -71,13 +71,19 @@ export function DownloadModal({ open, onClose, flowData }: DownloadModalProps) {
   return (
     <Modal open={open} onClose={onClose} size="2xl">
       <ModalHeader>
-        <HStack justify="space-between">
+        <HStack
+          justify={{ base: "space-between", md: "flex-start" }}
+          display={{ base: "flex", md: "inline-flex" }}
+          flexWrap="wrap"
+          alignItems="center"
+        >
           <Text>生成されたMermaidコード</Text>
           <Button
             startIcon={<DownloadIcon />}
             colorScheme="blue"
             size="sm"
             onClick={downloadMermaidCode}
+            ml={{ base: 0, md: "auto" }}
           >
             ダウンロード
           </Button>
