@@ -32,7 +32,7 @@
     "test:coverage": "vitest run --coverage",
     "test:watch": "vitest --watch",
     "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build"
+    "build-storybook": "storybook build -o docs/storybook"
   },
   "dependencies": {
     "@types/react-syntax-highlighter": "^15.5.13",

@@ -21,11 +21,15 @@ jobs:
       - name: Setup Node.js and PNPM
         uses: ./.github/actions/install
 
-      - name: Build
+      - name: Build Next.js static site
         run: |
-          pnpm build
+          pnpm export
         env:
           NODE_ENV: production
+
+      - name: Build Storybook static site
+        run: |
+          pnpm build-storybook
 
       - name: Create .nojekyll file
         run: |
