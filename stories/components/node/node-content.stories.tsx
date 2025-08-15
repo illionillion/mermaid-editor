@@ -15,9 +15,9 @@ export const Default = {
         label: "ノードラベル",
         variableName: "var1",
         shapeType: "rectangle",
-        onLabelChange: (id, label) => alert(`ラベル変更: ${label}`),
-        onVariableNameChange: (id, name) => alert(`変数名変更: ${name}`),
-        onShapeTypeChange: (id, shape) => alert(`形状変更: ${shape}`),
+        onLabelChange: (id, label) => alert(`ラベル変更: ${id} → ${label}`),
+        onVariableNameChange: (id, name) => alert(`変数名変更: ${id} → ${name}`),
+        onShapeTypeChange: (id, shape) => alert(`形状変更: ${id} → ${shape}`),
         onDelete: (id) => alert(`削除: ${id}`),
       }}
     />
