@@ -8,8 +8,8 @@ export const metadata = {
 
 const NotFound = () => {
   return (
-    <Center gap="md" flexDir="column" height="100vh">
-      <Heading>404 - ページが見つかりません</Heading>
+    <Center as="main" gap="md" flexDir="column" width="full" height="100vh">
+      <Heading as="h1">404 - ページが見つかりません</Heading>
       <Text>お探しのページは存在しません。</Text>
       <UILink as={Link} href="/">
         ホームに戻る
