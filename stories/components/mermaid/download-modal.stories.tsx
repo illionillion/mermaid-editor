@@ -7,7 +7,6 @@ const meta: Meta<typeof DownloadModal> = {
 };
 export default meta;
 
-// ダミーのflowData
 const dummyFlowData = {
   nodes: [
     { id: "1", type: "default", data: { label: "A" }, position: { x: 0, y: 0 } },
