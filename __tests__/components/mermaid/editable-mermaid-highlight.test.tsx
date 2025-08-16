@@ -1,4 +1,5 @@
 import { screen, fireEvent } from "@testing-library/react";
+import { ChangeEvent } from "react";
 import { describe, test, expect, vi, beforeEach } from "vitest";
 import { EditableMermaidHighlight } from "../../../components/mermaid/editable-mermaid-highlight";
 import { render } from "../../test-utils";
@@ -27,7 +28,7 @@ vi.mock("react-simple-code-editor", () => ({
     placeholder?: string;
     highlight?: (value: string) => string;
   }) => {
-    const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const handleChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
       onValueChange(e.target.value);
     };
 

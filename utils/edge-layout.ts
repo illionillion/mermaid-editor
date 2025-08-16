@@ -1,4 +1,5 @@
 import { Edge, Node } from "@xyflow/react";
+import { CSSProperties } from "react";
 
 /**
  * 循環参照エッジを検出する
@@ -130,7 +131,7 @@ export function getCyclicEdgeStyle(
   currentEdge: { source: string; target: string },
   allEdges: Edge[],
   enableStyling: boolean = false
-): React.CSSProperties {
+): CSSProperties {
   const cyclicGroups = detectCyclicEdges(allEdges);
 
   // 循環参照グループに属するかチェック

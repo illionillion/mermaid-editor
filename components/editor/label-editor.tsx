@@ -1,6 +1,6 @@
 "use client";
 
-import { Text, Input } from "@yamada-ui/react";
+import { Text, Input, FC } from "@yamada-ui/react";
 import { ChangeEvent, KeyboardEvent } from "react";
 
 interface LabelEditorProps {
@@ -14,7 +14,7 @@ interface LabelEditorProps {
   onBlur: () => void;
 }
 
-export function LabelEditor({
+export const LabelEditor: FC<LabelEditorProps> = ({
   value,
   isEditing,
   onDoubleClick,
@@ -23,7 +23,7 @@ export function LabelEditor({
   onCompositionStart,
   onCompositionEnd,
   onBlur,
-}: LabelEditorProps) {
+}) => {
   return (
     <>
       {isEditing ? (
@@ -59,4 +59,4 @@ export function LabelEditor({
       )}
     </>
   );
-}
+};

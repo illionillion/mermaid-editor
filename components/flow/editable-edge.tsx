@@ -10,7 +10,7 @@ import {
 } from "@xyflow/react";
 import { XIcon } from "@yamada-ui/lucide";
 import { Input, Box, IconButton, HStack } from "@yamada-ui/react";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, MouseEvent, KeyboardEvent } from "react";
 import { adjustEdgeLabelPosition, getCyclicEdgeStyle } from "../../utils/edge-layout";
 import { getArrowTypeSymbol } from "../../utils/mermaid";
 import { MermaidArrowType } from "../types/types";
@@ -48,7 +48,7 @@ export function EdgeContent({ id, labelX, labelY, data }: EdgeContentProps) {
     }
   }, [isEditing]);
 
-  const handleClick = (e: React.MouseEvent) => {
+  const handleClick = (e: MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     setIsEditing(true);
@@ -61,7 +61,7 @@ export function EdgeContent({ id, labelX, labelY, data }: EdgeContentProps) {
     }
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
+  const handleKeyDown = (e: KeyboardEvent) => {
     if (e.key === "Enter" && !isComposing) {
       handleSubmit();
     } else if (e.key === "Escape") {
@@ -88,7 +88,7 @@ export function EdgeContent({ id, labelX, labelY, data }: EdgeContentProps) {
     }
   };
 
-  const handleDelete = (e: React.MouseEvent) => {
+  const handleDelete = (e: MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     if (data?.onDelete) {

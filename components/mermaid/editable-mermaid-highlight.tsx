@@ -1,6 +1,6 @@
 "use client";
 
-import { Box } from "@yamada-ui/react";
+import { Box, FC } from "@yamada-ui/react";
 import { highlight, languages } from "prismjs";
 import Editor from "react-simple-code-editor";
 import "prismjs/themes/prism-dark.css";
@@ -14,13 +14,13 @@ interface EditableMermaidHighlightProps {
   fontSize?: string;
 }
 
-export function EditableMermaidHighlight({
+export const EditableMermaidHighlight: FC<EditableMermaidHighlightProps> = ({
   value,
   onChange,
   placeholder = "Mermaidコードを入力...",
   minHeight = "300px",
   fontSize = "14px",
-}: EditableMermaidHighlightProps) {
+}) => {
   const highlightCode = (code: string) => {
     try {
       // Now using Mermaid syntax highlighting with PrismJS
@@ -75,4 +75,4 @@ export function EditableMermaidHighlight({
       />
     </Box>
   );
-}
+};
