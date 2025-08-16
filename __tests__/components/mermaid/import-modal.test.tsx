@@ -1,5 +1,5 @@
 import { screen, waitFor } from "@testing-library/react";
-import React from "react";
+import { HTMLAttributes } from "react";
 import { describe, test, expect, vi, beforeEach, afterEach } from "vitest";
 import { ImportModal } from "../../../components/mermaid/import-modal";
 import type { MermaidShapeType, MermaidArrowType } from "../../../components/types/types";
@@ -27,7 +27,7 @@ vi.mock("../../../components/mermaid/editable-mermaid-highlight", () => ({
     onChange: (value: string) => void;
     placeholder: string;
     minHeight?: string;
-  } & React.HTMLAttributes<HTMLDivElement>) => (
+  } & HTMLAttributes<HTMLDivElement>) => (
     <div data-testid="editable-mermaid-highlight" style={{ minHeight }} {...props}>
       <textarea
         data-testid="mermaid-code-input"

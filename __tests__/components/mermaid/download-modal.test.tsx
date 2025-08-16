@@ -1,5 +1,5 @@
 import { screen } from "@testing-library/react";
-import React from "react";
+import { HTMLAttributes } from "react";
 import { describe, test, expect, vi, beforeEach, afterEach } from "vitest";
 import type { FlowData } from "../../../components/flow/flow-helpers";
 import { DownloadModal } from "../../../components/mermaid/download-modal";
@@ -31,10 +31,7 @@ vi.mock("../../../components/mermaid/mermaid-highlight", () => ({
 
 // CopyButtonのモック
 vi.mock("../../../components/ui/copy-button", () => ({
-  CopyButton: ({
-    value,
-    ...props
-  }: { value: string } & React.HTMLAttributes<HTMLButtonElement>) => (
+  CopyButton: ({ value, ...props }: { value: string } & HTMLAttributes<HTMLButtonElement>) => (
     <button data-testid="copy-button" data-value={value} {...props}>
       コピー
     </button>

@@ -12,6 +12,7 @@ import {
   Alert,
   AlertIcon,
   AlertDescription,
+  FC,
 } from "@yamada-ui/react";
 import { useState } from "react";
 import { parseMermaidCode } from "../../utils/mermaid";
@@ -27,7 +28,7 @@ interface ImportModalProps {
 // ヘルプテキストの定数
 const HELP_TEXT = `💡 対応しているノード形状: 四角形[label], ダイヤモンド{label}, 円((label)), 六角形{{label}}, スタジアム([label]), 角丸(label)`;
 
-export function ImportModal({ open, onClose, onImport }: ImportModalProps) {
+export const ImportModal: FC<ImportModalProps> = ({ open, onClose, onImport }) => {
   const [mermaidCode, setMermaidCode] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -114,7 +115,7 @@ export function ImportModal({ open, onClose, onImport }: ImportModalProps) {
       </ModalFooter>
     </Modal>
   );
-}
+};
 
 const ErrorAlert = ({ message }: { message: string }) => (
   <Alert status="error">

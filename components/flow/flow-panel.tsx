@@ -2,7 +2,7 @@
 
 import { Panel } from "@xyflow/react";
 import { PlusIcon, CodeIcon, UploadIcon } from "@yamada-ui/lucide";
-import { VStack, HStack, Text, Button, useDisclosure } from "@yamada-ui/react";
+import { VStack, HStack, Text, Button, useDisclosure, FC } from "@yamada-ui/react";
 import { ParsedMermaidData } from "../../utils/mermaid";
 import { ImportModal } from "../mermaid";
 
@@ -18,7 +18,7 @@ interface PanelContentProps {
   onImportMermaid: (data: ParsedMermaidData) => void;
 }
 
-export function FlowPanel({ onAddNode, onGenerateCode, onImportMermaid }: FlowPanelProps) {
+export const FlowPanel: FC<FlowPanelProps> = ({ onAddNode, onGenerateCode, onImportMermaid }) => {
   return (
     <Panel position="top-left">
       <PanelContent
@@ -28,9 +28,13 @@ export function FlowPanel({ onAddNode, onGenerateCode, onImportMermaid }: FlowPa
       />
     </Panel>
   );
-}
+};
 
-export function PanelContent({ onAddNode, onGenerateCode, onImportMermaid }: PanelContentProps) {
+export const PanelContent: FC<PanelContentProps> = ({
+  onAddNode,
+  onGenerateCode,
+  onImportMermaid,
+}) => {
   const { open, onOpen, onClose } = useDisclosure();
 
   return (
@@ -57,4 +61,4 @@ export function PanelContent({ onAddNode, onGenerateCode, onImportMermaid }: Pan
       <ImportModal open={open} onClose={onClose} onImport={onImportMermaid} />
     </VStack>
   );
-}
+};

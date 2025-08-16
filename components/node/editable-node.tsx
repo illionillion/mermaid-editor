@@ -1,7 +1,7 @@
 "use client";
 
 import { Handle, Position } from "@xyflow/react";
-import { Box } from "@yamada-ui/react";
+import { Box, FC } from "@yamada-ui/react";
 import { useState, useRef, MouseEvent, ChangeEvent, KeyboardEvent } from "react";
 import { VariableNameEditor, LabelEditor } from "../editor";
 import { UI_CONSTANTS, MermaidShapeType } from "../types/types";
@@ -20,7 +20,7 @@ interface EditableNodeProps {
   id: string;
 }
 
-export function EditableNode(props: EditableNodeProps) {
+export const EditableNode: FC<EditableNodeProps> = (props) => {
   return (
     <>
       <NodeContent {...props} />
@@ -28,9 +28,9 @@ export function EditableNode(props: EditableNodeProps) {
       <Handle type="source" position={Position.Bottom} />
     </>
   );
-}
+};
 
-export function NodeContent({ data, id }: EditableNodeProps) {
+export const NodeContent: FC<EditableNodeProps> = ({ data, id }) => {
   const [isEditingLabel, setIsEditingLabel] = useState(false);
   const [isEditingVariableName, setIsEditingVariableName] = useState(false);
   const [label, setLabel] = useState(data.label);
@@ -203,4 +203,4 @@ export function NodeContent({ data, id }: EditableNodeProps) {
       />
     </Box>
   );
-}
+};

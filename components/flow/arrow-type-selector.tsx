@@ -1,7 +1,7 @@
 "use client";
 
 import { ChevronDownIcon } from "@yamada-ui/lucide";
-import { Menu, MenuButton, MenuList, MenuItem, IconButton, Portal } from "@yamada-ui/react";
+import { Menu, MenuButton, MenuList, MenuItem, IconButton, Portal, FC } from "@yamada-ui/react";
 import { getArrowTypeDisplayName } from "../../utils/mermaid";
 import { MermaidArrowType, ARROW_TYPES } from "../types/types";
 
@@ -10,7 +10,10 @@ interface ArrowTypeSelectorProps {
   onArrowTypeChange: (arrowType: MermaidArrowType) => void;
 }
 
-export function ArrowTypeSelector({ currentArrowType, onArrowTypeChange }: ArrowTypeSelectorProps) {
+export const ArrowTypeSelector: FC<ArrowTypeSelectorProps> = ({
+  currentArrowType,
+  onArrowTypeChange,
+}) => {
   return (
     <Menu>
       <MenuButton
@@ -42,4 +45,4 @@ export function ArrowTypeSelector({ currentArrowType, onArrowTypeChange }: Arrow
       </Portal>
     </Menu>
   );
-}
+};

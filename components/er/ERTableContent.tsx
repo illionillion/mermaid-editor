@@ -1,0 +1,213 @@
+import { useReactTable, getCoreRowModel, flexRender, ColumnDef } from "@tanstack/react-table";
+import { XIcon } from "@yamada-ui/lucide";
+import {
+  Input,
+  Checkbox,
+  IconButton,
+  HStack,
+  Button,
+  VStack,
+  TableContainer,
+  NativeTable,
+  TableCaption,
+  Thead,
+  Tbody,
+  Tr,
+  Th,
+  Td,
+  FC,
+  Center,
+  Label,
+  Text,
+} from "@yamada-ui/react";
+import { useState, useEffect, useRef } from "react";
+
+export type ERColumn = {
+  name: string;
+  type: string;
+  pk: boolean;
+  nn: boolean;
+  defaultValue: string;
+};
+
+export type ERTableContentProps = {
+  name: string;
+  columns: ERColumn[];
+  onNameChange: (name: string) => void;
+  onColumnsChange: (columns: ERColumn[]) => void;
+};
+
+export const ERTableContent: FC<ERTableContentProps> = ({
+  name,
+  columns,
+  onNameChange,
+  onColumnsChange,
+}) => {
+  const handleChange = (rowIdx: number, key: keyof ERColumn, value: string | boolean) => {
+    onColumnsChange(columns.map((col, i) => (i === rowIdx ? { ...col, [key]: value } : col)));
+  };
+  const handleDelete = (rowIdx: number) => {
+    onColumnsChange(columns.filter((_, i) => i !== rowIdx));
+  };
+  const handleAdd = () => {
+    onColumnsChange([...columns, { name: "", type: "", pk: false, nn: false, defaultValue: "" }]);
+  };
+
+  const columnDefs: ColumnDef<ERColumn>[] = [
+    {
+      header: () => "カラム名",
+      cell: ({ row, getValue }) => (
+        <CellEditor
+          value={getValue() as string}
+          onCommit={(v) => handleChange(row.index, "name", v)}
+        />
+      ),
+      accessorKey: "name",
+    },
+    {
+      header: () => "型",
+      cell: ({ row, getValue }) => (
+        <CellEditor
+          value={getValue() as string}
+          onCommit={(v) => handleChange(row.index, "type", v)}
+        />
+      ),
+      accessorKey: "type",
+    },
+    {
+      header: () => "PK",
+      cell: ({ row, getValue }) => (
+        <Checkbox
+          checked={getValue() as boolean}
+          aria-label="PK"
+          onChange={(e) => handleChange(row.index, "pk", e.target.checked)}
+        />
+      ),
+      accessorKey: "pk",
+    },
+    {
+      header: () => "NN",
+      cell: ({ row, getValue }) => (
+        <Checkbox
+          checked={getValue() as boolean}
+          aria-label="NN"
+          onChange={(e) => handleChange(row.index, "nn", e.target.checked)}
+        />
+      ),
+      accessorKey: "nn",
+    },
+    {
+      header: "Default",
+      cell: ({ row, getValue }) => (
+        <CellEditor
+          value={getValue() as string}
+          onCommit={(v) => handleChange(row.index, "defaultValue", v)}
+        />
+      ),
+      accessorKey: "defaultValue",
+    },
+    {
+      header: "",
+      id: "actions",
+      cell: ({ row }) => (
+        <IconButton
+          aria-label="削除"
+          icon={<XIcon />}
+          size="xs"
+          colorScheme="danger"
+          onClick={() => handleDelete(row.index)}
+          variant="outline"
+        />
+      ),
+    },
+  ];
+
+  const table = useReactTable({
+    data: columns,
+    columns: columnDefs,
+    getCoreRowModel: getCoreRowModel(),
+    manualPagination: true,
+  });
+
+  return (
+    <VStack align="start" gap={2}>
+      <TableContainer w="full">
+        <NativeTable variant="simple" size="sm">
+          <TableCaption placement="top">
+            <HStack as={Label}>
+              <Text fontWeight="bold" fontSize="md">
+                テーブル名
+              </Text>
+              <Input
+                value={name}
+                onChange={(e) => onNameChange(e.target.value)}
+                fontWeight="bold"
+                fontSize="md"
+              />
+            </HStack>
+          </TableCaption>
+          <Thead>
+            <Tr>
+              {table.getHeaderGroups()[0].headers.map((header) => (
+                <Th key={header.id} fontWeight="bold" textAlign="left">
+                  {flexRender(header.column.columnDef.header, header.getContext())}
+                </Th>
+              ))}
+            </Tr>
+          </Thead>
+          <Tbody>
+            {table.getRowModel().rows.map((row) => (
+              <Tr key={row.id}>
+                {row.getVisibleCells().map((cell) => (
+                  <Td key={cell.id}>
+                    <Center w="full" h="full">
+                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                    </Center>
+                  </Td>
+                ))}
+              </Tr>
+            ))}
+          </Tbody>
+        </NativeTable>
+      </TableContainer>
+      <HStack w="full" justify="end">
+        <Button size="sm" colorScheme="blue" onClick={handleAdd}>
+          カラム追加
+        </Button>
+      </HStack>
+    </VStack>
+  );
+};
+
+// セル編集用ローカルstate付きエディタ（再利用可能）
+export const CellEditor: FC<{ value: string; onCommit: (v: string) => void }> = ({
+  value,
+  onCommit,
+}) => {
+  const [inputValue, setInputValue] = useState(value);
+  const isComposing = useRef(false);
+  useEffect(() => {
+    setInputValue(value);
+  }, [value]);
+  return (
+    <Input
+      size="sm"
+      value={inputValue}
+      onChange={(e) => setInputValue(e.target.value)}
+      onCompositionStart={() => {
+        isComposing.current = true;
+      }}
+      onCompositionEnd={(e) => {
+        isComposing.current = false;
+        setInputValue(e.currentTarget.value);
+      }}
+      onBlur={() => onCommit(inputValue)}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" && !isComposing.current) {
+          onCommit(inputValue);
+          e.currentTarget.blur();
+        }
+      }}
+    />
+  );
+};

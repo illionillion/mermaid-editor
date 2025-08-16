@@ -23,6 +23,7 @@ import {
   MenuItem,
   Component,
   IconProps,
+  FC,
 } from "@yamada-ui/react";
 import { useCallback, useState, useMemo } from "react";
 import { generateMermaidCode } from "../../utils/mermaid";
@@ -48,7 +49,7 @@ const graphType: GraphTypeWithArrow[] = [
   { type: "BT", arrow: ArrowUpIcon },
 ];
 
-export function DownloadModal({ open, onClose, flowData }: DownloadModalProps) {
+export const DownloadModal: FC<DownloadModalProps> = ({ open, onClose, flowData }) => {
   const [currentGraphType, setCurrentGraphType] = useState<GraphType>("TD");
 
   // 現在選択されている方向でMermaidコードを生成
@@ -116,4 +117,4 @@ export function DownloadModal({ open, onClose, flowData }: DownloadModalProps) {
       </ModalBody>
     </Modal>
   );
-}
+};
