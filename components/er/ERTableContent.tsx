@@ -1,8 +1,8 @@
 import { useReactTable, getCoreRowModel, flexRender, ColumnDef } from "@tanstack/react-table";
 import { XIcon } from "@yamada-ui/lucide";
 import {
+  ui,
   Input,
-  Checkbox,
   IconButton,
   HStack,
   Button,
@@ -79,7 +79,8 @@ export const ERTableContent: FC<ERTableContentProps> = ({
     {
       header: () => "PK",
       cell: ({ row, getValue }) => (
-        <Checkbox
+        <ui.input
+          type="checkbox"
           checked={getValue() as boolean}
           aria-label="PK"
           onChange={(e) => handleChange(row.index, "pk", e.target.checked)}
@@ -90,7 +91,8 @@ export const ERTableContent: FC<ERTableContentProps> = ({
     {
       header: () => "NN",
       cell: ({ row, getValue }) => (
-        <Checkbox
+        <ui.input
+          type="checkbox"
           checked={getValue() as boolean}
           aria-label="NN"
           onChange={(e) => handleChange(row.index, "nn", e.target.checked)}
