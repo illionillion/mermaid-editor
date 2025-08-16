@@ -109,12 +109,12 @@ describe("ERTableContent", () => {
     const columnsRef = { current: defaultColumns } as MutableRefObject<ERColumn[]>;
     render(<TestComponent columnsRef={columnsRef} />);
     // nameカラム編集
-    const nameInputs = screen.getAllByDisplayValue(/id|name/);
+    const nameInputs = screen.getAllByRole("textbox", { name: "カラム名" });
     fireEvent.change(nameInputs[1], { target: { value: "名前" } });
     fireEvent.blur(nameInputs[1]);
     expect(nameInputs[1]).toHaveValue("名前");
     // typeカラム編集
-    const typeInputs = screen.getAllByDisplayValue(/int|varchar/);
+    const typeInputs = screen.getAllByRole("textbox", { name: "型" });
     fireEvent.change(typeInputs[1], { target: { value: "text" } });
     fireEvent.blur(typeInputs[1]);
     expect(typeInputs[1]).toHaveValue("text");
@@ -126,7 +126,7 @@ describe("ERTableContent", () => {
     fireEvent.click(nnChecks[1]);
     expect(nnChecks[1]).toBeChecked();
     // defaultValue編集
-    const defaultInputs = screen.getAllByDisplayValue("auto_increment");
+    const defaultInputs = screen.getAllByRole("textbox", { name: "Default" });
     fireEvent.change(defaultInputs[0], { target: { value: "hoge" } });
     fireEvent.blur(defaultInputs[0]);
     expect(defaultInputs[0]).toHaveValue("hoge");
