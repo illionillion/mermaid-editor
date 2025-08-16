@@ -20,7 +20,7 @@ import {
   Label,
   Text,
 } from "@yamada-ui/react";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 
 export type ERColumn = {
   name: string;
@@ -126,7 +126,6 @@ export const ERTableContent: FC<ERTableContentProps> = ({
     data: columns,
     columns: columnDefs,
     getCoreRowModel: getCoreRowModel(),
-    manualPagination: true,
   });
 
   return (
@@ -180,12 +179,15 @@ export const ERTableContent: FC<ERTableContentProps> = ({
 };
 
 // セル編集用ローカルstate付きエディタ（再利用可能）
-export const CellEditor: FC<{ value: string; onCommit: (v: string) => void }> = ({
+export const CellEditor = ({
   value,
   onCommit,
+}: {
+  value: string;
+  onCommit: (v: string) => void;
 }) => {
   const [inputValue, setInputValue] = useState(value);
-  const isComposing = useRef(false);
+  const [isComposing, setIsComposing] = useState(false);
   useEffect(() => {
     setInputValue(value);
   }, [value]);
@@ -194,18 +196,16 @@ export const CellEditor: FC<{ value: string; onCommit: (v: string) => void }> = 
       size="sm"
       value={inputValue}
       onChange={(e) => setInputValue(e.target.value)}
-      onCompositionStart={() => {
-        isComposing.current = true;
-      }}
+      onCompositionStart={() => setIsComposing(true)}
       onCompositionEnd={(e) => {
-        isComposing.current = false;
+        setIsComposing(false);
         setInputValue(e.currentTarget.value);
       }}
       onBlur={() => onCommit(inputValue)}
       onKeyDown={(e) => {
-        if (e.key === "Enter" && !isComposing.current) {
+        if (e.key === "Enter" && !isComposing) {
           onCommit(inputValue);
-          e.currentTarget.blur();
+          (e.currentTarget as HTMLElement).blur();
         }
       }}
     />
