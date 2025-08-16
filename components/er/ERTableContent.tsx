@@ -59,6 +59,7 @@ export const ERTableContent: FC<ERTableContentProps> = ({
       cell: ({ row, getValue }) => (
         <CellEditor
           value={getValue() as string}
+          label="カラム名"
           onCommit={(v) => handleChange(row.index, "name", v)}
         />
       ),
@@ -69,6 +70,7 @@ export const ERTableContent: FC<ERTableContentProps> = ({
       cell: ({ row, getValue }) => (
         <CellEditor
           value={getValue() as string}
+          label="型"
           onCommit={(v) => handleChange(row.index, "type", v)}
         />
       ),
@@ -101,6 +103,7 @@ export const ERTableContent: FC<ERTableContentProps> = ({
       cell: ({ row, getValue }) => (
         <CellEditor
           value={getValue() as string}
+          label="Default"
           onCommit={(v) => handleChange(row.index, "defaultValue", v)}
         />
       ),
@@ -138,6 +141,7 @@ export const ERTableContent: FC<ERTableContentProps> = ({
                 テーブル名
               </Text>
               <Input
+                aria-label="テーブル名"
                 value={name}
                 onChange={(e) => onNameChange(e.target.value)}
                 fontWeight="bold"
@@ -182,9 +186,11 @@ export const ERTableContent: FC<ERTableContentProps> = ({
 export const CellEditor = ({
   value,
   onCommit,
+  label,
 }: {
   value: string;
   onCommit: (v: string) => void;
+  label: string;
 }) => {
   const [inputValue, setInputValue] = useState(value);
   const [isComposing, setIsComposing] = useState(false);
@@ -193,6 +199,7 @@ export const CellEditor = ({
   }, [value]);
   return (
     <Input
+      aria-label={label}
       size="sm"
       value={inputValue}
       onChange={(e) => setInputValue(e.target.value)}
