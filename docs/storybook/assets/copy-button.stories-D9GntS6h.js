@@ -1,3 +1,0 @@
-import{R as m}from"./iframe-B0pyN9P4.js";import{C as a}from"./copy-button-BnrquPQI.js";import"./preload-helper-C1FmrZbK.js";import"./createLucideIcon-3yn87STw.js";import"./chunk-AFVGPBIP-Z4a0uDJe.js";import"./chunk-FVWMS4CP-DcwLrdLC.js";import"./index-uCLQ8KRJ.js";const l={title:"components/ui/CopyButton",component:a},t={render:()=>m.createElement(a,{value:"コピーするテキスト"})};var e,o,r;t.parameters={...t.parameters,docs:{...(e=t.parameters)==null?void 0:e.docs,source:{originalSource:`{
-  render: () => <CopyButton value="コピーするテキスト" />
-}`,...(r=(o=t.parameters)==null?void 0:o.docs)==null?void 0:r.source}}};const f=["Default"];export{t as Default,f as __namedExportsOrder,l as default};
