@@ -19,8 +19,6 @@ import {
   Center,
   Label,
   Text,
-  Card,
-  CardBody,
 } from "@yamada-ui/react";
 import { useState, useEffect } from "react";
 
@@ -136,54 +134,65 @@ export const ERTableContent: FC<ERTableContentProps> = ({
   });
 
   return (
-    <VStack as={Card} maxW="5xl" bg="white">
-      <CardBody>
-        <TableContainer w="full">
-          <NativeTable variant="simple" size="sm">
-            <TableCaption placement="top">
-              <HStack justifyContent="space-between" w="full">
-                <HStack as={Label}>
-                  <Text fontWeight="bold" fontSize="md">
-                    テーブル名
-                  </Text>
-                  <Input
-                    aria-label="テーブル名"
-                    value={name}
-                    onChange={(e) => onNameChange(e.target.value)}
-                    fontWeight="bold"
-                    fontSize="md"
-                  />
-                </HStack>
-                <Button size="md" colorScheme="blue" onClick={handleAdd}>
-                  カラム追加
-                </Button>
+    <VStack
+      bg="white"
+      border="2px solid #1a365d"
+      borderRadius="md"
+      p={2}
+      maxW="5xl"
+      display="flex"
+      alignItems="center"
+      justifyContent="center"
+      textAlign="center"
+      cursor="pointer"
+      _hover={{ boxShadow: "md" }}
+      position="relative"
+    >
+      <TableContainer w="full">
+        <NativeTable variant="simple" size="sm">
+          <TableCaption placement="top">
+            <HStack justifyContent="space-between" w="full">
+              <HStack as={Label}>
+                <Text fontWeight="bold" fontSize="md">
+                  テーブル名
+                </Text>
+                <Input
+                  aria-label="テーブル名"
+                  value={name}
+                  onChange={(e) => onNameChange(e.target.value)}
+                  fontWeight="bold"
+                  fontSize="md"
+                />
               </HStack>
-            </TableCaption>
-            <Thead>
-              <Tr>
-                {table.getHeaderGroups()[0].headers.map((header) => (
-                  <Th key={header.id} fontWeight="bold" textAlign="left">
-                    {flexRender(header.column.columnDef.header, header.getContext())}
-                  </Th>
+              <Button size="md" colorScheme="blue" onClick={handleAdd}>
+                カラム追加
+              </Button>
+            </HStack>
+          </TableCaption>
+          <Thead>
+            <Tr>
+              {table.getHeaderGroups()[0].headers.map((header) => (
+                <Th key={header.id} fontWeight="bold" textAlign="left">
+                  {flexRender(header.column.columnDef.header, header.getContext())}
+                </Th>
+              ))}
+            </Tr>
+          </Thead>
+          <Tbody>
+            {table.getRowModel().rows.map((row) => (
+              <Tr key={row.id}>
+                {row.getVisibleCells().map((cell) => (
+                  <Td key={cell.id}>
+                    <Center w="full" h="full">
+                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                    </Center>
+                  </Td>
                 ))}
               </Tr>
-            </Thead>
-            <Tbody>
-              {table.getRowModel().rows.map((row) => (
-                <Tr key={row.id}>
-                  {row.getVisibleCells().map((cell) => (
-                    <Td key={cell.id}>
-                      <Center w="full" h="full">
-                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                      </Center>
-                    </Td>
-                  ))}
-                </Tr>
-              ))}
-            </Tbody>
-          </NativeTable>
-        </TableContainer>
-      </CardBody>
+            ))}
+          </Tbody>
+        </NativeTable>
+      </TableContainer>
     </VStack>
   );
 };
