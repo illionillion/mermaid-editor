@@ -15,16 +15,16 @@ import {
 import type { NodeTypes, Node } from "@xyflow/react";
 import { Box, FC, useToken } from "@yamada-ui/react";
 import { useCallback, useState, useRef } from "react";
+import { ERDiagramPanel } from "./er-diagram-panel";
 import {
   createNewERTableNode,
   createNewEREdge,
   calculateNodePosition,
   parseConnectingNodeId,
-} from "./er-diagram-helpers";
-import { ERDiagramPanel } from "./er-diagram-panel";
-import type { ERColumn } from "./er-table-content";
-import type { ERTableNodeProps } from "./er-table-node";
-import { ERTableNode } from "./er-table-node";
+} from "./hooks/er-diagram-helpers";
+import type { ERColumn } from "./node/er-table-content";
+import type { ERTableNodeProps } from "./node/er-table-node";
+import { ERTableNode } from "./node/er-table-node";
 
 const nodeTypes = {
   erTable: ERTableNode,
