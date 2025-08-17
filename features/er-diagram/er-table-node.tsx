@@ -1,6 +1,5 @@
 import { Handle, Position } from "@xyflow/react";
-import { Box } from "@yamada-ui/react";
-import { ERColumn, ERTableContent } from "./ERTableContent";
+import { ERColumn, ERTableContent } from "./er-table-content";
 
 // ReactFlowノードラッパーとしてpropsをそのままContentに渡すだけ
 export type ERTableNodeProps = {
@@ -10,12 +9,13 @@ export type ERTableNodeProps = {
   onColumnsChange: (columns: ERColumn[]) => void;
 };
 
-export function ERTableNode(props: ERTableNodeProps) {
+// React Flowノード用: props.dataにERTableNodePropsが入る
+export function ERTableNode(props: { data: ERTableNodeProps }) {
   return (
-    <Box borderWidth={1} borderRadius="md" p={3} bg="white" minW="320px" boxShadow="md">
-      <ERTableContent {...props} />
+    <>
+      <ERTableContent {...props.data} />
       <Handle type="target" position={Position.Top} />
       <Handle type="source" position={Position.Bottom} />
-    </Box>
+    </>
   );
 }

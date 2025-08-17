@@ -136,7 +136,7 @@ export const ERTableContent: FC<ERTableContentProps> = ({
   });
 
   return (
-    <VStack as={Card} maxW="5xl">
+    <VStack as={Card} maxW="5xl" bg="white">
       <CardBody>
         <TableContainer w="full">
           <NativeTable variant="simple" size="sm">
