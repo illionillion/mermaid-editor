@@ -1,6 +1,6 @@
 import { describe, test, expect } from "vitest";
-import type { MermaidShapeType } from "../../../components/types/types";
-import { formatMermaidShape } from "../../../utils/mermaid";
+import { formatMermaidShape } from "../../../features/flowchart/hooks/mermaid";
+import type { MermaidShapeType } from "../../../features/flowchart/types/types";
 
 describe("formatMermaidShape", () => {
   describe("図形タイプ別の正確な出力", () => {

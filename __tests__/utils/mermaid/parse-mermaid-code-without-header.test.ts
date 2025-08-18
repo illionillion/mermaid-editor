@@ -1,5 +1,5 @@
 import { describe, test, expect } from "vitest";
-import { parseMermaidCode, ParsedMermaidData } from "../../../utils/mermaid";
+import { parseMermaidCode, ParsedMermaidData } from "../../../features/flowchart/hooks/mermaid";
 
 describe("parseMermaidCode - flowchartヘッダーなしのケース", () => {
   test("flowchart TDがない場合でも正常に解析する", () => {

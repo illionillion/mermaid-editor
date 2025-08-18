@@ -1,5 +1,5 @@
 import type { Meta } from "@storybook/react-vite";
-import { DownloadModal } from "../../../components/mermaid/download-modal";
+import { DownloadModal } from "../../../features/flowchart/components/mermaid/download-modal";
 
 const meta: Meta<typeof DownloadModal> = {
   title: "components/mermaid/DownloadModal",

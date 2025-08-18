@@ -1,7 +1,7 @@
 import type { Meta } from "@storybook/react-vite";
 import { Center } from "@yamada-ui/react";
 import { useState } from "react";
-import { NodeMenu } from "../../../components/node/node-menu";
+import { NodeMenu } from "../../../features/flowchart/components/node/node-menu";
 
 const meta: Meta<typeof NodeMenu> = {
   title: "components/node/NodeMenu",

@@ -2,7 +2,7 @@ import { describe, test, expect } from "vitest";
 import {
   calculateNodePosition,
   parseConnectingNodeId,
-} from "../../../components/flow/flow-helpers";
+} from "../../../features/flowchart/hooks/flow-helpers";
 
 describe("calculateNodePosition", () => {
   test("マウス位置を中心にしてノード位置を計算する", () => {
