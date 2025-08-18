@@ -15,8 +15,8 @@ import {
   FC,
 } from "@yamada-ui/react";
 import { useState } from "react";
-import { parseMermaidCode } from "../../utils/mermaid";
-import type { ParsedMermaidData } from "../../utils/mermaid";
+import { parseMermaidCode } from "../../hooks/mermaid";
+import type { ParsedMermaidData } from "../../hooks/mermaid";
 import { EditableMermaidHighlight } from "./editable-mermaid-highlight";
 
 interface ImportModalProps {

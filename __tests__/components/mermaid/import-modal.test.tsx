@@ -1,21 +1,21 @@
 import { screen, waitFor } from "@testing-library/react";
 import { HTMLAttributes } from "react";
 import { describe, test, expect, vi, beforeEach, afterEach } from "vitest";
-import { ImportModal } from "../../../components/mermaid/import-modal";
-import type { MermaidShapeType, MermaidArrowType } from "../../../components/types/types";
-import type { ParsedMermaidData } from "../../../utils/mermaid";
-import { parseMermaidCode } from "../../../utils/mermaid";
+import { ImportModal } from "../../../features/flowchart/components/mermaid/import-modal";
+import type { ParsedMermaidData } from "../../../features/flowchart/hooks/mermaid";
+import { parseMermaidCode } from "../../../features/flowchart/hooks/mermaid";
+import type { MermaidShapeType, MermaidArrowType } from "../../../features/flowchart/types/types";
 import { render } from "../../test-utils";
 
 // utilsのモック
-vi.mock("../../../utils/mermaid", () => ({
+vi.mock("../../../features/flowchart/hooks/mermaid", () => ({
   parseMermaidCode: vi.fn(),
 }));
 
 const mockParseMermaidCode = vi.mocked(parseMermaidCode);
 
 // EditableMermaidHighlightのモック
-vi.mock("../../../components/mermaid/editable-mermaid-highlight", () => ({
+vi.mock("../../../features/flowchart/components/mermaid/editable-mermaid-highlight", () => ({
   EditableMermaidHighlight: ({
     value,
     onChange,

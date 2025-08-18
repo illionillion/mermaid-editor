@@ -1,5 +1,5 @@
-import { FlowData } from "../components/flow/flow-helpers";
-import { MermaidArrowType, MermaidShapeType, GraphType } from "../components/types/types";
+import { MermaidArrowType, MermaidShapeType, GraphType } from "../types/types";
+import { FlowData } from "./flow-helpers";
 
 /**
  * パースされたMermaidデータの型定義

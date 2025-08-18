@@ -2,8 +2,8 @@
 
 import { ChevronDownIcon } from "@yamada-ui/lucide";
 import { Menu, MenuButton, MenuList, MenuItem, IconButton, Portal, FC } from "@yamada-ui/react";
-import { getArrowTypeDisplayName } from "../../utils/mermaid";
-import { MermaidArrowType, ARROW_TYPES } from "../types/types";
+import { getArrowTypeDisplayName } from "../../hooks/mermaid";
+import { MermaidArrowType, ARROW_TYPES } from "../../types/types";
 
 interface ArrowTypeSelectorProps {
   currentArrowType: MermaidArrowType;

@@ -1,5 +1,5 @@
 import { describe, test, expect } from "vitest";
-import { getReservedWords } from "../../../utils/mermaid";
+import { getReservedWords } from "../../../features/flowchart/hooks/mermaid";
 
 describe("getReservedWords", () => {
   test("予約語のSetを正しく返す", () => {

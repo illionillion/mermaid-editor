@@ -1,4 +1,4 @@
-import { ERDiagramPanel } from "../../../features/er-diagram/er-diagram-panel";
+import { ERDiagramPanel } from "../../../features/er-diagram/components/panel/er-diagram-panel";
 
 export default {
   title: "ER/ERDiagramPanel",

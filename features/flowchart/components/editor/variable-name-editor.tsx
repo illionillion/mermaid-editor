@@ -2,8 +2,8 @@
 
 import { Box, FC, Input } from "@yamada-ui/react";
 import { MouseEvent, ChangeEvent, KeyboardEvent } from "react";
-import { formatMermaidShape } from "../../utils/mermaid";
-import { MermaidShapeType } from "../types/types";
+import { formatMermaidShape } from "../../hooks/mermaid";
+import { MermaidShapeType } from "../../types/types";
 
 interface VariableNameEditorProps {
   value: string;

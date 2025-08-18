@@ -1,9 +1,9 @@
 import { screen } from "@testing-library/react";
 import { HTMLAttributes } from "react";
 import { describe, test, expect, vi, beforeEach, afterEach } from "vitest";
-import type { FlowData } from "../../../components/flow/flow-helpers";
-import { DownloadModal } from "../../../components/mermaid/download-modal";
-import { generateMermaidCode } from "../../../utils/mermaid";
+import { DownloadModal } from "../../../features/flowchart/components/mermaid/download-modal";
+import type { FlowData } from "../../../features/flowchart/hooks/flow-helpers";
+import { generateMermaidCode } from "../../../features/flowchart/hooks/mermaid";
 import { render } from "../../test-utils";
 
 // グローバルオブジェクトの設定
@@ -16,14 +16,14 @@ Object.defineProperty(global, "URL", {
 });
 
 // utilsのモック
-vi.mock("../../../utils/mermaid", () => ({
+vi.mock("../../../features/flowchart/hooks/mermaid", () => ({
   generateMermaidCode: vi.fn(),
 }));
 
 const mockGenerateMermaidCode = vi.mocked(generateMermaidCode);
 
 // MermaidHighlightのモック
-vi.mock("../../../components/mermaid/mermaid-highlight", () => ({
+vi.mock("../../../features/flowchart/components/mermaid/mermaid-highlight", () => ({
   MermaidHighlight: ({ code }: { code: string }) => (
     <div data-testid="mermaid-highlight">{code}</div>
   ),

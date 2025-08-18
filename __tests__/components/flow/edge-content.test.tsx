@@ -1,7 +1,7 @@
 import { screen, fireEvent } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, test, expect, vi, beforeEach } from "vitest";
-import { EdgeContent } from "../../../components/flow/editable-edge";
+import { EdgeContent } from "../../../features/flowchart/components/edge/editable-edge";
 import { render } from "../../test-utils";
 
 describe("EdgeContent", () => {

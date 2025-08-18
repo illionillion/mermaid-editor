@@ -14,19 +14,19 @@ import {
 } from "@xyflow/react";
 import { Box, useDisclosure, useToken } from "@yamada-ui/react";
 import { useCallback, useState, useRef, useEffect } from "react";
-import { ParsedMermaidData } from "../../utils/mermaid";
-import { FlowLayout } from "../layout/";
-import { DownloadModal } from "../mermaid";
-import { MermaidArrowType } from "../types/types";
-import { edgeTypes } from "./edge-types";
+import { FlowLayout } from "@/components/layout/";
+import { edgeTypes } from "./components/edge/edge-types";
+import { DownloadModal } from "./components/mermaid/download-modal";
+import { nodeTypes } from "./components/node/node-types";
+import { FlowPanel } from "./components/panel/flow-panel";
 import {
   calculateNodePosition,
   createNewNode,
   createNewEdge,
   parseConnectingNodeId,
-} from "./flow-helpers";
-import { FlowPanel } from "./flow-panel";
-import { nodeTypes } from "./node-types";
+} from "./hooks/flow-helpers";
+import { ParsedMermaidData } from "./hooks/mermaid";
+import { MermaidArrowType } from "./types";
 
 // レイアウト定数
 const LAYOUT_CONSTANTS = {

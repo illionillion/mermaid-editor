@@ -1,10 +1,10 @@
 import { describe, test, expect } from "vitest";
-import { MermaidArrowType } from "../../../components/types/types";
 import {
   formatMermaidArrow,
   getArrowTypeSymbol,
   getArrowTypeDisplayName,
-} from "../../../utils/mermaid";
+} from "../../../features/flowchart/hooks/mermaid";
+import { MermaidArrowType } from "../../../features/flowchart/types/types";
 
 describe("formatMermaidArrow", () => {
   describe("矢印タイプ別の出力", () => {

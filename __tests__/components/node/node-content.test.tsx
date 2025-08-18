@@ -1,8 +1,8 @@
 import { screen, fireEvent } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, test, expect, vi, beforeEach } from "vitest";
-import { NodeContent } from "../../../components/node/editable-node";
-import { SHAPE_OPTIONS } from "../../../components/types/types";
+import { NodeContent } from "../../../features/flowchart/components/node/editable-node";
+import { SHAPE_OPTIONS } from "../../../features/flowchart/types/types";
 import { render } from "../../test-utils";
 
 describe("NodeContent", () => {

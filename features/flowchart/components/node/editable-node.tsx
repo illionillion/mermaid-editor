@@ -3,8 +3,8 @@
 import { Handle, Position } from "@xyflow/react";
 import { Box, FC } from "@yamada-ui/react";
 import { useState, useRef, MouseEvent, ChangeEvent, KeyboardEvent } from "react";
+import { UI_CONSTANTS, MermaidShapeType } from "../../types/types";
 import { VariableNameEditor, LabelEditor } from "../editor";
-import { UI_CONSTANTS, MermaidShapeType } from "../types/types";
 import { NodeMenu } from "./node-menu";
 
 interface EditableNodeProps {

@@ -1,4 +1,4 @@
-import { EditableNode } from "../node";
+import { EditableNode } from "./editable-node";
 
 export const nodeTypes = {
   editableNode: EditableNode,

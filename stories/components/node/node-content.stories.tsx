@@ -1,5 +1,5 @@
 import type { Meta } from "@storybook/react-vite";
-import { NodeContent } from "../../../components/node/editable-node";
+import { NodeContent } from "../../../features/flowchart/components/node/editable-node";
 
 const meta: Meta<typeof NodeContent> = {
   title: "components/node/NodeContent",

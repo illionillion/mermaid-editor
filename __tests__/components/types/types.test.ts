@@ -1,5 +1,5 @@
 import { describe, test, expect } from "vitest";
-import { UI_CONSTANTS, ARROW_TYPES, SHAPE_OPTIONS } from "../../../components/types/types";
+import { UI_CONSTANTS, ARROW_TYPES, SHAPE_OPTIONS } from "../../../features/flowchart/types/types";
 
 describe("UI_CONSTANTS", () => {
   test("定数値が正しく定義されている", () => {

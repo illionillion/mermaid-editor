@@ -1,7 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, it, expect, vi } from "vitest";
-import { ERDiagramPanel } from "../../../features/er-diagram/er-diagram-panel";
+import { ERDiagramPanel } from "../../../features/er-diagram/components/panel/er-diagram-panel";
 
 describe("ERDiagramPanel", () => {
   it("renders title and add button", () => {

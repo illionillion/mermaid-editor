@@ -26,10 +26,10 @@ import {
   FC,
 } from "@yamada-ui/react";
 import { useCallback, useState, useMemo } from "react";
-import { generateMermaidCode } from "../../utils/mermaid";
-import { FlowData } from "../flow/flow-helpers";
-import { GraphType } from "../types/types";
-import { CopyButton } from "../ui";
+import { CopyButton } from "@/components/ui";
+import { FlowData } from "../../hooks/flow-helpers";
+import { generateMermaidCode } from "../../hooks/mermaid";
+import { GraphType } from "../../types/types";
 import { MermaidHighlight } from "./mermaid-highlight";
 
 interface DownloadModalProps {

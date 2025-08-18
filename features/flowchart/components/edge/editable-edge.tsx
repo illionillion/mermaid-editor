@@ -11,9 +11,9 @@ import {
 import { XIcon } from "@yamada-ui/lucide";
 import { Input, Box, IconButton, HStack } from "@yamada-ui/react";
 import { useState, useRef, useEffect, MouseEvent, KeyboardEvent } from "react";
-import { adjustEdgeLabelPosition, getCyclicEdgeStyle } from "../../utils/edge-layout";
-import { getArrowTypeSymbol } from "../../utils/mermaid";
-import { MermaidArrowType } from "../types/types";
+import { adjustEdgeLabelPosition, getCyclicEdgeStyle } from "../../hooks/edge-layout";
+import { getArrowTypeSymbol } from "../../hooks/mermaid";
+import { MermaidArrowType } from "../../types/types";
 import { ArrowTypeSelector } from "./arrow-type-selector";
 
 interface EditableEdgeProps extends EdgeProps {

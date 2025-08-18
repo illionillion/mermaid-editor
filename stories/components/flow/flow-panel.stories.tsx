@@ -1,5 +1,5 @@
 import type { Meta } from "@storybook/react-vite";
-import { FlowPanel } from "../../../components/flow/flow-panel";
+import { FlowPanel } from "../../../features/flowchart/components/panel/flow-panel";
 
 const meta: Meta<typeof FlowPanel> = {
   title: "components/flow/FlowPanel",
