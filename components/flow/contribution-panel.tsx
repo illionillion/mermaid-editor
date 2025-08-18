@@ -4,7 +4,7 @@ import { IconButton, Link } from "@yamada-ui/react";
 
 export const ContributionPanel = () => {
   return (
-    <Panel position="bottom-right">
+    <Panel position="top-right">
       <ContributionPanelContent />
     </Panel>
   );

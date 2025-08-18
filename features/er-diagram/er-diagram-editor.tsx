@@ -1,7 +1,5 @@
 "use client";
 import {
-  Controls,
-  MiniMap,
   ReactFlow,
   addEdge,
   useNodesState,
@@ -15,6 +13,7 @@ import {
 import type { NodeTypes, Node } from "@xyflow/react";
 import { Box, FC, useToken } from "@yamada-ui/react";
 import { useCallback, useState, useRef } from "react";
+import { FlowLayout } from "@/components/layout/";
 import { ERDiagramPanel } from "./er-diagram-panel";
 import {
   createNewERTableNode,
@@ -194,7 +193,6 @@ export const ERDiagramEditor: FC = () => {
 
   return (
     <Box h="100vh" w="full">
-      <ERDiagramPanel onAddTable={handleAddTable} />
       <ReactFlow
         nodes={nodesWithHandlers}
         edges={edges}
@@ -206,8 +204,9 @@ export const ERDiagramEditor: FC = () => {
         nodeTypes={nodeTypes}
         fitView
       >
-        <MiniMap />
-        <Controls />
+        <FlowLayout>
+          <ERDiagramPanel onAddTable={handleAddTable} />
+        </FlowLayout>
       </ReactFlow>
     </Box>
   );

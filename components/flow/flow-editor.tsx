@@ -5,8 +5,6 @@ import {
   Node,
   Edge,
   addEdge,
-  Controls,
-  Background,
   useNodesState,
   useEdgesState,
   useReactFlow,
@@ -17,9 +15,9 @@ import {
 import { Box, useDisclosure, useToken } from "@yamada-ui/react";
 import { useCallback, useState, useRef, useEffect } from "react";
 import { ParsedMermaidData } from "../../utils/mermaid";
+import { FlowLayout } from "../layout/";
 import { DownloadModal } from "../mermaid";
 import { MermaidArrowType } from "../types/types";
-import { ContributionPanel } from "./contribution-panel";
 import { edgeTypes } from "./edge-types";
 import {
   calculateNodePosition,
@@ -470,14 +468,13 @@ export function FlowEditor() {
         edgeTypes={edgeTypes}
         fitView
       >
-        <Controls />
-        <Background />
-        <FlowPanel
-          onAddNode={addNode}
-          onGenerateCode={generateMermaidCodeCallback}
-          onImportMermaid={handleImportMermaid}
-        />
-        <ContributionPanel />
+        <FlowLayout>
+          <FlowPanel
+            onAddNode={addNode}
+            onGenerateCode={generateMermaidCodeCallback}
+            onImportMermaid={handleImportMermaid}
+          />
+        </FlowLayout>
       </ReactFlow>
 
       <DownloadModal open={open} onClose={onClose} flowData={{ nodes, edges }} />
