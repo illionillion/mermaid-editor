@@ -14,3 +14,12 @@ export const ER_CARDINALITY_SYMBOLS: Record<ErCardinality, string> = {
   "many-to-many": "}o--o{",
   "zero-to-one": "o|--||",
 };
+
+// GUI表示用のカーディナリティラベル
+export const ER_CARDINALITY_DISPLAY_LABELS: Record<ErCardinality, string> = {
+  "one-to-one": "1...1",
+  "one-to-many": "1...*",
+  "many-to-one": "*...1",
+  "many-to-many": "*...*",
+  "zero-to-one": "0...1",
+};
