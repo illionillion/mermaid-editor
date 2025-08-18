@@ -26,7 +26,7 @@ import {
   FC,
 } from "@yamada-ui/react";
 import { useCallback, useState, useMemo } from "react";
-import { CopyButton } from "@/components/ui";
+import { CopyButton } from "../../../../components/ui/copy-button";
 import { FlowData } from "../../hooks/flow-helpers";
 import { generateMermaidCode } from "../../hooks/mermaid";
 import { GraphType } from "../../types/types";
