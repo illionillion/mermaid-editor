@@ -10,10 +10,11 @@ import {
   OnConnectEnd,
   useReactFlow,
 } from "@xyflow/react";
-import type { NodeTypes, Node } from "@xyflow/react";
+import type { NodeTypes, Node, EdgeTypes } from "@xyflow/react";
 import { Box, FC, useToken } from "@yamada-ui/react";
 import { useCallback, useState, useRef } from "react";
 import { FlowLayout } from "@/components/layout/";
+import { ErEdge } from "./components/edge/er-edge";
 import type { ERColumn } from "./components/node/er-table-content";
 import type { ERTableNodeProps } from "./components/node/er-table-node";
 import { ERTableNode } from "./components/node/er-table-node";
@@ -28,6 +29,10 @@ import {
 const nodeTypes = {
   erTable: ERTableNode,
 } as NodeTypes;
+
+const edgeTypes = {
+  erEdge: ErEdge,
+} as EdgeTypes;
 
 export type ERDiagramNodeData = {
   id: string;
@@ -187,7 +192,21 @@ export const ERDiagramEditor: FC = () => {
   });
 
   const onConnect = useCallback(
-    (params: Edge | Connection) => setEdges((eds) => addEdge(params, eds)),
+    (params: Edge | Connection) => {
+      setEdges((eds) =>
+        addEdge(
+          {
+            ...params,
+            type: "erEdge",
+            data: {
+              label: "relation",
+              cardinality: "one-to-many",
+            },
+          },
+          eds
+        )
+      );
+    },
     [setEdges]
   );
 
@@ -202,6 +221,7 @@ export const ERDiagramEditor: FC = () => {
         onConnectStart={onConnectStart}
         onConnectEnd={onConnectEnd}
         nodeTypes={nodeTypes}
+        edgeTypes={edgeTypes}
         fitView
       >
         <FlowLayout>
