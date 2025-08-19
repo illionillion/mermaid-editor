@@ -88,6 +88,18 @@ export const ERDiagramEditor: FC = () => {
     [setEdges]
   );
 
+  // エッジのカーディナリティ変更ハンドラ
+  const handleEdgeCardinalityChange = useCallback(
+    (edgeId: string, cardinality: string) => {
+      setEdges((eds) =>
+        eds.map((edge) =>
+          edge.id === edgeId ? { ...edge, data: { ...edge.data, cardinality } } : edge
+        )
+      );
+    },
+    [setEdges]
+  );
+
   // ノード追加
   const handleAddTable = useCallback(() => {
     const newNode = createNewERTableNode(
@@ -226,7 +238,7 @@ export const ERDiagramEditor: FC = () => {
     };
   });
 
-  // 各エッジにonDelete等のハンドラを付与
+  // 各エッジにonDelete, onCardinalityChange等のハンドラを付与
   const edgesWithHandlers = edges.map((edge) => {
     if (edge.type !== "erEdge") return edge;
     return {
@@ -234,6 +246,7 @@ export const ERDiagramEditor: FC = () => {
       data: {
         ...edge.data,
         onDelete: handleEdgeDelete,
+        onCardinalityChange: handleEdgeCardinalityChange,
       },
     };
   });
