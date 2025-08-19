@@ -85,7 +85,7 @@ export function ErEditableEdge({
             aria-label="Delete edge"
             icon={<XIcon />}
             size="xs"
-            variant="ghost"
+            variant="outline"
             colorScheme="red"
             onClick={() => onDelete(id)}
           />

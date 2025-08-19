@@ -80,6 +80,14 @@ export const ERDiagramEditor: FC = () => {
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
   const [nodeId, setNodeId] = useState(2);
 
+  // エッジ削除ハンドラ
+  const handleEdgeDelete = useCallback(
+    (edgeId: string) => {
+      setEdges((eds) => eds.filter((edge) => edge.id !== edgeId));
+    },
+    [setEdges]
+  );
+
   // ノード追加
   const handleAddTable = useCallback(() => {
     const newNode = createNewERTableNode(
@@ -218,11 +226,23 @@ export const ERDiagramEditor: FC = () => {
     };
   });
 
+  // 各エッジにonDelete等のハンドラを付与
+  const edgesWithHandlers = edges.map((edge) => {
+    if (edge.type !== "erEdge") return edge;
+    return {
+      ...edge,
+      data: {
+        ...edge.data,
+        onDelete: handleEdgeDelete,
+      },
+    };
+  });
+
   return (
     <Box h="100vh" w="full">
       <ReactFlow
         nodes={nodesWithHandlers}
-        edges={edges}
+        edges={edgesWithHandlers}
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
