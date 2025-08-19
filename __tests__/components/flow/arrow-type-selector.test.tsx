@@ -141,8 +141,8 @@ describe("ArrowTypeSelector", () => {
       const button = screen.getByRole("button", { name: "Select arrow type" });
       await user.click(button);
 
-      // ARROW_TYPESの数と表示される項目数が一致する
-      const menuItems = screen.getAllByRole("menuitem");
+      // ARROW_TYPESの数と表示される項目数が一致する（非同期で待つ）
+      const menuItems = await screen.findAllByRole("menuitem");
       expect(menuItems).toHaveLength(ARROW_TYPES.length);
     });
   });

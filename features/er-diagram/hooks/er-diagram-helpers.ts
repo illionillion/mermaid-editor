@@ -1,5 +1,6 @@
 import type { Node, Edge } from "@xyflow/react";
 import type { ERTableNodeProps } from "../components/node/er-table-node";
+import type { ErCardinality } from "../types/types";
 
 export function calculateNodePosition(
   mousePosition: { x: number; y: number },
@@ -32,15 +33,19 @@ export function createNewERTableNode(
 export function createNewEREdge(
   sourceNodeId: string,
   targetNodeId: string,
-  handleType?: string
+  handleType?: string,
+  label: string = "relation",
+  cardinality: ErCardinality = "one-to-many"
 ): Edge {
-  // flow-editorと同じくhandleTypeでsource/targetを切り替え
   return {
     id: `${sourceNodeId}-${targetNodeId}`,
     source: handleType === "source" ? sourceNodeId : targetNodeId,
     target: handleType === "source" ? targetNodeId : sourceNodeId,
-    type: "default",
-    data: {},
+    type: "erEdge",
+    data: {
+      label,
+      cardinality,
+    },
   };
 }
 
