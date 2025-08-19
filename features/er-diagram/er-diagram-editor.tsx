@@ -80,6 +80,16 @@ export const ERDiagramEditor: FC = () => {
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
   const [nodeId, setNodeId] = useState(2);
 
+  // エッジラベル編集ハンドラ
+  const handleEdgeLabelChange = useCallback(
+    (edgeId: string, label: string) => {
+      setEdges((eds) =>
+        eds.map((edge) => (edge.id === edgeId ? { ...edge, data: { ...edge.data, label } } : edge))
+      );
+    },
+    [setEdges]
+  );
+
   // エッジ削除ハンドラ
   const handleEdgeDelete = useCallback(
     (edgeId: string) => {
@@ -238,7 +248,7 @@ export const ERDiagramEditor: FC = () => {
     };
   });
 
-  // 各エッジにonDelete, onCardinalityChange等のハンドラを付与
+  // 各エッジにonDelete, onCardinalityChange, onLabelChange等のハンドラを付与
   const edgesWithHandlers = edges.map((edge) => {
     if (edge.type !== "erEdge") return edge;
     return {
@@ -247,6 +257,7 @@ export const ERDiagramEditor: FC = () => {
         ...edge.data,
         onDelete: handleEdgeDelete,
         onCardinalityChange: handleEdgeCardinalityChange,
+        onLabelChange: handleEdgeLabelChange,
       },
     };
   });
