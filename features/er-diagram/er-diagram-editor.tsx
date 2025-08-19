@@ -114,9 +114,15 @@ export const ERDiagramEditor: FC = () => {
   const onConnectEnd: OnConnectEnd = useCallback(
     (event) => {
       if (!connectingNodeId.current) return;
-      // 既存ノードやハンドルにドロップした場合は新ノード作成しない
+      // 既存ノード同士が繋がった場合は新ノード作成しない
+      if (connectingNodeId.current === "connected") {
+        connectingNodeId.current = null;
+        return;
+      }
       const target = (event && (event.target as Element)) || null;
-      if (!target || !target.classList.contains("react-flow__pane")) {
+      // pane上にドロップされた場合のみ新ノード作成（flowchart最新版と同じ判定）
+      const isPaneDrop = target && target.closest && target.closest(".react-flow__pane");
+      if (!isPaneDrop) {
         connectingNodeId.current = null;
         return;
       }
@@ -170,6 +176,27 @@ export const ERDiagramEditor: FC = () => {
     [nodeId, setNodes, setEdges, screenToFlowPosition, nodes]
   );
 
+  // flowchartと同じonConnect: 既存ノード同士が繋がった場合はconnectingNodeId.current = 'connected'を必ずセット
+  const onConnect = useCallback(
+    (params: Edge | Connection) => {
+      setEdges((eds) =>
+        addEdge(
+          {
+            ...params,
+            type: "erEdge",
+            data: {
+              label: "relation",
+              cardinality: "one-to-many",
+            },
+          },
+          eds
+        )
+      );
+      connectingNodeId.current = "connected";
+    },
+    [setEdges]
+  );
+
   // ノード編集用のonNameChange/onColumnsChangeを各ノードに付与
   const nodesWithHandlers: Node<ERTableNodeProps>[] = nodes.map((node) => {
     if (node.type !== "erTable") return node as Node<ERTableNodeProps>;
@@ -190,25 +217,6 @@ export const ERDiagramEditor: FC = () => {
       },
     };
   });
-
-  const onConnect = useCallback(
-    (params: Edge | Connection) => {
-      setEdges((eds) =>
-        addEdge(
-          {
-            ...params,
-            type: "erEdge",
-            data: {
-              label: "relation",
-              cardinality: "one-to-many",
-            },
-          },
-          eds
-        )
-      );
-    },
-    [setEdges]
-  );
 
   return (
     <Box h="100vh" w="full">
