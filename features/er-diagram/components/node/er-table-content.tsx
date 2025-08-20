@@ -26,8 +26,7 @@ export type ERColumn = {
   name: string;
   type: string;
   pk: boolean;
-  nn: boolean;
-  defaultValue: string;
+  uk: boolean;
 };
 
 export type ERTableContentProps = {
@@ -50,7 +49,7 @@ export const ERTableContent: FC<ERTableContentProps> = ({
     onColumnsChange(columns.filter((_, i) => i !== rowIdx));
   };
   const handleAdd = () => {
-    onColumnsChange([...columns, { name: "", type: "", pk: false, nn: false, defaultValue: "" }]);
+    onColumnsChange([...columns, { name: "", type: "", pk: false, uk: false }]);
   };
 
   const columnDefs: ColumnDef<ERColumn>[] = [
@@ -78,38 +77,39 @@ export const ERTableContent: FC<ERTableContentProps> = ({
     },
     {
       header: () => "PK",
-      cell: ({ row, getValue }) => (
+      cell: ({ row }) => (
         <ui.input
           type="checkbox"
-          checked={getValue() as boolean}
+          checked={columns[row.index].pk}
           aria-label="PK"
-          onChange={(e) => handleChange(row.index, "pk", e.target.checked)}
+          disabled={columns[row.index].uk}
+          onChange={(e) => {
+            const checked = e.target.checked;
+            onColumnsChange(
+              columns.map((col, i) => (i === row.index ? { ...col, pk: checked } : col))
+            );
+          }}
         />
       ),
       accessorKey: "pk",
     },
     {
-      header: () => "NN",
-      cell: ({ row, getValue }) => (
+      header: () => "UK",
+      cell: ({ row }) => (
         <ui.input
           type="checkbox"
-          checked={getValue() as boolean}
-          aria-label="NN"
-          onChange={(e) => handleChange(row.index, "nn", e.target.checked)}
+          checked={columns[row.index].uk}
+          aria-label="UK"
+          disabled={columns[row.index].pk}
+          onChange={(e) => {
+            const checked = e.target.checked;
+            onColumnsChange(
+              columns.map((col, i) => (i === row.index ? { ...col, uk: checked } : col))
+            );
+          }}
         />
       ),
-      accessorKey: "nn",
-    },
-    {
-      header: "Default",
-      cell: ({ row, getValue }) => (
-        <CellEditor
-          value={getValue() as string}
-          label="Default"
-          onCommit={(v) => handleChange(row.index, "defaultValue", v)}
-        />
-      ),
-      accessorKey: "defaultValue",
+      accessorKey: "uk",
     },
     {
       header: "",

@@ -25,6 +25,7 @@ import {
   calculateNodePosition,
   parseConnectingNodeId,
 } from "./hooks/er-diagram-helpers";
+import { generateERDiagramMermaidCode } from "./utils/generate-mermaid-code";
 
 const nodeTypes = {
   erTable: ERTableNode,
@@ -66,8 +67,8 @@ export const ERDiagramEditor: FC = () => {
       data: {
         name: "ユーザー",
         columns: [
-          { name: "id", type: "int", pk: true, nn: true, defaultValue: "auto_increment" },
-          { name: "name", type: "varchar(255)", pk: false, nn: false, defaultValue: "" },
+          { name: "id", type: "int", pk: true, uk: false },
+          { name: "name", type: "varchar(255)", pk: false, uk: true },
         ],
         onNameChange: () => {},
         onColumnsChange: () => {},
@@ -277,7 +278,12 @@ export const ERDiagramEditor: FC = () => {
         fitView
       >
         <FlowLayout>
-          <ERDiagramPanel onAddTable={handleAddTable} />
+          <ERDiagramPanel
+            onAddTable={handleAddTable}
+            nodes={nodes}
+            edges={edges}
+            generateCode={generateERDiagramMermaidCode}
+          />
         </FlowLayout>
       </ReactFlow>
     </Box>

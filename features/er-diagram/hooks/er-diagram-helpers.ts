@@ -24,7 +24,7 @@ export function createNewERTableNode(
     position,
     data: {
       name: `テーブル${nodeId}`,
-      columns: [{ name: "id", type: "int", pk: true, nn: true, defaultValue: "auto_increment" }],
+      columns: [{ name: "id", type: "int", pk: true, uk: false }],
       ...handlers,
     },
   };

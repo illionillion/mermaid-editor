@@ -1,15 +1,12 @@
 import { screen, fireEvent, waitFor } from "@testing-library/react";
 import { useState, useEffect, ReactNode, MutableRefObject } from "react";
 import { describe, test, expect } from "vitest";
-import {
-  ERTableContent,
-  ERColumn,
-} from "../../../features/er-diagram/components/node/er-table-content";
-import { render } from "../../test-utils";
+import { render } from "../../../__tests__/test-utils";
+import { ERTableContent, ERColumn } from "../components/node/er-table-content";
 
 const defaultColumns: ERColumn[] = [
-  { name: "id", type: "int", pk: true, nn: true, defaultValue: "auto_increment" },
-  { name: "name", type: "varchar(255)", pk: false, nn: false, defaultValue: "" },
+  { name: "id", type: "int", pk: true, uk: false },
+  { name: "name", type: "varchar(255)", pk: false, uk: false },
 ];
 
 // テスト用ラッパー（テスト本体でstateを直接参照できる形）
@@ -125,13 +122,44 @@ describe("ERTableContent", () => {
     const pkChecks = screen.getAllByRole("checkbox", { name: "PK" });
     fireEvent.click(pkChecks[1]);
     expect(pkChecks[1]).toBeChecked();
-    const nnChecks = screen.getAllByRole("checkbox", { name: "NN" });
-    fireEvent.click(nnChecks[1]);
-    expect(nnChecks[1]).toBeChecked();
-    // defaultValue編集
-    const defaultInputs = screen.getAllByRole("textbox", { name: "Default" });
-    fireEvent.change(defaultInputs[0], { target: { value: "hoge" } });
-    fireEvent.blur(defaultInputs[0]);
-    expect(defaultInputs[0]).toHaveValue("hoge");
+    // ukチェック
+    const ukChecks = screen.getAllByRole("checkbox", { name: "UK" });
+    fireEvent.click(ukChecks[1]);
+    expect(ukChecks[1]).toBeChecked();
+  });
+
+  test("PK/UKは排他でどちらかがtrueのときもう一方はdisabledになる", async () => {
+    const singleColumn = [{ name: "col", type: "int", pk: false, uk: false }];
+    render(
+      <StateWrapper initialColumns={singleColumn}>
+        {({ name, columns, setColumns }) => (
+          <ERTableContent
+            name={name}
+            columns={columns}
+            onNameChange={() => {}}
+            onColumnsChange={setColumns}
+          />
+        )}
+      </StateWrapper>
+    );
+    // 初期状態: どちらも有効
+    expect(screen.getByRole("checkbox", { name: "PK" })).not.toBeDisabled();
+    expect(screen.getByRole("checkbox", { name: "UK" })).not.toBeDisabled();
+    // PKをチェック→UKがdisabled
+    fireEvent.click(screen.getByRole("checkbox", { name: "PK" }));
+    expect(screen.getByRole("checkbox", { name: "PK" })).toBeChecked();
+    await waitFor(() => expect(screen.getByRole("checkbox", { name: "UK" })).toBeDisabled());
+    // PKを外す→UKが有効
+    fireEvent.click(screen.getByRole("checkbox", { name: "PK" }));
+    expect(screen.getByRole("checkbox", { name: "PK" })).not.toBeChecked();
+    await waitFor(() => expect(screen.getByRole("checkbox", { name: "UK" })).not.toBeDisabled());
+    // UKをチェック→PKがdisabled
+    fireEvent.click(screen.getByRole("checkbox", { name: "UK" }));
+    expect(screen.getByRole("checkbox", { name: "UK" })).toBeChecked();
+    await waitFor(() => expect(screen.getByRole("checkbox", { name: "PK" })).toBeDisabled());
+    // UKを外す→PKが有効
+    fireEvent.click(screen.getByRole("checkbox", { name: "UK" }));
+    expect(screen.getByRole("checkbox", { name: "UK" })).not.toBeChecked();
+    await waitFor(() => expect(screen.getByRole("checkbox", { name: "PK" })).not.toBeDisabled());
   });
 });
