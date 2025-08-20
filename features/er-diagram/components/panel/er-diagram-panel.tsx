@@ -34,7 +34,7 @@ export const ERDiagramPanel: FC<ERDiagramPanelProps> = ({
     <Panel position="top-left">
       <VStack gap={4} p={4} bg="white" borderRadius="md" boxShadow="md">
         <Text fontSize="lg" fontWeight="bold">
-          ER図エディタ
+          Mermaid ER図エディター
         </Text>
         <VStack gap={2} align="start">
           <Text fontSize="sm" color="gray.600">
