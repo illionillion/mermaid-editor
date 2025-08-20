@@ -1,9 +1,6 @@
 import type { Meta } from "@storybook/react-vite";
 import { useState } from "react";
-import {
-  ERTableContent,
-  ERColumn,
-} from "../../../features/er-diagram/components/node/er-table-content";
+import { ERTableContent, ERColumn } from "../components/node/er-table-content";
 
 const meta: Meta<typeof ERTableContent> = {
   title: "components/er/ERTableContent",
@@ -12,8 +9,8 @@ const meta: Meta<typeof ERTableContent> = {
 export default meta;
 
 const initialColumns: ERColumn[] = [
-  { name: "id", type: "int", pk: true, nn: true, defaultValue: "auto_increment" },
-  { name: "name", type: "varchar(255)", pk: false, nn: false, defaultValue: "" },
+  { name: "id", type: "int", pk: true, uk: false },
+  { name: "name", type: "varchar(255)", pk: false, uk: false },
 ];
 
 export const Default = {

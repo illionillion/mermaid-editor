@@ -4,7 +4,8 @@ export type ErCardinality =
   | "one-to-many"
   | "many-to-one"
   | "many-to-many"
-  | "zero-to-one";
+  | "zero-to-one"
+  | "one-to-zero";
 
 // Mermaid記法用のカーディナリティ記号
 export const ER_CARDINALITY_SYMBOLS: Record<ErCardinality, string> = {
@@ -13,6 +14,7 @@ export const ER_CARDINALITY_SYMBOLS: Record<ErCardinality, string> = {
   "many-to-one": "}o--||",
   "many-to-many": "}o--o{",
   "zero-to-one": "o|--||",
+  "one-to-zero": "||--o|",
 };
 
 // GUI表示用のカーディナリティラベル
@@ -22,4 +24,5 @@ export const ER_CARDINALITY_DISPLAY_LABELS: Record<ErCardinality, string> = {
   "many-to-one": "*...1",
   "many-to-many": "*...*",
   "zero-to-one": "0...1",
+  "one-to-zero": "1...0",
 };
