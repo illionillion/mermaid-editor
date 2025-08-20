@@ -1,0 +1,1 @@
+import{r as e}from"./iframe-CUU_ex75.js";var n=(a=!1)=>{const[t,s]=e.useState(a),o=e.useCallback(()=>s(!0),[]),l=e.useCallback(()=>s(!1),[]),r=e.useCallback(()=>s(c=>!c),[]);return[t,{on:o,off:l,toggle:r}]};export{n as u};

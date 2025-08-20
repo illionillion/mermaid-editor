@@ -1,1 +1,0 @@
-import{B as u}from"./chunk-AFVGPBIP-_bZBFQaB.js";import{f as i,j as c,b as e}from"./iframe-BUjWjKwL.js";var o=i(({className:t,children:n,icon:r,...a},s)=>c.jsx(u,{ref:s,className:e("ui-icon-button",t),p:0,...a,children:r||n}));o.displayName="IconButton";o.__ui__="IconButton";export{o as I};
