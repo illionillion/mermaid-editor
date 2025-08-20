@@ -18,7 +18,7 @@ describe("ERDiagramPanel", () => {
         generateCode={dummyGenerateCode}
       />
     );
-    expect(screen.getByText("ER図エディタ")).toBeInTheDocument();
+    expect(screen.getByText("Mermaid ER図エディター")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /テーブル追加/ })).toBeInTheDocument();
   });
 
