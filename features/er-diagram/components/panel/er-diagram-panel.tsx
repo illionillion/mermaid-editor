@@ -1,6 +1,7 @@
 import { Panel, Node, Edge } from "@xyflow/react";
 import { PlusIcon, DownloadIcon } from "@yamada-ui/lucide";
 import { VStack, HStack, Text, Button, FC, useBoolean } from "@yamada-ui/react";
+import { NavigationMenu } from "@/components/ui";
 import type { ERTableNodeProps } from "../node/er-table-node";
 import { ERDiagramMermaidModal } from "./er-diagram-mermaid-modal";
 
@@ -33,9 +34,12 @@ export const ERDiagramPanel: FC<ERDiagramPanelProps> = ({
   return (
     <Panel position="top-left">
       <VStack gap={4} p={4} bg="white" borderRadius="md" boxShadow="md">
-        <Text fontSize="lg" fontWeight="bold">
-          Mermaid ER図エディター
-        </Text>
+        <HStack w="full" justify="space-between">
+          <Text fontSize="lg" fontWeight="bold">
+            Mermaid ER図エディター
+          </Text>
+          <NavigationMenu />
+        </HStack>
         <VStack gap={2} align="start">
           <Text fontSize="sm" color="gray.600">
             💡 ヒント: テーブルをダブルクリックで編集、ドラッグして空の場所で新テーブル作成

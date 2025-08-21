@@ -23,7 +23,7 @@ vi.mock("../../../features/flowchart/hooks/mermaid", () => ({
 const mockGenerateMermaidCode = vi.mocked(generateMermaidCode);
 
 // MermaidHighlightのモック
-vi.mock("../../../features/flowchart/components/mermaid/mermaid-highlight", () => ({
+vi.mock("../../../components/ui/mermaid-highlight", () => ({
   MermaidHighlight: ({ code }: { code: string }) => (
     <div data-testid="mermaid-highlight">{code}</div>
   ),

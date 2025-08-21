@@ -5,6 +5,10 @@ import { describe, it, expect, vi } from "vitest";
 import type { ERTableNodeProps } from "../components/node/er-table-node";
 import { ERDiagramPanel } from "../components/panel/er-diagram-panel";
 
+vi.mock("next/navigation", () => ({
+  usePathname: () => "/er-diagram",
+}));
+
 const dummyNodes: Node<ERTableNodeProps>[] = [];
 const dummyEdges: Edge[] = [];
 const dummyGenerateCode = () => "erDiagram";

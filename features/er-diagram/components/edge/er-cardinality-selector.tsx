@@ -1,6 +1,6 @@
 import { ChevronDownIcon } from "@yamada-ui/lucide";
 import { Menu, MenuButton, MenuList, MenuItem, Button, Portal } from "@yamada-ui/react";
-import { ErCardinality, ER_CARDINALITY_DISPLAY_LABELS } from "../../types/types";
+import { ErCardinality, ER_CARDINALITY_DISPLAY_LABELS } from "@/features/er-diagram/types";
 
 interface ErCardinalitySelectorProps {
   current: ErCardinality;

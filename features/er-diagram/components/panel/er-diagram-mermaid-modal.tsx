@@ -9,8 +9,8 @@ import {
   Button,
 } from "@yamada-ui/react";
 import { FC } from "react";
-import { CopyButton } from "../../../../components/ui/copy-button";
-import { MermaidHighlight } from "../../../flowchart/components/mermaid/mermaid-highlight";
+import { CopyButton } from "@/components/ui/copy-button";
+import { MermaidHighlight } from "@/components/ui/mermaid-highlight";
 
 export interface ERDiagramMermaidModalProps {
   open: boolean;

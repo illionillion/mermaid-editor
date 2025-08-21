@@ -3,6 +3,7 @@
 import { Panel } from "@xyflow/react";
 import { PlusIcon, CodeIcon, UploadIcon } from "@yamada-ui/lucide";
 import { VStack, HStack, Text, Button, useDisclosure, FC } from "@yamada-ui/react";
+import { NavigationMenu } from "@/components/ui";
 import { ParsedMermaidData } from "../../hooks/mermaid";
 import { ImportModal } from "../mermaid";
 
@@ -39,9 +40,12 @@ export const PanelContent: FC<PanelContentProps> = ({
 
   return (
     <VStack gap={4} p={4} bg="white" borderRadius="md" boxShadow="md">
-      <Text fontSize="lg" fontWeight="bold">
-        Mermaid フローチャート エディター
-      </Text>
+      <HStack w="full" justifyContent="space-between">
+        <Text fontSize="lg" fontWeight="bold">
+          Mermaid フローチャート エディター
+        </Text>
+        <NavigationMenu />
+      </HStack>
       <VStack gap={2} align="start">
         <Text fontSize="sm" color="gray.600">
           💡 ヒント: ノードをダブルクリックで編集、ドラッグして空の場所で新ノード作成
