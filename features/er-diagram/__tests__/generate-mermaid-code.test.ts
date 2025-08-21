@@ -1,7 +1,7 @@
 import type { Node, Edge } from "@xyflow/react";
 import { describe, it, expect } from "vitest";
 import type { ERTableNodeProps } from "../components/node/er-table-node";
-import type { ErCardinality } from "../types/types";
+import type { ErCardinality } from "../types";
 import { generateERDiagramMermaidCode } from "../utils/generate-mermaid-code";
 
 describe("generateERDiagramMermaidCode", () => {

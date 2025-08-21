@@ -1,6 +1,6 @@
 import type { Node, Edge } from "@xyflow/react";
-import type { ERTableNodeProps } from "../components/node/er-table-node";
-import { ER_CARDINALITY_SYMBOLS } from "../types/types";
+import type { ERTableNodeProps } from "@/features/er-diagram/components/node/er-table-node";
+import { ER_CARDINALITY_SYMBOLS } from "../types";
 
 /**
  * ER図ノード・エッジ配列からmermaid ER記法を生成

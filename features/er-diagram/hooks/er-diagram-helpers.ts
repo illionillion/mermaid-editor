@@ -1,6 +1,6 @@
 import type { Node, Edge } from "@xyflow/react";
 import type { ERTableNodeProps } from "../components/node/er-table-node";
-import type { ErCardinality } from "../types/types";
+import type { ErCardinality } from "../types";
 
 export function calculateNodePosition(
   mousePosition: { x: number; y: number },
