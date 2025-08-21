@@ -88,8 +88,11 @@ jobs:
       - name: Setup Node.js and PNPM
         uses: ./.github/actions/install
 
-      - name: Start Next.js dev server
-        run: pnpm dev &
+      - name: Build application
+        run: pnpm build
+
+      - name: Start Next.js server
+        run: pnpm start &
 
       - name: Wait for server
         run: npx wait-on http://localhost:3000
