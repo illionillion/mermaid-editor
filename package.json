@@ -14,6 +14,7 @@
   },
   "homepage": "https://illionillion.github.io/mermaid-editor/",
   "scripts": {
+    "test:e2e": "playwright test",
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
@@ -53,6 +54,7 @@
     "@commitlint/config-conventional": "^19.8.1",
     "@eslint/eslintrc": "^3.3.1",
     "@eslint/js": "^9.32.0",
+    "@playwright/test": "^1.55.0",
     "@storybook/addon-a11y": "^9.1.2",
     "@storybook/addon-docs": "^9.1.2",
     "@storybook/addon-essentials": "^8.6.14",
@@ -88,7 +90,6 @@
     "jiti": "^2.5.1",
     "jsdom": "^26.1.0",
     "lefthook": "^1.12.2",
-    "playwright": "^1.54.2",
     "prettier": "^3.6.2",
     "storybook": "^9.1.2",
     "typescript": "^5",
