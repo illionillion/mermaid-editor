@@ -4,6 +4,10 @@ import { ContributionPanelContent } from "../../../components/ui/contribution-pa
 import { PanelContent } from "../../../features/flowchart/components/panel/flow-panel";
 import { render } from "../../test-utils";
 
+vi.mock("next/navigation", () => ({
+  usePathname: () => "/flow-chart",
+}));
+
 describe("PanelContent", () => {
   const defaultProps = {
     onAddNode: vi.fn(),
