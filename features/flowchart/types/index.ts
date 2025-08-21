@@ -1,1 +1,1 @@
-export type { MermaidShapeType, MermaidArrowType } from "./types";
+export type * from "./types";
