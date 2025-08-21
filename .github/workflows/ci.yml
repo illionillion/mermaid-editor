@@ -91,8 +91,8 @@ jobs:
       - name: Build application
         run: pnpm build
 
-      - name: Start Next.js server
-        run: pnpm start &
+      - name: Start static server for docs
+        run: npx serve docs -l 3000 &
 
       - name: Wait for server
         run: npx wait-on http://localhost:3000
