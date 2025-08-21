@@ -12,7 +12,7 @@ const config: StorybookConfig = {
     "@storybook/addon-onboarding",
     "@storybook/addon-a11y",
     "@storybook/addon-vitest",
-    "@storybook/addon-storysource", // なぜかv9だと使えないなんとか実装したい
+    "@storybook/addon-storysource",
   ],
   framework: {
     name: "@storybook/react-vite",
