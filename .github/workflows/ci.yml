@@ -89,7 +89,7 @@ jobs:
         uses: ./.github/actions/install
 
       - name: Start Next.js dev server
-        run: pnpm dev
+        run: pnpm dev &
 
       - name: Wait for server
         run: npx wait-on http://localhost:3000
