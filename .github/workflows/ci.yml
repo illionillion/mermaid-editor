@@ -88,14 +88,11 @@ jobs:
       - name: Setup Node.js and PNPM
         uses: ./.github/actions/install
 
-      - name: Build application
-        run: pnpm build
-
-      - name: Start static server for docs
-        run: npx serve docs -l 3000 &
+      - name: Start Next.js dev server
+        run: pnpm dev &
 
       - name: Wait for server
-        run: npx wait-on http://localhost:3000
+        run: npx wait-on http://localhost:3000 --timeout 60000
 
       - name: Install Playwright
         run: pnpm exec playwright install
