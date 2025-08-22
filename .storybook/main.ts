@@ -17,7 +17,7 @@ const config: StorybookConfig = {
     "@storybook/addon-storysource",
   ],
   framework: {
-    name: "@storybook/react-vite",
+    name: "@storybook/nextjs",
     options: {},
   },
   viteFinal: (config) => {

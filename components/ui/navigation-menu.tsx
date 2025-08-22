@@ -10,7 +10,7 @@ const NAV_ITEMS = [
 ];
 
 export const NavigationMenu = () => {
-  const pathname = usePathname();
+  const pathname = usePathname() ?? "";
   // '/' の時はフローチャートを選択中とみなす
   const isRoot = pathname === "/";
   const current = isRoot
@@ -29,7 +29,7 @@ export const NavigationMenu = () => {
       </MenuButton>
       <MenuList>
         {menuItems.map((item) => (
-          <MenuItem key={item.path} as={Link} href={item.path}>
+          <MenuItem key={item.path} as={Link} href={pathname !== "" ? item.path : "#"}>
             {item.label}
           </MenuItem>
         ))}
