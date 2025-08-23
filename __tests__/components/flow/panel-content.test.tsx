@@ -1,7 +1,7 @@
 import { screen, fireEvent } from "@testing-library/react";
 import { describe, test, expect, vi, beforeEach } from "vitest";
-import { ContributionPanelContent } from "../../../components/ui/contribution-panel";
-import { PanelContent } from "../../../features/flowchart/components/panel/flow-panel";
+import { ContributionPanelContent } from "@/components/ui/contribution-panel";
+import { PanelContent } from "@/features/flowchart/components/panel/flow-panel";
 import { render } from "../../test-utils";
 
 vi.mock("next/navigation", () => ({

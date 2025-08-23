@@ -5,7 +5,7 @@ import {
   calculateEdgeOffset,
   getCyclicEdgeStyle,
   adjustEdgeLabelPosition,
-} from "../../features/flowchart/hooks/edge-layout";
+} from "@/features/flowchart/hooks/edge-layout";
 
 describe("edge-layout utility functions", () => {
   const mockEdges: Edge[] = [

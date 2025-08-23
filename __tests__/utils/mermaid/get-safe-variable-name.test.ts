@@ -1,5 +1,5 @@
 import { describe, test, expect } from "vitest";
-import { getSafeVariableName, getReservedWords } from "../../../features/flowchart/hooks/mermaid";
+import { getSafeVariableName, getReservedWords } from "@/features/flowchart/hooks/mermaid";
 
 describe("getSafeVariableName", () => {
   describe("予約語の処理", () => {

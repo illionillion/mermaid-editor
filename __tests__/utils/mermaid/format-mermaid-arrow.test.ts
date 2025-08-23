@@ -3,8 +3,8 @@ import {
   formatMermaidArrow,
   getArrowTypeSymbol,
   getArrowTypeDisplayName,
-} from "../../../features/flowchart/hooks/mermaid";
-import { MermaidArrowType } from "../../../features/flowchart/types/types";
+} from "@/features/flowchart/hooks/mermaid";
+import { MermaidArrowType } from "@/features/flowchart/types/types";
 
 describe("formatMermaidArrow", () => {
   describe("矢印タイプ別の出力", () => {

@@ -1,7 +1,7 @@
 import { screen, fireEvent } from "@testing-library/react";
 import { ChangeEvent } from "react";
 import { describe, test, expect, vi, beforeEach } from "vitest";
-import { EditableMermaidHighlight } from "../../../features/flowchart/components/mermaid/editable-mermaid-highlight";
+import { EditableMermaidHighlight } from "@/features/flowchart/components/mermaid/editable-mermaid-highlight";
 import { render } from "../../test-utils";
 
 // PrismJSのモック

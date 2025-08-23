@@ -1,6 +1,6 @@
 import { describe, test, expect } from "vitest";
-import { getArrowTypeDisplayName } from "../../../features/flowchart/hooks/mermaid";
-import type { MermaidArrowType } from "../../../features/flowchart/types/types";
+import { getArrowTypeDisplayName } from "@/features/flowchart/hooks/mermaid";
+import type { MermaidArrowType } from "@/features/flowchart/types/types";
 
 describe("getArrowTypeDisplayName", () => {
   test("各矢印タイプに対応する正しい表示名を返す", () => {

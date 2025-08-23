@@ -1,9 +1,9 @@
 import { screen } from "@testing-library/react";
 import { HTMLAttributes } from "react";
 import { describe, test, expect, vi, beforeEach, afterEach } from "vitest";
-import { DownloadModal } from "../../../features/flowchart/components/mermaid/download-modal";
-import type { FlowData } from "../../../features/flowchart/hooks/flow-helpers";
-import { generateMermaidCode } from "../../../features/flowchart/hooks/mermaid";
+import { DownloadModal } from "@/features/flowchart/components/mermaid/download-modal";
+import type { FlowData } from "@/features/flowchart/hooks/flow-helpers";
+import { generateMermaidCode } from "@/features/flowchart/hooks/mermaid";
 import { render } from "../../test-utils";
 
 // グローバルオブジェクトの設定

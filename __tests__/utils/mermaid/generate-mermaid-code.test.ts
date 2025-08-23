@@ -1,7 +1,7 @@
 import { describe, test, expect } from "vitest";
-import { FlowData } from "../../../features/flowchart/hooks/flow-helpers";
-import { generateMermaidCode } from "../../../features/flowchart/hooks/mermaid";
-import { MermaidArrowType } from "../../../features/flowchart/types/types";
+import { FlowData } from "@/features/flowchart/hooks/flow-helpers";
+import { generateMermaidCode } from "@/features/flowchart/hooks/mermaid";
+import { MermaidArrowType } from "@/features/flowchart/types/types";
 
 describe("generateMermaidCode", () => {
   describe("基本的なフローチャート生成", () => {
