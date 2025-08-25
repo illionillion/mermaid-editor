@@ -1,9 +1,9 @@
 import { screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, test, expect, vi, beforeEach } from "vitest";
-import { ArrowTypeSelector } from "../../../features/flowchart/components/edge/arrow-type-selector";
-import { MermaidArrowType, ARROW_TYPES } from "../../../features/flowchart/types/types";
-import { render } from "../../test-utils";
+import { render } from "@/__tests__/test-utils";
+import { ArrowTypeSelector } from "@/features/flowchart/components/edge/arrow-type-selector";
+import { MermaidArrowType, ARROW_TYPES } from "@/features/flowchart/types/types";
 
 describe("ArrowTypeSelector", () => {
   const defaultProps = {

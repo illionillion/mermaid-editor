@@ -1,8 +1,8 @@
 import { screen, fireEvent } from "@testing-library/react";
 import { describe, test, expect, vi, beforeEach } from "vitest";
-import { ContributionPanelContent } from "../../../components/ui/contribution-panel";
-import { PanelContent } from "../../../features/flowchart/components/panel/flow-panel";
-import { render } from "../../test-utils";
+import { render } from "@/__tests__/test-utils";
+import { ContributionPanelContent } from "@/components/ui/contribution-panel";
+import { PanelContent } from "@/features/flowchart/components/panel/flow-panel";
 
 vi.mock("next/navigation", () => ({
   usePathname: () => "/flow-chart",

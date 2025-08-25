@@ -1,5 +1,5 @@
 import type { Meta } from "@storybook/react-vite";
-import { CopyButton } from "../../../components/ui/copy-button";
+import { CopyButton } from "@/components/ui/copy-button";
 
 const meta: Meta<typeof CopyButton> = {
   title: "components/ui/CopyButton",

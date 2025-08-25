@@ -1,7 +1,7 @@
 import type { Meta } from "@storybook/react-vite";
 import { Center } from "@yamada-ui/react";
-import { EdgeContent } from "../../../features/flowchart/components/edge/editable-edge";
-import type { MermaidArrowType } from "../../../features/flowchart/types/types";
+import { EdgeContent } from "@/features/flowchart/components/edge/editable-edge";
+import type { MermaidArrowType } from "@/features/flowchart/types/types";
 
 const meta: Meta<typeof EdgeContent> = {
   title: "components/flow/EdgeContent",

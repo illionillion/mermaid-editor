@@ -1,7 +1,7 @@
 import { describe, test, expect } from "vitest";
-import type { FlowData } from "../../../features/flowchart/hooks/flow-helpers";
-import { generateMermaidCode, parseMermaidCode } from "../../../features/flowchart/hooks/mermaid";
-import type { GraphType } from "../../../features/flowchart/types/types";
+import type { FlowData } from "@/features/flowchart/hooks/flow-helpers";
+import { generateMermaidCode, parseMermaidCode } from "@/features/flowchart/hooks/mermaid";
+import type { GraphType } from "@/features/flowchart/types/types";
 
 describe("Mermaid round-trip test", () => {
   test("生成されたMermaidコードを正しくパースできる", () => {
