@@ -1,7 +1,7 @@
 import { screen, fireEvent } from "@testing-library/react";
 import { describe, test, expect, vi, beforeEach } from "vitest";
 import { VariableNameEditor } from "@/features/flowchart/components/editor/variable-name-editor";
-import { render } from "../../test-utils";
+import { render } from "../../../../../__tests__/test-utils";
 
 describe("VariableNameEditor", () => {
   const defaultProps = {

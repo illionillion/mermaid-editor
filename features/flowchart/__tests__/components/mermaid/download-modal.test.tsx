@@ -1,10 +1,10 @@
 import { screen } from "@testing-library/react";
 import { HTMLAttributes } from "react";
 import { describe, test, expect, vi, beforeEach, afterEach } from "vitest";
+import { render } from "@/__tests__/test-utils";
 import { DownloadModal } from "@/features/flowchart/components/mermaid/download-modal";
 import type { FlowData } from "@/features/flowchart/hooks/flow-helpers";
 import { generateMermaidCode } from "@/features/flowchart/hooks/mermaid";
-import { render } from "../../test-utils";
 
 // グローバルオブジェクトの設定
 Object.defineProperty(global, "URL", {
@@ -16,21 +16,21 @@ Object.defineProperty(global, "URL", {
 });
 
 // utilsのモック
-vi.mock("../../../features/flowchart/hooks/mermaid", () => ({
+vi.mock("@/features/flowchart/hooks/mermaid", () => ({
   generateMermaidCode: vi.fn(),
 }));
 
 const mockGenerateMermaidCode = vi.mocked(generateMermaidCode);
 
 // MermaidHighlightのモック
-vi.mock("../../../components/ui/mermaid-highlight", () => ({
+vi.mock("@/components/ui/mermaid-highlight", () => ({
   MermaidHighlight: ({ code }: { code: string }) => (
     <div data-testid="mermaid-highlight">{code}</div>
   ),
 }));
 
 // CopyButtonのモック
-vi.mock("../../../components/ui/copy-button", () => ({
+vi.mock("@/components/ui/copy-button", () => ({
   CopyButton: ({ value, ...props }: { value: string } & HTMLAttributes<HTMLButtonElement>) => (
     <button data-testid="copy-button" data-value={value} {...props}>
       コピー

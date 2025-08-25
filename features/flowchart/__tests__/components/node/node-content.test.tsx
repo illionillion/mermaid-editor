@@ -1,9 +1,9 @@
 import { screen, fireEvent } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, test, expect, vi, beforeEach } from "vitest";
+import { render } from "@/__tests__/test-utils";
 import { NodeContent } from "@/features/flowchart/components/node/editable-node";
 import { SHAPE_OPTIONS } from "@/features/flowchart/types/types";
-import { render } from "../../test-utils";
 
 describe("NodeContent", () => {
   const defaultProps = {

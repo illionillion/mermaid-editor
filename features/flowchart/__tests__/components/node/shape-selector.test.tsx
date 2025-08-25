@@ -1,9 +1,9 @@
 import { screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, test, expect, vi, beforeEach } from "vitest";
+import { render } from "@/__tests__/test-utils";
 import { ShapeSelector } from "@/features/flowchart/components/node/shape-selector";
 import { MermaidShapeType, SHAPE_OPTIONS } from "@/features/flowchart/types/types";
-import { render } from "../../test-utils";
 
 describe("ShapeSelector", () => {
   const defaultProps = {
