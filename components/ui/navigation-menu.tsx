@@ -24,7 +24,7 @@ export const NavigationMenu = () => {
 
   return (
     <Menu>
-      <MenuButton as={Button} variant="outline" size="sm">
+      <MenuButton as={Button} variant="outline" size="sm" ml={{ base: 0, sm: "auto" }}>
         {current?.label ?? "エディタを選択"}
       </MenuButton>
       <MenuList>

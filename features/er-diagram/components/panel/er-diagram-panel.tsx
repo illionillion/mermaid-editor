@@ -34,7 +34,12 @@ export const ERDiagramPanel: FC<ERDiagramPanelProps> = ({
   return (
     <Panel position="top-left">
       <VStack gap={4} p={4} bg="white" borderRadius="md" boxShadow="md">
-        <HStack w="full" justify="space-between">
+        <HStack
+          w="full"
+          display={{ base: "flex", sm: "inline-flex" }}
+          flexWrap="wrap"
+          justify="space-between"
+        >
           <Text fontSize="lg" fontWeight="bold">
             Mermaid ER図エディター
           </Text>

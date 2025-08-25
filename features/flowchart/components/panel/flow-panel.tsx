@@ -40,7 +40,12 @@ export const PanelContent: FC<PanelContentProps> = ({
 
   return (
     <VStack gap={4} p={4} bg="white" borderRadius="md" boxShadow="md">
-      <HStack w="full" justifyContent="space-between">
+      <HStack
+        w="full"
+        display={{ base: "flex", sm: "inline-flex" }}
+        flexWrap="wrap"
+        justify="space-between"
+      >
         <Text fontSize="lg" fontWeight="bold">
           Mermaid フローチャート エディター
         </Text>
