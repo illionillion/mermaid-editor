@@ -1,6 +1,6 @@
 import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { describe, expect, vi , it } from "vitest";
+import { describe, expect, vi, it } from "vitest";
 import { ErCardinalitySelector } from "../components/edge/er-cardinality-selector";
 import { ER_CARDINALITY_DISPLAY_LABELS } from "../types";
 
