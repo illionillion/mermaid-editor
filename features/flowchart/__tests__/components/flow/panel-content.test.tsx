@@ -128,11 +128,14 @@ describe("PanelContent", () => {
   });
 
   describe("GitHubリンク", () => {
-    test("GitHubリンクが正しいURLを持つ", () => {
+    test("GitHubリンクが正しいURLを持つ", async () => {
       render(<ContributionPanelContent />);
-
-      const githubLink = screen.getByRole("link");
-
+      const user = userEvent.setup();
+      // メニューを開く
+      const menuButton = screen.getByRole("button", { name: "コントリビューションメニュー" });
+      await user.click(menuButton);
+      // メニュー内のリンクを取得
+      const githubLink = screen.getByRole("menuitem", { name: "リポジトリを見る" });
       expect(githubLink).toHaveAttribute("href", "https://github.com/illionillion/mermaid-editor");
       expect(githubLink).toHaveAttribute("target", "_blank");
       expect(githubLink).toHaveAttribute("rel", "noopener noreferrer");
@@ -147,11 +150,14 @@ describe("PanelContent", () => {
       expect(buttons.length).toBeGreaterThan(0);
     });
 
-    test("GitHubリンクが適切な属性を持つ", () => {
+    test("GitHubリンクが適切な属性を持つ", async () => {
       render(<ContributionPanelContent />);
-
-      const githubLink = screen.getByRole("link");
-
+      const user = userEvent.setup();
+      // メニューを開く
+      const menuButton = screen.getByRole("button", { name: "コントリビューションメニュー" });
+      await user.click(menuButton);
+      // メニュー内のリンクを取得
+      const githubLink = screen.getByRole("menuitem", { name: "リポジトリを見る" });
       expect(githubLink).toHaveAttribute("rel", "noopener noreferrer");
     });
   });

@@ -1,6 +1,6 @@
 import { Panel } from "@xyflow/react";
-import { GithubIcon } from "@yamada-ui/lucide";
-import { IconButton, Link } from "@yamada-ui/react";
+import { CircleDotIcon, CodeIcon, GithubIcon } from "@yamada-ui/lucide";
+import { Menu, MenuButton, MenuList, MenuItem, IconButton, Link } from "@yamada-ui/react";
 
 export const ContributionPanel = () => {
   return (
@@ -12,20 +12,36 @@ export const ContributionPanel = () => {
 
 export const ContributionPanelContent = () => {
   return (
-    <IconButton
-      icon={<GithubIcon />}
-      size="sm"
-      as={Link}
-      href="https://github.com/illionillion/mermaid-editor"
-      target="_blank"
-      rel="noopener noreferrer"
-      display="flex"
-      alignItems="center"
-      gap={1}
-      fontSize="sm"
-      bg="gray.600"
-      color="white"
-      _hover={{ bg: "black", textDecoration: "none" }}
-    />
+    <Menu>
+      <MenuButton
+        as={IconButton}
+        icon={<GithubIcon />}
+        size="sm"
+        aria-label="コントリビューションメニュー"
+        bg="gray.600"
+        color="white"
+        _hover={{ bg: "black", textDecoration: "none" }}
+      />
+      <MenuList>
+        <MenuItem
+          as={Link}
+          href="https://github.com/illionillion/mermaid-editor"
+          target="_blank"
+          rel="noopener noreferrer"
+          icon={<CodeIcon />}
+        >
+          リポジトリを見る
+        </MenuItem>
+        <MenuItem
+          as={Link}
+          href="https://github.com/illionillion/mermaid-editor/issues/new/choose"
+          target="_blank"
+          rel="noopener noreferrer"
+          icon={<CircleDotIcon />}
+        >
+          Issueを作成
+        </MenuItem>
+      </MenuList>
+    </Menu>
   );
 };
