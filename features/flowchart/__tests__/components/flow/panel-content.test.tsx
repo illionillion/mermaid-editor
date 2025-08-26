@@ -1,5 +1,6 @@
-import { screen, fireEvent } from "@testing-library/react";
-import { describe, test, expect, vi, beforeEach } from "vitest";
+import { screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import { describe, test, expect, vi, beforeEach, it, MockInstance } from "vitest";
 import { render } from "@/__tests__/test-utils";
 import { ContributionPanelContent } from "@/components/ui/contribution-panel";
 import { PanelContent } from "@/features/flowchart/components/panel/flow-panel";
@@ -42,40 +43,44 @@ describe("PanelContent", () => {
   });
 
   describe("ボタンの動作", () => {
-    test("ノード追加ボタンクリックでonAddNodeが呼ばれる", () => {
+    test("ノード追加ボタンクリックでonAddNodeが呼ばれる", async () => {
+      const user = userEvent.setup();
       render(<PanelContent {...defaultProps} />);
 
       const addButton = screen.getByText("ノード追加");
-      fireEvent.click(addButton);
+      await user.click(addButton);
 
       expect(defaultProps.onAddNode).toHaveBeenCalledTimes(1);
     });
 
-    test("コード生成ボタンクリックでonGenerateCodeが呼ばれる", () => {
+    test("コード生成ボタンクリックでonGenerateCodeが呼ばれる", async () => {
+      const user = userEvent.setup();
       render(<PanelContent {...defaultProps} />);
 
       const generateButton = screen.getByText("コード生成");
-      fireEvent.click(generateButton);
+      await user.click(generateButton);
 
       expect(defaultProps.onGenerateCode).toHaveBeenCalledTimes(1);
     });
 
-    test("インポートボタンクリックでモーダルが開く", () => {
+    test("インポートボタンクリックでモーダルが開く", async () => {
+      const user = userEvent.setup();
       render(<PanelContent {...defaultProps} />);
 
       const importButton = screen.getByText("インポート");
-      fireEvent.click(importButton);
+      await user.click(importButton);
 
       // モーダルが開いていることを確認（ImportModalコンポーネント内のテキストで判定）
       expect(screen.getByText("Mermaidコードインポート")).toBeInTheDocument();
     });
 
-    test("Mermaidコードを入力してインポートできる", () => {
+    test("Mermaidコードを入力してインポートできる", async () => {
+      const user = userEvent.setup();
       render(<PanelContent {...defaultProps} />);
 
       // モーダルを開く
       const importButton = screen.getByText("インポート");
-      fireEvent.click(importButton);
+      await user.click(importButton);
 
       // テキストエリアに有効なMermaidコードを入力
       const textarea = screen.getByPlaceholderText(/例:/);
@@ -85,32 +90,35 @@ describe("PanelContent", () => {
     B -->|No| D[End]
     C --> D`;
 
-      fireEvent.change(textarea, { target: { value: validMermaidCode } });
+      await user.clear(textarea);
+      await user.type(textarea, validMermaidCode);
 
       // モーダル内のインポートボタンをクリック（getAllByTextで取得し、モーダル内のものを選択）
       const importButtons = screen.getAllByText("インポート");
       const modalImportButton = importButtons[1]; // モーダル内のボタンは2番目
-      fireEvent.click(modalImportButton);
+      await user.click(modalImportButton);
 
       // onImportMermaidが呼ばれることを確認
       expect(defaultProps.onImportMermaid).toHaveBeenCalledTimes(1);
     });
 
-    test("不正なMermaidコードでエラーが表示される", () => {
+    test("不正なMermaidコードでエラーが表示される", async () => {
+      const user = userEvent.setup();
       render(<PanelContent {...defaultProps} />);
 
       // モーダルを開く
       const importButton = screen.getByText("インポート");
-      fireEvent.click(importButton);
+      await user.click(importButton);
 
       // テキストエリアに無効なコードを入力
       const textarea = screen.getByPlaceholderText(/例:/);
-      fireEvent.change(textarea, { target: { value: "invalid mermaid code" } });
+      await user.clear(textarea);
+      await user.type(textarea, "invalid mermaid code");
 
       // モーダル内のインポートボタンをクリック
       const importButtons = screen.getAllByText("インポート");
       const modalImportButton = importButtons[1]; // モーダル内のボタンは2番目
-      fireEvent.click(modalImportButton);
+      await user.click(modalImportButton);
 
       // エラーメッセージが表示されることを確認
       expect(screen.getByText(/有効なMermaidコードが見つかりませんでした/)).toBeInTheDocument();
@@ -161,27 +169,22 @@ describe("PanelContent", () => {
   });
 
   describe("複数回クリック", () => {
-    test("ノード追加ボタンを複数回クリックできる", () => {
-      render(<PanelContent {...defaultProps} />);
+    const clickCases: { label: string; handler: keyof typeof defaultProps; times: number }[] = [
+      { label: "ノード追加", handler: "onAddNode", times: 3 },
+      { label: "コード生成", handler: "onGenerateCode", times: 2 },
+    ];
+    it.each(clickCases)(
+      "$labelボタンを$times回クリックできる",
+      async ({ label, handler, times }) => {
+        const user = userEvent.setup();
+        render(<PanelContent {...defaultProps} />);
 
-      const addButton = screen.getByText("ノード追加");
-
-      fireEvent.click(addButton);
-      fireEvent.click(addButton);
-      fireEvent.click(addButton);
-
-      expect(defaultProps.onAddNode).toHaveBeenCalledTimes(3);
-    });
-
-    test("コード生成ボタンを複数回クリックできる", () => {
-      render(<PanelContent {...defaultProps} />);
-
-      const generateButton = screen.getByText("コード生成");
-
-      fireEvent.click(generateButton);
-      fireEvent.click(generateButton);
-
-      expect(defaultProps.onGenerateCode).toHaveBeenCalledTimes(2);
-    });
+        const button = screen.getByText(label);
+        for (let i = 0; i < times; i++) {
+          await user.click(button);
+        }
+        expect((defaultProps[handler] as MockInstance).mock.calls.length).toBe(times);
+      }
+    );
   });
 });
