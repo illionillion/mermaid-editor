@@ -1,0 +1,12 @@
+name: その他
+description: その他の問い合わせや提案
+title: "[Other] "
+labels: ["question"]
+body:
+  - type: textarea
+    id: details
+    attributes:
+      label: 内容
+      description: 詳細を記載してください。
+    validations:
+      required: true
