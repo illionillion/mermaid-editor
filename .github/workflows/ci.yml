@@ -100,6 +100,29 @@ jobs:
       - name: Run E2E tests
         run: pnpm test:e2e
 
+  vrt_test:
+    name: VRT Test
+    runs-on: macos-latest
+    needs: [eslint, prettier, type_script]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js and PNPM
+        uses: ./.github/actions/install
+
+      - name: Start Storybook
+        run: pnpm storybook &
+
+      - name: Wait for server
+        run: npx wait-on http://localhost:6006 --timeout 60000
+
+      - name: Install Playwright
+        run: pnpm exec playwright install
+
+      - name: Run VRT tests
+        run: pnpm test:vrt
+
   # Stage 2: Testing and Building (parallel, depends on code quality and type check)
   build_next:
     name: Build Next.js
