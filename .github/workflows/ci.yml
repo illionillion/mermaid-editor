@@ -112,6 +112,9 @@ jobs:
       - name: Build and start services
         run: docker compose -f compose.vrt.yml up -d --build
 
+      - name: Wait for server
+        run: npx wait-on http://localhost:6006 --timeout 60000
+
       - name: Run tests in container
         run: docker exec mermaid-editor-vrt pnpm test:vrt
 
