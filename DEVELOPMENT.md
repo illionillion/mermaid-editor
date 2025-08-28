@@ -267,6 +267,32 @@ const sanitizeLabel = (label: string): string => {
 };
 ```
 
+## 🖼️ VRT（ビジュアルリグレッションテスト）運用ガイド
+
+### よく使うコマンド
+
+```sh
+# StorybookサーバーをDocker Composeで起動（※ホスト側のStorybookサーバーは終了しておくこと）
+docker compose -f compose.vrt.yml up -d --build
+
+# VRTテストを実行
+docker exec mermaid-editor-vrt pnpm test:vrt
+
+# スナップショットを意図的に更新したい場合（UI変更時など）
+docker exec mermaid-editor-vrt pnpm test:vrt -u
+
+# サービス停止
+docker compose -f compose.vrt.yml down
+```
+
+### 運用ルール
+
+- **意図したUI変更の場合**  
+  `-u`オプションでスナップショットを更新し、PRの差分で目視確認してレビュー
+- **意図しない差分が出た場合**  
+  CIでVRTがfailし、PRが通らないので原因を調査
+- **スナップショットの差分画像**は`__image_snapshots__/__diff_output__`に出力されるので、必ず確認
+
 ## 📚 参考資料
 
 ### 公式ドキュメント
