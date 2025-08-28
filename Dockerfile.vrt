@@ -9,4 +9,4 @@ COPY . .
 RUN pnpm exec playwright install-deps
 RUN pnpm exec playwright install
 
-# VRT専用なのでCMDは空。execでコマンドを指定して
+CMD ["pnpm", "storybook", "--ci"]

@@ -8,5 +8,6 @@ services:
       - .:/app
       - /app/node_modules
     working_dir: /app
-    # Macならnetwork_mode不要。Linuxでlocalhost:6006にアクセスできない場合は有効化
-    # network_mode: "host"
+    ports:
+      - "6006:6006"
+    command: ["pnpm", "storybook", "--ci"]

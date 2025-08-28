@@ -109,19 +109,10 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Node.js and PNPM
-        uses: ./.github/actions/install
-
-      - name: Start Storybook
-        run: pnpm storybook &
-
-      - name: Wait for server
-        run: npx wait-on http://localhost:6006 --timeout 60000
-
       - name: Build Docker image
         run: docker build -f Dockerfile.vrt -t vrt-test .
       - name: Run tests in container
-        run: docker run --rm vrt-test pnpm test:vrt-docker
+        run: docker run --rm vrt-test pnpm test:vrt
 
   # Stage 2: Testing and Building (parallel, depends on code quality and type check)
   build_next:
