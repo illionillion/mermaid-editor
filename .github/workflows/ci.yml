@@ -103,6 +103,8 @@ jobs:
   vrt_test:
     name: VRT Test
     runs-on: ubuntu-latest
+    container:
+      image: node:20-bullseye
     needs: [eslint, prettier, type_script]
     steps:
       - name: Checkout repository
