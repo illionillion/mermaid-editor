@@ -109,10 +109,11 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Build Docker image
-        run: docker build -f Dockerfile.vrt -t vrt-test .
+      - name: Build and start services
+        run: docker compose -f compose.vrt.yml up -d --build
+
       - name: Run tests in container
-        run: docker run --rm vrt-test pnpm test:vrt
+        run: docker exec mermaid-editor-vrt pnpm test:vrt
 
   # Stage 2: Testing and Building (parallel, depends on code quality and type check)
   build_next:
