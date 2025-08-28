@@ -30,6 +30,7 @@
     "test": "vitest",
     "test:ui": "vitest --ui",
     "test:vrt": "test-storybook --url http://localhost:6006",
+    "test:vrt-docker": "test-storybook --url http://host.docker.internal:6006",
     "test:run": "vitest run",
     "test:coverage": "vitest run --coverage",
     "test:watch": "vitest --watch",

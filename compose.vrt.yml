@@ -1,0 +1,12 @@
+services:
+  vrt:
+    container_name: mermaid-editor-vrt
+    build:
+      context: .
+      dockerfile: Dockerfile.vrt
+    volumes:
+      - .:/app
+      - /app/node_modules
+    working_dir: /app
+    # Macならnetwork_mode不要。Linuxでlocalhost:6006にアクセスできない場合は有効化
+    # network_mode: "host"

@@ -17,8 +17,8 @@ export default {
     expect(image).toMatchImageSnapshot({
       customSnapshotsDir: "__image_snapshots__",
       customSnapshotIdentifier: context.id,
-      failureThreshold: 0.01, // 1%まで許容
-      failureThresholdType: "percent",
+      //   failureThreshold: 0.01, // 1%まで許容
+      //   failureThresholdType: "percent",
     });
   },
 };
