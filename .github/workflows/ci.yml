@@ -107,7 +107,7 @@ jobs:
       - name: Build Docker image
         run: docker build -f Dockerfile.vrt -t vrt-test .
       - name: Run tests in container
-        run: docker run --rm -v ${{ github.workspace }}:/workspace -w /workspace vrt-test pnpm test:vrt-docker
+        run: docker run --rm vrt-test pnpm test:vrt-docker
 
   # Stage 2: Testing and Building (parallel, depends on code quality and type check)
   build_next:
