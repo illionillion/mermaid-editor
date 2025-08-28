@@ -1,0 +1,12 @@
+FROM node:21-bullseye
+
+WORKDIR /app
+
+RUN npm i -g pnpm
+COPY ./package.json ./pnpm-lock.yaml ./
+RUN pnpm install --ignore-scripts
+COPY . .
+RUN pnpm exec playwright install-deps
+RUN pnpm exec playwright install
+
+CMD ["pnpm", "storybook", "--ci"]

@@ -1,0 +1,13 @@
+services:
+  vrt:
+    container_name: mermaid-editor-vrt
+    build:
+      context: .
+      dockerfile: Dockerfile.vrt
+    volumes:
+      - .:/app
+      - /app/node_modules
+    working_dir: /app
+    ports:
+      - "6006:6006"
+    command: ["pnpm", "storybook", "--ci"]

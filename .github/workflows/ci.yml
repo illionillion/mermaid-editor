@@ -101,27 +101,22 @@ jobs:
         run: pnpm test:e2e
 
   vrt_test:
-    name: VRT Test
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
     needs: [eslint, prettier, type_script]
     steps:
+      - uses: actions/checkout@v4
+
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Node.js and PNPM
-        uses: ./.github/actions/install
-
-      - name: Start Storybook
-        run: pnpm storybook &
+      - name: Build and start services
+        run: docker compose -f compose.vrt.yml up -d --build
 
       - name: Wait for server
-        run: npx wait-on http://localhost:6006 --timeout 60000
+        run: npx wait-on http://localhost:6006 --timeout 180000
 
-      - name: Install Playwright
-        run: pnpm exec playwright install
-
-      - name: Run VRT tests
-        run: pnpm test:vrt
+      - name: Run tests in container
+        run: docker exec mermaid-editor-vrt pnpm test:vrt
 
   # Stage 2: Testing and Building (parallel, depends on code quality and type check)
   build_next:
