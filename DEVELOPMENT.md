@@ -269,20 +269,25 @@ const sanitizeLabel = (label: string): string => {
 
 ## 🖼️ VRT（ビジュアルリグレッションテスト）運用ガイド
 
-### よく使うコマンド
+### よく使うコマンド（Makefile対応）
+
+VRT関連の操作はMakefileから簡単に実行できます。
 
 ```sh
-# StorybookサーバーをDocker Composeで起動（※ホスト側のStorybookサーバーは終了しておくこと）
-docker compose -f compose.vrt.yml up -d --build
+# サービスをビルドして起動（初回や依存更新時に推奨）
+make vrt-build
+
+# サービスをビルドせずに起動（既存イメージ利用）
+make vrt-up
 
 # VRTテストを実行
-docker exec mermaid-editor-vrt pnpm test:vrt
+make vrt-test
 
 # スナップショットを意図的に更新したい場合（UI変更時など）
-docker exec mermaid-editor-vrt pnpm test:vrt -u
+make vrt-update
 
 # サービス停止
-docker compose -f compose.vrt.yml down
+make vrt-down
 ```
 
 ### 運用ルール
