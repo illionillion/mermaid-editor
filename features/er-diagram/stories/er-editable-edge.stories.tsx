@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from "@storybook/react";
+import { Meta, StoryObj } from "@storybook/react-vite";
 import { ErEditableEdge } from "../components/edge/er-editable-edge";
 import { ErCardinality } from "../types";
 
@@ -31,14 +31,17 @@ type Story = StoryObj<typeof ErEditableEdge>;
 export const Default: Story = {
   args: {
     label: "relation",
-    cardinality: "1:N",
+    cardinality: "1:N" as ErCardinality,
   },
 };
 
 export const Editing: Story = {
-  render: (args: typeof meta.args) => <ErEditableEdge {...args} />,
+  render: (args) => (
+    <ErEditableEdge {...args} id={args.id ?? "edge-1"} cardinality={"0..1" as ErCardinality} />
+  ),
   args: {
     label: "editing label",
-    cardinality: "0..1",
+    id: "edge-1",
+    cardinality: "0..1" as ErCardinality,
   },
 };
