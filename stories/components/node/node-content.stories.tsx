@@ -1,4 +1,4 @@
-import type { Meta } from "@storybook/react-vite";
+import type { Meta } from "@storybook/nextjs-vite";
 import { NodeContent } from "@/features/flowchart/components/node/editable-node";
 
 const meta: Meta<typeof NodeContent> = {

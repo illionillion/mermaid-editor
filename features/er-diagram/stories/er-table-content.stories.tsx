@@ -1,4 +1,4 @@
-import type { Meta } from "@storybook/react-vite";
+import type { Meta } from "@storybook/nextjs-vite";
 import { useState } from "react";
 import { ERTableContent, ERColumn } from "../components/node/er-table-content";
 

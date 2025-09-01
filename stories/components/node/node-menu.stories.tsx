@@ -1,4 +1,4 @@
-import type { Meta } from "@storybook/react-vite";
+import type { Meta } from "@storybook/nextjs-vite";
 import { Center } from "@yamada-ui/react";
 import { useState } from "react";
 import { NodeMenu } from "@/features/flowchart/components/node/node-menu";

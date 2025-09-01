@@ -1,4 +1,4 @@
-import type { Meta } from "@storybook/react-vite";
+import type { Meta } from "@storybook/nextjs-vite";
 import { Center } from "@yamada-ui/react";
 import { EdgeContent } from "@/features/flowchart/components/edge/editable-edge";
 import type { MermaidArrowType } from "@/features/flowchart/types/types";

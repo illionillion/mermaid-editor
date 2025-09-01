@@ -1,4 +1,4 @@
-import type { Meta } from "@storybook/react-vite";
+import type { Meta } from "@storybook/nextjs-vite";
 import { ImportModal } from "@/features/flowchart/components/mermaid/import-modal";
 
 const meta: Meta<typeof ImportModal> = {
