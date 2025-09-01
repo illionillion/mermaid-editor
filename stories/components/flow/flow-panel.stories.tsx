@@ -1,4 +1,4 @@
-import type { Meta } from "@storybook/react-vite";
+import type { Meta } from "@storybook/nextjs-vite";
 import { FlowPanel } from "@/features/flowchart/components/panel/flow-panel";
 
 const meta: Meta<typeof FlowPanel> = {

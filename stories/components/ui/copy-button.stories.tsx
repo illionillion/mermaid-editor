@@ -1,4 +1,4 @@
-import type { Meta } from "@storybook/react-vite";
+import type { Meta } from "@storybook/nextjs-vite";
 import { CopyButton } from "@/components/ui/copy-button";
 
 const meta: Meta<typeof CopyButton> = {

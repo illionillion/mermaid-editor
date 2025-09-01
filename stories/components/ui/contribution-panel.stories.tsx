@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from "@storybook/react-vite";
+import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { ContributionPanel } from "../../../components/ui/contribution-panel";
 
 const meta: Meta<typeof ContributionPanel> = {

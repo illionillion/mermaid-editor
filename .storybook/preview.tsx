@@ -1,4 +1,4 @@
-import type { StoryContext, StoryFn } from "@storybook/react";
+import type { StoryContext, StoryFn } from "@storybook/nextjs";
 import type { Preview } from "@storybook/react-vite";
 import { AppProviders } from "../components/providers";
 
@@ -14,8 +14,13 @@ const preview: Preview = {
         date: /Date$/i,
       },
     },
+
     a11y: {
       test: "todo",
+    },
+
+    docs: {
+      codePanel: true,
     },
   },
   decorators: [withProviders],

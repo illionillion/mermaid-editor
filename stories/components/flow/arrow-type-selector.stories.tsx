@@ -1,4 +1,4 @@
-import type { Meta } from "@storybook/react-vite";
+import type { Meta } from "@storybook/nextjs-vite";
 import { useState } from "react";
 import { ArrowTypeSelector } from "@/features/flowchart/components/edge/arrow-type-selector";
 import type { MermaidArrowType } from "@/features/flowchart/types/types";

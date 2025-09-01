@@ -1,4 +1,4 @@
-import { themes } from "@storybook/theming";
+import { themes } from "storybook/theming";
 
 export default {
   theme: themes.light,

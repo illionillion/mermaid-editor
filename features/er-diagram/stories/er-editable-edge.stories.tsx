@@ -1,4 +1,4 @@
-import { Meta, StoryObj } from "@storybook/react-vite";
+import { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { ErEditableEdge } from "../components/edge/er-editable-edge";
 import { ErCardinality } from "../types";
 
