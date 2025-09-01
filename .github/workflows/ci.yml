@@ -6,6 +6,8 @@ on:
   pull_request:
     # The branches below must be a subset of the branches above
     branches: ["main", "dev"]
+  pull_request_target:
+    branches: ["main", "dev"]
 
 jobs:
   # Stage 1: Code Quality and Type Check (all parallel)
@@ -102,6 +104,9 @@ jobs:
 
   vrt_test:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
     steps:
       - uses: actions/checkout@v4
 
