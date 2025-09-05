@@ -521,6 +521,13 @@ const parseEdgeDefinition = (line: string): ParsedMermaidEdge | null => {
       regex: new RegExp(`^(${nodeId})${nodeShape}\\s*-->\\s*(${nodeId})${nodeShape}$`),
       arrowType: "arrow",
     },
+    // スペース区切りラベル付き矢印: A -- label --> B
+    {
+      regex: new RegExp(
+        `^(${nodeId})${nodeShape}\\s*--\\s*([^\\s]+)\\s*-->\\s*(${nodeId})${nodeShape}$`
+      ),
+      arrowType: "arrow",
+    },
   ];
 
   for (const pattern of patterns) {

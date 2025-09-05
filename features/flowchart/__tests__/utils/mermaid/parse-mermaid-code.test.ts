@@ -84,6 +84,30 @@ describe("parseMermaidCode", () => {
   });
 
   describe("基本的なエッジ解析", () => {
+    test("スペース区切りラベル付き矢印（-- label -->）を解析する", () => {
+      const mermaid = `
+        flowchart TD
+        A[開始] -- はい --> B[終了]
+      `;
+
+      const expected: ParsedMermaidData = {
+        nodes: [
+          { id: "A", variableName: "A", label: "開始", shapeType: "rectangle" },
+          { id: "B", variableName: "B", label: "終了", shapeType: "rectangle" },
+        ],
+        edges: [
+          {
+            id: "A-B",
+            source: "A",
+            target: "B",
+            label: "はい",
+            arrowType: "arrow",
+          },
+        ],
+      };
+
+      expect(parseMermaidCode(mermaid)).toEqual(expected);
+    });
     test("単純な矢印を解析する", () => {
       const mermaid = `
         flowchart TD
