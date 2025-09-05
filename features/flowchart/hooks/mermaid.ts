@@ -548,7 +548,7 @@ const parseEdgeDefinition = (line: string): ParsedMermaidEdge | null => {
     },
     // 通常の矢印（ラベルなし）: A --> B
     {
-      regex: new RegExp(`^(${nodeId})${nodeShape} *--> *(${nodeId})${nodeShape}$`),
+      regex: new RegExp(`^(${nodeId})${nodeShape}\\s*-->\\s*(${nodeId})${nodeShape}$`),
       arrowType: "arrow",
     },
   ];
