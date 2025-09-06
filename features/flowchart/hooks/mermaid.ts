@@ -539,10 +539,10 @@ const parseEdgeDefinition = (line: string): ParsedMermaidEdge | null => {
       ),
       arrowType: "arrow",
     },
-    // スペース区切りラベル付き矢印: A -- label --> B
+    // スペース有無両対応ラベル付き矢印: A--label-->B, A-- label -->B
     {
       regex: new RegExp(
-        `^(${nodeId})${nodeShape}\\s*--\\s+([^\n]+?)\\s+-->\\s*(${nodeId})${nodeShape}$`
+        `^(${nodeId})${nodeShape}\\s*--\\s*(.+?)\\s*-->\\s*(${nodeId})${nodeShape}$`
       ),
       arrowType: "arrow",
     },
