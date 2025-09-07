@@ -96,6 +96,15 @@ export default tseslint.config(
       "@typescript-eslint/explicit-module-boundary-types": "off",
       "@typescript-eslint/no-explicit-any": "warn",
 
+      // import typeを強制
+      "@typescript-eslint/consistent-type-imports": [
+        "error",
+        {
+          prefer: "type-imports",
+          disallowTypeAnnotations: false,
+        },
+      ],
+
       // Import関連
       "import/no-unresolved": "off", // TypeScriptが処理
       "import/no-duplicates": "error",
