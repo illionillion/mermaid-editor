@@ -479,6 +479,11 @@ const parseEdgeDefinition = (line: string): ParsedMermaidEdge | null => {
       ),
       arrowType: "bidirectional",
     },
+    // 双方向矢印（ラベル有り: スペース有無両対応）例: A <--ラベル-->B, A <-- ラベル --> B
+    {
+      regex: new RegExp(`^(${nodeId})${nodeShape}\\s*<--\\s*(.+?)\\s*-->\\s*(${nodeId})${nodeShape}$`),
+      arrowType: "bidirectional",
+    },
     // 双方向矢印（ラベルなし）: A <--> B
     {
       regex: new RegExp(`^(${nodeId})${nodeShape}\\s*<-->\\s*(${nodeId})${nodeShape}$`),

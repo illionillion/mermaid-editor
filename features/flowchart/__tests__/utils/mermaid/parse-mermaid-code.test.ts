@@ -85,6 +85,51 @@ describe("parseMermaidCode", () => {
   });
 
   describe("基本的なエッジ解析", () => {
+    test("通常矢印の双方向ラベル付き（A <-- label --> B）を解析する", () => {
+      const mermaid = `
+        flowchart TD
+        A[開始] <-- ラベル --> B[終了]
+      `;
+      const expected: ParsedMermaidData = {
+        nodes: [
+          { id: "A", variableName: "A", label: "開始", shapeType: "rectangle" },
+          { id: "B", variableName: "B", label: "終了", shapeType: "rectangle" },
+        ],
+        edges: [
+          {
+            id: "A-B",
+            source: "A",
+            target: "B",
+            label: "ラベル",
+            arrowType: "bidirectional",
+          },
+        ],
+      };
+      expect(parseMermaidCode(mermaid)).toEqual(expected);
+    });
+
+    test("通常矢印の双方向ラベル付き（A <--label--> B）を解析する", () => {
+      const mermaid = `
+        flowchart TD
+        A[開始]<--ラベル-->B[終了]
+      `;
+      const expected: ParsedMermaidData = {
+        nodes: [
+          { id: "A", variableName: "A", label: "開始", shapeType: "rectangle" },
+          { id: "B", variableName: "B", label: "終了", shapeType: "rectangle" },
+        ],
+        edges: [
+          {
+            id: "A-B",
+            source: "A",
+            target: "B",
+            label: "ラベル",
+            arrowType: "bidirectional",
+          },
+        ],
+      };
+      expect(parseMermaidCode(mermaid)).toEqual(expected);
+    });
     test("点線矢印（-. ラベル .->）を解析する", () => {
       const mermaid = `
         flowchart TD
