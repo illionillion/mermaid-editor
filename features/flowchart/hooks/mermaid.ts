@@ -487,6 +487,7 @@ const parseEdgeDefinition = (line: string): ParsedMermaidEdge | null => {
         `^(${nodeId})${nodeShape}\\s*<--\\s*(.+?)\\s*-->\\s*(${nodeId})${nodeShape}$`
       ),
       arrowType: "bidirectional",
+      labelPosition: "middle",
     },
     // 双方向矢印（ラベルなし）: A <--> B
     {
