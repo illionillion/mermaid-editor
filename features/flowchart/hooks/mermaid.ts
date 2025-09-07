@@ -463,7 +463,9 @@ const parseEdgeDefinition = (line: string): ParsedMermaidEdge | null => {
   }[] = [
     // 太い双方向矢印（スペース区切りラベル付き: スペース有無両対応）: A <==ラベル==> B, A <== ラベル ==> B
     {
-      regex: new RegExp(`^(${nodeId})${nodeShape}\\s*<==\\s*(.+?)\\s*==>\\s*(${nodeId})${nodeShape}$`),
+      regex: new RegExp(
+        `^(${nodeId})${nodeShape}\\s*<==\\s*(.+?)\\s*==>\\s*(${nodeId})${nodeShape}$`
+      ),
       arrowType: "bidirectional-thick",
       labelPosition: "middle",
     },
@@ -481,7 +483,9 @@ const parseEdgeDefinition = (line: string): ParsedMermaidEdge | null => {
     },
     // 双方向矢印（ラベル有り: スペース有無両対応）例: A <--ラベル-->B, A <-- ラベル --> B
     {
-      regex: new RegExp(`^(${nodeId})${nodeShape}\\s*<--\\s*(.+?)\\s*-->\\s*(${nodeId})${nodeShape}$`),
+      regex: new RegExp(
+        `^(${nodeId})${nodeShape}\\s*<--\\s*(.+?)\\s*-->\\s*(${nodeId})${nodeShape}$`
+      ),
       arrowType: "bidirectional",
     },
     // 双方向矢印（ラベルなし）: A <--> B
@@ -511,7 +515,9 @@ const parseEdgeDefinition = (line: string): ParsedMermaidEdge | null => {
     },
     // 太い矢印（スペース区切りラベル付き: スペース有無両対応）: A ==ラベル==> B, A == ラベル ==> B
     {
-      regex: new RegExp(`^(${nodeId})${nodeShape}\\s*==\\s*(.+?)\\s*==>\\s*(${nodeId})${nodeShape}$`),
+      regex: new RegExp(
+        `^(${nodeId})${nodeShape}\\s*==\\s*(.+?)\\s*==>\\s*(${nodeId})${nodeShape}$`
+      ),
       arrowType: "thick",
     },
     // 太い矢印（ラベルなし）: A ==> B
