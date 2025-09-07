@@ -2,9 +2,10 @@
 
 import { Panel } from "@xyflow/react";
 import { PlusIcon, CodeIcon, UploadIcon } from "@yamada-ui/lucide";
-import { VStack, HStack, Text, Button, useDisclosure, FC } from "@yamada-ui/react";
+import type { FC } from "@yamada-ui/react";
+import { VStack, HStack, Text, Button, useDisclosure } from "@yamada-ui/react";
 import { NavigationMenu } from "@/components/ui";
-import { ParsedMermaidData } from "../../hooks/mermaid";
+import type { ParsedMermaidData } from "../../hooks/mermaid";
 import { ImportModal } from "../mermaid";
 
 interface FlowPanelProps {

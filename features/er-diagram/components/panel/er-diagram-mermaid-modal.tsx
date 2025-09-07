@@ -8,7 +8,7 @@ import {
   Text,
   Button,
 } from "@yamada-ui/react";
-import { FC } from "react";
+import type { FC } from "react";
 import { CopyButton, MermaidHighlight } from "@/components/ui";
 
 export interface ERDiagramMermaidModalProps {

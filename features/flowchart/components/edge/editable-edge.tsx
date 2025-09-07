@@ -1,19 +1,14 @@
 "use client";
 
-import {
-  BaseEdge,
-  EdgeLabelRenderer,
-  EdgeProps,
-  getBezierPath,
-  useReactFlow,
-  Edge,
-} from "@xyflow/react";
+import type { EdgeProps, Edge } from "@xyflow/react";
+import { BaseEdge, EdgeLabelRenderer, getBezierPath, useReactFlow } from "@xyflow/react";
 import { XIcon } from "@yamada-ui/lucide";
 import { Input, Box, IconButton, HStack } from "@yamada-ui/react";
-import { useState, useRef, useEffect, MouseEvent, KeyboardEvent } from "react";
+import type { MouseEvent, KeyboardEvent } from "react";
+import { useState, useRef, useEffect } from "react";
 import { adjustEdgeLabelPosition, getCyclicEdgeStyle } from "../../hooks/edge-layout";
 import { getArrowTypeSymbol } from "../../hooks/mermaid";
-import { MermaidArrowType } from "../../types/types";
+import type { MermaidArrowType } from "../../types/types";
 import { ArrowTypeSelector } from "./arrow-type-selector";
 
 interface EditableEdgeProps extends EdgeProps {

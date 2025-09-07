@@ -1,6 +1,7 @@
 import type { Meta } from "@storybook/nextjs-vite";
 import { useState } from "react";
-import { ERTableContent, ERColumn } from "../components/node/er-table-content";
+import type { ERColumn } from "../components/node/er-table-content";
+import { ERTableContent } from "../components/node/er-table-content";
 
 const meta: Meta<typeof ERTableContent> = {
   title: "components/er/ERTableContent",

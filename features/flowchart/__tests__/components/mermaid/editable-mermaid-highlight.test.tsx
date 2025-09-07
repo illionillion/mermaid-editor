@@ -1,5 +1,5 @@
 import { screen, fireEvent } from "@testing-library/react";
-import { ChangeEvent } from "react";
+import type { ChangeEvent } from "react";
 import { describe, test, expect, vi, beforeEach } from "vitest";
 import { render } from "@/__tests__/test-utils";
 import { EditableMermaidHighlight } from "@/features/flowchart/components/mermaid/editable-mermaid-highlight";

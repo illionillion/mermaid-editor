@@ -1,6 +1,7 @@
 import { screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { describe, test, expect, vi, beforeEach, it, MockInstance } from "vitest";
+import type { MockInstance } from "vitest";
+import { describe, test, expect, vi, beforeEach, it } from "vitest";
 import { render } from "@/__tests__/test-utils";
 import { ContributionPanelContent } from "@/components/ui/contribution-panel";
 import { PanelContent } from "@/features/flowchart/components/panel/flow-panel";

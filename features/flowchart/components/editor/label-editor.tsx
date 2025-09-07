@@ -1,7 +1,8 @@
 "use client";
 
-import { Text, Input, FC } from "@yamada-ui/react";
-import { ChangeEvent, KeyboardEvent } from "react";
+import type { FC } from "@yamada-ui/react";
+import { Text, Input } from "@yamada-ui/react";
+import type { ChangeEvent, KeyboardEvent } from "react";
 
 interface LabelEditorProps {
   value: string;

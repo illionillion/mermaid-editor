@@ -1,9 +1,12 @@
 "use client";
 
 import { Handle, Position } from "@xyflow/react";
-import { Box, FC } from "@yamada-ui/react";
-import { useState, useRef, MouseEvent, ChangeEvent, KeyboardEvent } from "react";
-import { UI_CONSTANTS, MermaidShapeType } from "../../types/types";
+import type { FC } from "@yamada-ui/react";
+import { Box } from "@yamada-ui/react";
+import type { MouseEvent, ChangeEvent, KeyboardEvent } from "react";
+import { useState, useRef } from "react";
+import type { MermaidShapeType } from "../../types/types";
+import { UI_CONSTANTS } from "../../types/types";
 import { VariableNameEditor, LabelEditor } from "../editor";
 import { NodeMenu } from "./node-menu";
 

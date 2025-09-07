@@ -1,5 +1,6 @@
 import { describe, test, expect } from "vitest";
-import { parseMermaidCode, ParsedMermaidData } from "@/features/flowchart/hooks/mermaid";
+import type { ParsedMermaidData } from "@/features/flowchart/hooks/mermaid";
+import { parseMermaidCode } from "@/features/flowchart/hooks/mermaid";
 
 describe("parseMermaidCode", () => {
   describe("基本的なノード解析", () => {
@@ -84,11 +85,78 @@ describe("parseMermaidCode", () => {
   });
 
   describe("基本的なエッジ解析", () => {
+    test("通常矢印の双方向ラベル付き（A <-- label --> B）を解析する", () => {
+      const mermaid = `
+        flowchart TD
+        A[開始] <-- ラベル --> B[終了]
+      `;
+      const expected: ParsedMermaidData = {
+        nodes: [
+          { id: "A", variableName: "A", label: "開始", shapeType: "rectangle" },
+          { id: "B", variableName: "B", label: "終了", shapeType: "rectangle" },
+        ],
+        edges: [
+          {
+            id: "A-B",
+            source: "A",
+            target: "B",
+            label: "ラベル",
+            arrowType: "bidirectional",
+          },
+        ],
+      };
+      expect(parseMermaidCode(mermaid)).toEqual(expected);
+    });
+
+    test("通常矢印の双方向ラベル付き（A <--label--> B）を解析する", () => {
+      const mermaid = `
+        flowchart TD
+        A[開始]<--ラベル-->B[終了]
+      `;
+      const expected: ParsedMermaidData = {
+        nodes: [
+          { id: "A", variableName: "A", label: "開始", shapeType: "rectangle" },
+          { id: "B", variableName: "B", label: "終了", shapeType: "rectangle" },
+        ],
+        edges: [
+          {
+            id: "A-B",
+            source: "A",
+            target: "B",
+            label: "ラベル",
+            arrowType: "bidirectional",
+          },
+        ],
+      };
+      expect(parseMermaidCode(mermaid)).toEqual(expected);
+    });
     test("点線矢印（-. ラベル .->）を解析する", () => {
       const mermaid = `
         flowchart TD
         A[開始] -. 進む .-> B[終了]
       `;
+      const expected: ParsedMermaidData = {
+        nodes: [
+          { id: "A", variableName: "A", label: "開始", shapeType: "rectangle" },
+          { id: "B", variableName: "B", label: "終了", shapeType: "rectangle" },
+        ],
+        edges: [
+          {
+            id: "A-B",
+            source: "A",
+            target: "B",
+            label: "進む",
+            arrowType: "dotted",
+          },
+        ],
+      };
+      expect(parseMermaidCode(mermaid)).toEqual(expected);
+    });
+    test("点線矢印（スペース無しラベル付き -.label.->）を解析する", () => {
+      const mermaid = `
+          flowchart TD
+          A[開始]-.進む.->B[終了]
+        `;
       const expected: ParsedMermaidData = {
         nodes: [
           { id: "A", variableName: "A", label: "開始", shapeType: "rectangle" },
@@ -130,6 +198,29 @@ describe("parseMermaidCode", () => {
       expect(parseMermaidCode(mermaid)).toEqual(expected);
     });
 
+    test("太い矢印（==ラベル==>）スペース無しラベル付きを解析する", () => {
+      const mermaid = `
+          flowchart TD
+          A[開始]==進む==>B[終了]
+        `;
+      const expected: ParsedMermaidData = {
+        nodes: [
+          { id: "A", variableName: "A", label: "開始", shapeType: "rectangle" },
+          { id: "B", variableName: "B", label: "終了", shapeType: "rectangle" },
+        ],
+        edges: [
+          {
+            id: "A-B",
+            source: "A",
+            target: "B",
+            label: "進む",
+            arrowType: "thick",
+          },
+        ],
+      };
+      expect(parseMermaidCode(mermaid)).toEqual(expected);
+    });
+
     test("太い双方向矢印（<== ラベル ==>）を解析する", () => {
       const mermaid = `
         flowchart TD
@@ -152,11 +243,58 @@ describe("parseMermaidCode", () => {
       };
       expect(parseMermaidCode(mermaid)).toEqual(expected);
     });
+
+    test("太い双方向矢印（<==ラベル==>）スペース無しラベル付きを解析する", () => {
+      const mermaid = `
+          flowchart TD
+          A[開始]<==進む==>B[終了]
+        `;
+      const expected: ParsedMermaidData = {
+        nodes: [
+          { id: "A", variableName: "A", label: "開始", shapeType: "rectangle" },
+          { id: "B", variableName: "B", label: "終了", shapeType: "rectangle" },
+        ],
+        edges: [
+          {
+            id: "A-B",
+            source: "A",
+            target: "B",
+            label: "進む",
+            arrowType: "bidirectional-thick",
+          },
+        ],
+      };
+      expect(parseMermaidCode(mermaid)).toEqual(expected);
+    });
     test("スペース区切りラベル付き矢印（-- label -->）を解析する", () => {
       const mermaid = `
         flowchart TD
         A[開始] -- はい --> B[終了]
       `;
+
+      const expected: ParsedMermaidData = {
+        nodes: [
+          { id: "A", variableName: "A", label: "開始", shapeType: "rectangle" },
+          { id: "B", variableName: "B", label: "終了", shapeType: "rectangle" },
+        ],
+        edges: [
+          {
+            id: "A-B",
+            source: "A",
+            target: "B",
+            label: "はい",
+            arrowType: "arrow",
+          },
+        ],
+      };
+
+      expect(parseMermaidCode(mermaid)).toEqual(expected);
+    });
+    test("スペースなしラベル付き矢印（--label-->）を解析する", () => {
+      const mermaid = `
+    flowchart TD
+    A[開始]--はい-->B[終了]
+  `;
 
       const expected: ParsedMermaidData = {
         nodes: [

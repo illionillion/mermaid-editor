@@ -1,6 +1,6 @@
-import { Meta, StoryObj } from "@storybook/nextjs-vite";
+import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { ErEditableEdge } from "../components/edge/er-editable-edge";
-import { ErCardinality } from "../types";
+import type { ErCardinality } from "../types";
 
 const meta: Meta<typeof ErEditableEdge> = {
   title: "ER/ErEditableEdge",

@@ -1,5 +1,6 @@
 import { ReactFlowProvider } from "@xyflow/react";
-import { FC, UIProvider } from "@yamada-ui/react";
+import type { FC } from "@yamada-ui/react";
+import { UIProvider } from "@yamada-ui/react";
 import type { ReactNode } from "react";
 import "@xyflow/react/dist/style.css";
 

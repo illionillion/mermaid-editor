@@ -1,7 +1,7 @@
 import { render, screen, fireEvent, within } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { ErEditableEdge } from "../components/edge/er-editable-edge";
-import { ErCardinality } from "../types";
+import type { ErCardinality } from "../types";
 
 describe("ErEditableEdge", () => {
   const baseProps = {

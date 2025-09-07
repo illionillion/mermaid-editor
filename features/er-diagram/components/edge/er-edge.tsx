@@ -1,6 +1,7 @@
-import { BaseEdge, EdgeLabelRenderer, EdgeProps, getBezierPath } from "@xyflow/react";
+import type { EdgeProps } from "@xyflow/react";
+import { BaseEdge, EdgeLabelRenderer, getBezierPath } from "@xyflow/react";
 import { Box } from "@yamada-ui/react";
-import { ErCardinality } from "@/features/er-diagram/types";
+import type { ErCardinality } from "@/features/er-diagram/types";
 import { ErEditableEdge } from "./er-editable-edge";
 
 interface ErEdgeProps extends EdgeProps {

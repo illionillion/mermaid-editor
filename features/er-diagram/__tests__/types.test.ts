@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
-import { ER_CARDINALITY_SYMBOLS, ER_CARDINALITY_DISPLAY_LABELS, ErCardinality } from "../types";
+import type { ErCardinality } from "../types";
+import { ER_CARDINALITY_SYMBOLS, ER_CARDINALITY_DISPLAY_LABELS } from "../types";
 
 describe("types/index", () => {
   const all: ErCardinality[] = [

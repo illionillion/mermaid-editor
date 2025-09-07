@@ -1,5 +1,6 @@
 "use client";
 
+import type { FC } from "@yamada-ui/react";
 import {
   Modal,
   ModalOverlay,
@@ -12,7 +13,6 @@ import {
   Alert,
   AlertIcon,
   AlertDescription,
-  FC,
 } from "@yamada-ui/react";
 import { useState } from "react";
 import { parseMermaidCode } from "../../hooks/mermaid";

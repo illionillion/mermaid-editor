@@ -8,6 +8,7 @@ import {
   ArrowLeftIcon,
   ArrowDownIcon,
 } from "@yamada-ui/lucide";
+import type { Component, IconProps, FC } from "@yamada-ui/react";
 import {
   Modal,
   ModalHeader,
@@ -21,15 +22,12 @@ import {
   MenuButton,
   MenuList,
   MenuItem,
-  Component,
-  IconProps,
-  FC,
 } from "@yamada-ui/react";
 import { useCallback, useState, useMemo } from "react";
 import { CopyButton, MermaidHighlight } from "@/components/ui";
-import { FlowData } from "../../hooks/flow-helpers";
+import type { FlowData } from "../../hooks/flow-helpers";
 import { generateMermaidCode } from "../../hooks/mermaid";
-import { GraphType } from "../../types/";
+import type { GraphType } from "../../types/";
 
 interface DownloadModalProps {
   open: boolean;
