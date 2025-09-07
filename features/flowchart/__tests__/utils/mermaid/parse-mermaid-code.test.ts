@@ -107,6 +107,28 @@ describe("parseMermaidCode", () => {
       };
       expect(parseMermaidCode(mermaid)).toEqual(expected);
     });
+    test("点線矢印（スペース無しラベル付き -.label.->）を解析する", () => {
+      const mermaid = `
+          flowchart TD
+          A[開始]-.進む.->B[終了]
+        `;
+      const expected: ParsedMermaidData = {
+        nodes: [
+          { id: "A", variableName: "A", label: "開始", shapeType: "rectangle" },
+          { id: "B", variableName: "B", label: "終了", shapeType: "rectangle" },
+        ],
+        edges: [
+          {
+            id: "A-B",
+            source: "A",
+            target: "B",
+            label: "進む",
+            arrowType: "dotted",
+          },
+        ],
+      };
+      expect(parseMermaidCode(mermaid)).toEqual(expected);
+    });
 
     test("太い矢印（== ラベル ==>）を解析する", () => {
       const mermaid = `

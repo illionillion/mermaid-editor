@@ -492,18 +492,10 @@ const parseEdgeDefinition = (line: string): ParsedMermaidEdge | null => {
       regex: new RegExp(`^(${nodeId})${nodeShape}\\s*<-->\\s*(${nodeId})${nodeShape}$`),
       arrowType: "bidirectional",
     },
-    // 点線矢印（ラベル付き）: A -. label .-> B
+    // 点線矢印（ラベル付き: スペース有無両対応）: A -.label.->B, A -. label .-> B
     {
       regex: new RegExp(
-        `^(${nodeId})${nodeShape}\\s*-\\.\\s*(.+?)\\s*\\.-\\s*>\\s*(${nodeId})${nodeShape}$`
-      ),
-      arrowType: "dotted",
-      labelPosition: "sides",
-    },
-    // 点線矢印（スペース区切りラベル付き）: A -. ラベル .-> B
-    {
-      regex: new RegExp(
-        `^(${nodeId})${nodeShape}\\s*-\\.\\s+([^\n]+?)\\s+\\.->\\s*(${nodeId})${nodeShape}$`
+        `^(${nodeId})${nodeShape}\\s*-\\.\\s*(.+?)\\s*\\.->\\s*(${nodeId})${nodeShape}$`
       ),
       arrowType: "dotted",
       labelPosition: "sides",
