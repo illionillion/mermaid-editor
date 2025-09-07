@@ -1,6 +1,7 @@
 "use client";
 
-import { Box, FC } from "@yamada-ui/react";
+import type { FC } from "@yamada-ui/react";
+import { Box } from "@yamada-ui/react";
 import { highlight, languages } from "prismjs";
 import Editor from "react-simple-code-editor";
 import "prismjs/themes/prism-dark.css";

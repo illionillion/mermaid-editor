@@ -1,5 +1,6 @@
 import { describe, test, expect } from "vitest";
-import { parseMermaidCode, ParsedMermaidData } from "@/features/flowchart/hooks/mermaid";
+import type { ParsedMermaidData } from "@/features/flowchart/hooks/mermaid";
+import { parseMermaidCode } from "@/features/flowchart/hooks/mermaid";
 
 describe("parseMermaidCode", () => {
   describe("基本的なノード解析", () => {

@@ -1,5 +1,5 @@
-import { Node, Edge } from "@xyflow/react";
-import { MermaidArrowType } from "../types/types";
+import type { Node, Edge } from "@xyflow/react";
+import type { MermaidArrowType } from "../types/types";
 
 /**
  * FlowEditorのビジネスロジックを分離したヘルパー関数

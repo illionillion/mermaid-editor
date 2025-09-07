@@ -1,5 +1,7 @@
-import { useReactTable, getCoreRowModel, flexRender, ColumnDef } from "@tanstack/react-table";
+import type { ColumnDef } from "@tanstack/react-table";
+import { useReactTable, getCoreRowModel, flexRender } from "@tanstack/react-table";
 import { XIcon } from "@yamada-ui/lucide";
+import type { FC } from "@yamada-ui/react";
 import {
   ui,
   Input,
@@ -15,7 +17,6 @@ import {
   Tr,
   Th,
   Td,
-  FC,
   Center,
   Label,
   Text,

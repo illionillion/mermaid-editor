@@ -1,6 +1,6 @@
 import { Background, Controls, MiniMap } from "@xyflow/react";
-import { FC } from "@yamada-ui/react";
-import { ReactNode } from "react";
+import type { FC } from "@yamada-ui/react";
+import type { ReactNode } from "react";
 import { ContributionPanel } from "@/components/ui/contribution-panel";
 
 interface FlowLayoutProps {

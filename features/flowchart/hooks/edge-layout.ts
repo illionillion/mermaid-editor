@@ -1,5 +1,5 @@
-import { Edge, Node } from "@xyflow/react";
-import { CSSProperties } from "react";
+import type { Edge, Node } from "@xyflow/react";
+import type { CSSProperties } from "react";
 
 /**
  * 循環参照エッジを検出する

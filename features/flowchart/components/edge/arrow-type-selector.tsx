@@ -1,9 +1,11 @@
 "use client";
 
 import { ChevronDownIcon } from "@yamada-ui/lucide";
-import { Menu, MenuButton, MenuList, MenuItem, IconButton, Portal, FC } from "@yamada-ui/react";
+import type { FC } from "@yamada-ui/react";
+import { Menu, MenuButton, MenuList, MenuItem, IconButton, Portal } from "@yamada-ui/react";
 import { getArrowTypeDisplayName } from "../../hooks/mermaid";
-import { MermaidArrowType, ARROW_TYPES } from "../../types/types";
+import type { MermaidArrowType } from "../../types/types";
+import { ARROW_TYPES } from "../../types/types";
 
 interface ArrowTypeSelectorProps {
   currentArrowType: MermaidArrowType;

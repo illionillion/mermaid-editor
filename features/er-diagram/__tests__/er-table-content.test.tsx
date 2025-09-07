@@ -1,8 +1,10 @@
 import { screen, fireEvent, waitFor } from "@testing-library/react";
-import { useState, useEffect, ReactNode, MutableRefObject } from "react";
+import type { ReactNode, MutableRefObject } from "react";
+import { useState, useEffect } from "react";
 import { describe, test, expect } from "vitest";
 import { render } from "../../../__tests__/test-utils";
-import { ERTableContent, ERColumn } from "../components/node/er-table-content";
+import type { ERColumn } from "../components/node/er-table-content";
+import { ERTableContent } from "../components/node/er-table-content";
 
 const defaultColumns: ERColumn[] = [
   { name: "id", type: "int", pk: true, uk: false },

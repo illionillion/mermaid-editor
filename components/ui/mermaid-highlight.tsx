@@ -1,6 +1,7 @@
 "use client";
 
-import { Box, FC } from "@yamada-ui/react";
+import type { FC } from "@yamada-ui/react";
+import { Box } from "@yamada-ui/react";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { vscDarkPlus } from "react-syntax-highlighter/dist/esm/styles/prism";
 

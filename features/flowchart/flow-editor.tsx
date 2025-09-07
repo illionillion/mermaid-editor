@@ -1,17 +1,7 @@
 "use client";
 
-import {
-  ReactFlow,
-  Node,
-  Edge,
-  addEdge,
-  useNodesState,
-  useEdgesState,
-  useReactFlow,
-  Connection,
-  OnConnectStartParams,
-  OnConnectEnd,
-} from "@xyflow/react";
+import type { Node, Edge, Connection, OnConnectStartParams, OnConnectEnd } from "@xyflow/react";
+import { ReactFlow, addEdge, useNodesState, useEdgesState, useReactFlow } from "@xyflow/react";
 import { Box, useDisclosure, useToken } from "@yamada-ui/react";
 import { useCallback, useState, useRef, useEffect } from "react";
 import { FlowLayout } from "@/components/layout/";
@@ -25,8 +15,8 @@ import {
   createNewEdge,
   parseConnectingNodeId,
 } from "./hooks/flow-helpers";
-import { ParsedMermaidData } from "./hooks/mermaid";
-import { MermaidArrowType } from "./types";
+import type { ParsedMermaidData } from "./hooks/mermaid";
+import type { MermaidArrowType } from "./types";
 
 // レイアウト定数
 const LAYOUT_CONSTANTS = {

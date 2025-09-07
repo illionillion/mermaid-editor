@@ -1,6 +1,8 @@
-import { Panel, Node, Edge } from "@xyflow/react";
+import type { Node, Edge } from "@xyflow/react";
+import { Panel } from "@xyflow/react";
 import { PlusIcon, DownloadIcon } from "@yamada-ui/lucide";
-import { VStack, HStack, Text, Button, FC, useBoolean } from "@yamada-ui/react";
+import type { FC } from "@yamada-ui/react";
+import { VStack, HStack, Text, Button, useBoolean } from "@yamada-ui/react";
 import { NavigationMenu } from "@/components/ui";
 import type { ERTableNodeProps } from "../node/er-table-node";
 import { ERDiagramMermaidModal } from "./er-diagram-mermaid-modal";

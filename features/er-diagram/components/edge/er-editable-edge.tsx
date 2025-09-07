@@ -1,7 +1,7 @@
 import { XIcon } from "@yamada-ui/lucide";
 import { Box, Input, HStack, IconButton } from "@yamada-ui/react";
 import { useState, useRef, useEffect } from "react";
-import { ErCardinality } from "../../types";
+import type { ErCardinality } from "../../types";
 import { ErCardinalitySelector } from "./er-cardinality-selector";
 
 interface ErEditableEdgeProps {

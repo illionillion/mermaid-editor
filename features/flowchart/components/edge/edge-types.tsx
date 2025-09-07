@@ -1,4 +1,4 @@
-import { EdgeTypes } from "@xyflow/react";
+import type { EdgeTypes } from "@xyflow/react";
 import { EditableEdge } from "./editable-edge";
 
 export const edgeTypes: EdgeTypes = {

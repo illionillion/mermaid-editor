@@ -1,5 +1,5 @@
 import { screen, waitFor } from "@testing-library/react";
-import { HTMLAttributes } from "react";
+import type { HTMLAttributes } from "react";
 import { describe, test, expect, vi, beforeEach, afterEach } from "vitest";
 import { render } from "@/__tests__/test-utils";
 import { ImportModal } from "@/features/flowchart/components/mermaid/import-modal";

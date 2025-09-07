@@ -1,5 +1,6 @@
 import { Handle, Position } from "@xyflow/react";
-import { ERColumn, ERTableContent } from "./er-table-content";
+import type { ERColumn } from "./er-table-content";
+import { ERTableContent } from "./er-table-content";
 
 // ReactFlowノードラッパーとしてpropsをそのままContentに渡すだけ
 export type ERTableNodeProps = {
