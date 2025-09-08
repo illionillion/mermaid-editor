@@ -4,9 +4,8 @@ WORKDIR /app
 
 RUN npm i -g pnpm
 COPY ./package.json ./pnpm-lock.yaml ./
-RUN pnpm install --ignore-scripts
+RUN pnpm install --ignore-scripts --frozen-lockfile --prefer-offline
 COPY . .
-RUN pnpm exec playwright install-deps
-RUN pnpm exec playwright install
+RUN pnpm exec playwright install --with-deps chromium
 
 CMD ["pnpm", "storybook", "--ci"]
