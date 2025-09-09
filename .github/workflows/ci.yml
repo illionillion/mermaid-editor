@@ -77,22 +77,6 @@ jobs:
           json-summary-path: "./coverage/coverage-summary.json"
           json-final-path: "./coverage/coverage-final.json"
 
-      - name: Log in to GitHub Container Registry
-        uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-      - name: Pull cached CI image if exists
-        run: docker pull ghcr.io/illionillion/mermaid-editor-ci:latest || true
-      - name: Build CI image (with cache)
-        run: docker build --cache-from ghcr.io/illionillion/mermaid-editor-ci:latest -t ghcr.io/illionillion/mermaid-editor-ci:latest -f Dockerfile.vrt .
-      - name: Push CI image
-        run: docker push ghcr.io/illionillion/mermaid-editor-ci:latest
-      - name: Run tests in CI container
-        run: docker run --rm -v ${{ github.workspace }}:/app -w /app ghcr.io/illionillion/mermaid-editor-ci:latest pnpm test:run
-      - name: Run tests with coverage in CI container
-        run: docker run --rm -v ${{ github.workspace }}:/app -w /app ghcr.io/illionillion/mermaid-editor-ci:latest pnpm test:coverage
   e2e_test:
     name: E2E Test
     runs-on: ubuntu-latest
