@@ -119,13 +119,20 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Pull cached VRT image if exists
-        run: docker pull ghcr.io/illionillion/mermaid-editor-vrt:latest || true
+      - name: Pull VRT image
+        id: pull_image
+        run: docker pull ghcr.io/illionillion/mermaid-editor-vrt:latest
+        # 失敗しても続行
+        continue-on-error: true
 
-      - name: Build VRT image (with cache)
-        run: docker build --cache-from ghcr.io/illionillion/mermaid-editor-vrt:latest -t ghcr.io/illionillion/mermaid-editor-vrt:latest -f Dockerfile.vrt .
+      - name: Build VRT image
+        # 失敗した場合はローカルでビルド
+        if: steps.pull_image.outcome == 'failure'
+        run: docker build -t ghcr.io/illionillion/mermaid-editor-vrt:latest -f Dockerfile.vrt .
 
       - name: Push VRT image
+        # ビルドした場合のみプッシュ
+        if: steps.pull_image.outcome == 'failure'
         run: docker push ghcr.io/illionillion/mermaid-editor-vrt:latest
 
       - name: Build and start services
