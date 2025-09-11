@@ -1,0 +1,11 @@
+services:
+  vrt:
+    container_name: mermaid-editor-vrt
+    image: ghcr.io/illionillion/mermaid-editor-vrt:latest
+    volumes:
+      - .:/app
+      - /app/node_modules
+    working_dir: /app
+    ports:
+      - "6006:6006"
+    command: ["pnpm", "storybook", "--ci"]

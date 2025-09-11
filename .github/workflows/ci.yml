@@ -136,7 +136,7 @@ jobs:
         run: docker push ghcr.io/illionillion/mermaid-editor-vrt:latest
 
       - name: Build and start services
-        run: docker compose -f compose.vrt.yml up -d
+        run: docker compose -f compose.vrt.ci.yml up -d
 
       - name: Wait for server
         run: npx wait-on http://localhost:6006 --timeout 180000
