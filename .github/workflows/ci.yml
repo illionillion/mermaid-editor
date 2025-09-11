@@ -105,14 +105,38 @@ jobs:
     permissions:
       contents: read
       pull-requests: write
+      packages: write
     steps:
       - uses: actions/checkout@v4
 
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Pull VRT image
+        id: pull_image
+        run: docker pull ghcr.io/illionillion/mermaid-editor-vrt:latest
+        # 失敗しても続行
+        continue-on-error: true
+
+      - name: Build VRT image
+        # 失敗した場合はローカルでビルド
+        if: steps.pull_image.outcome == 'failure'
+        run: docker build -t ghcr.io/illionillion/mermaid-editor-vrt:latest -f Dockerfile.vrt .
+
+      - name: Push VRT image
+        # ビルドした場合のみプッシュ
+        if: steps.pull_image.outcome == 'failure'
+        run: docker push ghcr.io/illionillion/mermaid-editor-vrt:latest
+
       - name: Build and start services
-        run: docker compose -f compose.vrt.yml up -d --build
+        run: docker compose -f compose.vrt.ci.yml up -d
 
       - name: Wait for server
         run: npx wait-on http://localhost:6006 --timeout 180000
