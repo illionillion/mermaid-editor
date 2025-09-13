@@ -1,5 +1,5 @@
-name: "Build Applications"
-description: "Build Next.js and Storybook"
+name: "Build Next.js"
+description: "Build Next.js application"
 
 runs:
   using: "composite"
@@ -10,7 +10,3 @@ runs:
     - name: Build Next.js application
       shell: bash
       run: pnpm build
-
-    - name: Build Storybook
-      shell: bash
-      run: pnpm build-storybook

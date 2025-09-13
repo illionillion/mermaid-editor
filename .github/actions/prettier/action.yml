@@ -1,0 +1,12 @@
+name: "Prettier"
+description: "Check code formatting with Prettier"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Setup Node.js and PNPM
+      uses: ./.github/actions/install
+
+    - name: Check code formatting
+      shell: bash
+      run: pnpm format:check
