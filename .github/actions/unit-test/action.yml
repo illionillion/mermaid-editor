@@ -1,0 +1,16 @@
+name: "Unit Test"
+description: "Run unit tests with coverage"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Setup Node.js and PNPM
+      uses: ./.github/actions/install
+
+    - name: Run tests
+      shell: bash
+      run: pnpm test:run
+
+    - name: Run tests with coverage
+      shell: bash
+      run: pnpm test:coverage

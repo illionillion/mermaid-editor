@@ -1,0 +1,24 @@
+name: "E2E Test"
+description: "Run end-to-end tests with Playwright"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Setup Node.js and PNPM
+      uses: ./.github/actions/install
+
+    - name: Start Next.js dev server
+      shell: bash
+      run: pnpm dev &
+
+    - name: Wait for server
+      shell: bash
+      run: npx wait-on http://localhost:3000 --timeout 60000
+
+    - name: Install Playwright
+      shell: bash
+      run: pnpm exec playwright install
+
+    - name: Run E2E tests
+      shell: bash
+      run: pnpm test:e2e
