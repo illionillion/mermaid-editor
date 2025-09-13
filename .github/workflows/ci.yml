@@ -139,9 +139,11 @@ jobs:
         run: docker exec mermaid-editor-vrt pnpm test:vrt
 
       - name: Upload VRT diff images
+        if: failure() && hashFiles('__image_snapshots__/__diff_output__/*.png') != ''
         uses: ./.github/actions/vrt-upload-diff
 
       - name: Comment VRT failure on PR
+        if: failure() && hashFiles('__image_snapshots__/__diff_output__/*.png') != '' && github.event_name == 'pull_request'
         uses: ./.github/actions/vrt-comment-pr
 
   # Stage 2: Testing and Building (parallel, depends on code quality and type check)
