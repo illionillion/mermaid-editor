@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from "@storybook/react-vite";
+import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { userEvent, within } from "@storybook/testing-library";
 import { ContributionPanel } from "../../../components/ui/contribution-panel";
 
