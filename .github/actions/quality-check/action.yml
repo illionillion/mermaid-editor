@@ -1,0 +1,20 @@
+name: "Quality Check"
+description: "Run ESLint, Prettier, and TypeScript checks"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Setup Node.js and PNPM
+      uses: ./.github/actions/install
+
+    - name: Run ESLint
+      shell: bash
+      run: pnpm lint
+
+    - name: Check code formatting
+      shell: bash
+      run: pnpm format:check
+
+    - name: Run TypeScript type check
+      shell: bash
+      run: pnpm type-check

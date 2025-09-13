@@ -7,42 +7,22 @@ on:
     branches: ["main", "dev"]
 
 jobs:
-  # Stage 1: Code Quality Checks (all parallel)
-  eslint:
-    name: ESLint
+  # Stage 1: Code Quality Check
+  quality_check:
+    name: Quality Check
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Run ESLint
-        uses: ./.github/actions/eslint
+      - name: Run quality checks
+        uses: ./.github/actions/quality-check
 
-  prettier:
-    name: Prettier
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Run Prettier check
-        uses: ./.github/actions/prettier
-
-  typescript:
-    name: TypeScript
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Run TypeScript check
-        uses: ./.github/actions/typescript
-
-  # Stage 2: Testing and Building (parallel, depends on quality checks)
+  # Stage 2: Testing and Building (parallel, depends on quality check)
   unit_test:
     name: Unit Test
     runs-on: ubuntu-latest
-    needs: [eslint, prettier, typescript]
+    needs: [quality_check]
     permissions:
       contents: read
       pull-requests: write
@@ -63,7 +43,7 @@ jobs:
   e2e_test:
     name: E2E Test
     runs-on: ubuntu-latest
-    needs: [eslint, prettier, typescript]
+    needs: [quality_check]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -92,24 +72,13 @@ jobs:
       - name: Run VRT tests
         uses: ./.github/actions/vrt-test
 
-  build_next:
-    name: Build Next.js
+  build:
+    name: Build
     runs-on: ubuntu-latest
-    needs: [eslint, prettier, typescript]
+    needs: [quality_check]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Build Next.js
-        uses: ./.github/actions/build-next
-
-  build_storybook:
-    name: Build Storybook
-    runs-on: ubuntu-latest
-    needs: [eslint, prettier, typescript]
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Build Storybook
-        uses: ./.github/actions/build-storybook
+      - name: Build applications
+        uses: ./.github/actions/build
