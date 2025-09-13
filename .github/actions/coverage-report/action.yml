@@ -1,0 +1,12 @@
+name: "Coverage Report"
+description: "Generate and comment coverage report on PR"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Coverage Report as Comment
+      uses: davelosert/vitest-coverage-report-action@v2
+      if: github.event_name == 'pull_request'
+      with:
+        json-summary-path: "./coverage/coverage-summary.json"
+        json-final-path: "./coverage/coverage-final.json"

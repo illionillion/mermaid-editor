@@ -1,0 +1,20 @@
+name: "Comment VRT Failure on PR"
+description: "Comment artifact link on PR when VRT tests fail"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Comment artifact link on PR
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const pr = context.payload.pull_request?.number;
+          if (!pr) return;
+          const runId = process.env.GITHUB_RUN_ID;
+          const artifactUrl = `https://github.com/${process.env.GITHUB_REPOSITORY}/actions/runs/${runId}`;
+          github.rest.issues.createComment({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            issue_number: pr,
+            body: `❌ VRTテストが失敗しました。差分画像は [Actionsのアーティファクト](${artifactUrl}) から確認できます。`
+          });
