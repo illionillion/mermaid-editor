@@ -1,5 +1,5 @@
 name: "Unit Test"
-description: "Run unit tests with coverage and report"
+description: "Run unit tests with coverage"
 
 runs:
   using: "composite"
@@ -14,10 +14,3 @@ runs:
     - name: Run tests with coverage
       shell: bash
       run: pnpm test:coverage
-
-    - name: Coverage Report as Comment
-      uses: davelosert/vitest-coverage-report-action@v2
-      if: github.event_name == 'pull_request'
-      with:
-        json-summary-path: "./coverage/coverage-summary.json"
-        json-final-path: "./coverage/coverage-final.json"

@@ -53,6 +53,13 @@ jobs:
       - name: Run unit tests
         uses: ./.github/actions/unit-test
 
+      - name: Coverage Report as Comment
+        uses: davelosert/vitest-coverage-report-action@v2
+        if: github.event_name == 'pull_request'
+        with:
+          json-summary-path: "./coverage/coverage-summary.json"
+          json-final-path: "./coverage/coverage-final.json"
+
   e2e_test:
     name: E2E Test
     runs-on: ubuntu-latest
