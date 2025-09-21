@@ -10,8 +10,9 @@ export default meta;
 export const Default = {
   render: () => (
     <FlowPanel
+      edges={[]}
+      nodes={[]}
       onAddNode={() => alert("ノード追加")}
-      onGenerateCode={() => alert("コード生成")}
       onImportMermaid={() => alert("Mermaidインポート")}
     />
   ),
