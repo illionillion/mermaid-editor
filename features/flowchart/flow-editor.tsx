@@ -2,11 +2,10 @@
 
 import type { Node, Edge, Connection, OnConnectStartParams, OnConnectEnd } from "@xyflow/react";
 import { ReactFlow, addEdge, useNodesState, useEdgesState, useReactFlow } from "@xyflow/react";
-import { Box, useDisclosure, useToken } from "@yamada-ui/react";
+import { Box, useToken } from "@yamada-ui/react";
 import { useCallback, useState, useRef, useEffect } from "react";
 import { FlowLayout } from "@/components/layout/";
 import { edgeTypes } from "./components/edge/edge-types";
-import { DownloadModal } from "./components/mermaid/download-modal";
 import { nodeTypes } from "./components/node/node-types";
 import { FlowPanel } from "./components/panel/flow-panel";
 import {
@@ -48,7 +47,7 @@ export function FlowEditor() {
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
   const [nodeId, setNodeId] = useState(2);
-  const { open, onOpen, onClose } = useDisclosure();
+  // DownloadModalの状態管理はFlowPanelに移動
   const connectingNodeId = useRef<string | null>(null);
   const { screenToFlowPosition } = useReactFlow();
 
@@ -322,10 +321,6 @@ export function FlowEditor() {
     handleNodeDelete,
   ]);
 
-  const generateMermaidCodeCallback = useCallback(() => {
-    onOpen();
-  }, [onOpen]);
-
   const handleImportMermaid = useCallback(
     (data: ParsedMermaidData) => {
       // ノードの階層構造を分析してレイアウトを決定
@@ -461,13 +456,12 @@ export function FlowEditor() {
         <FlowLayout>
           <FlowPanel
             onAddNode={addNode}
-            onGenerateCode={generateMermaidCodeCallback}
             onImportMermaid={handleImportMermaid}
+            nodes={nodes}
+            edges={edges}
           />
         </FlowLayout>
       </ReactFlow>
-
-      <DownloadModal open={open} onClose={onClose} flowData={{ nodes, edges }} />
     </Box>
   );
 }

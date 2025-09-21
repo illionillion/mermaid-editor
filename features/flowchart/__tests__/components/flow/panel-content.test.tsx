@@ -12,8 +12,9 @@ vi.mock("next/navigation", () => ({
 
 describe("PanelContent", () => {
   const defaultProps = {
+    nodes: [],
+    edges: [],
     onAddNode: vi.fn(),
-    onGenerateCode: vi.fn(),
     onImportMermaid: vi.fn(),
   };
 
@@ -54,14 +55,15 @@ describe("PanelContent", () => {
       expect(defaultProps.onAddNode).toHaveBeenCalledTimes(1);
     });
 
-    test("コード生成ボタンクリックでonGenerateCodeが呼ばれる", async () => {
+    test("コード生成ボタンクリックでDownloadModalが開く", async () => {
       const user = userEvent.setup();
       render(<PanelContent {...defaultProps} />);
 
       const generateButton = screen.getByText("コード生成");
       await user.click(generateButton);
 
-      expect(defaultProps.onGenerateCode).toHaveBeenCalledTimes(1);
+      // モーダルが開いていることを確認（DownloadModalコンポーネント内のテキストで判定）
+      expect(screen.getByText("生成されたMermaidコード")).toBeInTheDocument();
     });
 
     test("インポートボタンクリックでモーダルが開く", async () => {
@@ -178,7 +180,6 @@ describe("PanelContent", () => {
   describe("複数回クリック", () => {
     const clickCases: { label: string; handler: keyof typeof defaultProps; times: number }[] = [
       { label: "ノード追加", handler: "onAddNode", times: 3 },
-      { label: "コード生成", handler: "onGenerateCode", times: 2 },
     ];
     it.each(clickCases)(
       "$labelボタンを$times回クリックできる",
