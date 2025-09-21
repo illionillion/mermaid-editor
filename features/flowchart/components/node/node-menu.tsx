@@ -30,6 +30,7 @@ export const NodeMenu = ({
         as={IconButton}
         icon={<GripIcon fontSize="2xl" />}
         variant="ghost"
+        aria-label="ノードの操作メニューを開く"
       />
 
       <MenuList>
