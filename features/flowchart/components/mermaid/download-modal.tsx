@@ -108,7 +108,6 @@ export const DownloadModal: FC<DownloadModalProps> = ({ open, onClose, flowData 
       </ModalHeader>
       <ModalCloseButton />
       <ModalBody pb={6} position="relative">
-        {/* コピーボタン */}
         <CopyButton value={currentMermaidCode} position="absolute" top={2} right={6} zIndex={1} />
         <MermaidHighlight code={currentMermaidCode} />
       </ModalBody>

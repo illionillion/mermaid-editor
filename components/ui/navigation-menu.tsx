@@ -7,7 +7,7 @@ import { usePathname } from "next/navigation";
 const NAV_ITEMS = [
   { label: "フローチャートエディタ", path: "/flow-chart" },
   { label: "ER図エディタ", path: "/er-diagram" },
-];
+] as const;
 
 export const NavigationMenu = () => {
   const pathname = usePathname() ?? "";
