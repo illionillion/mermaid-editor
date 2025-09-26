@@ -1,7 +1,5 @@
-import type { Node } from "@xyflow/react";
-import { describe, it, expect } from "vitest";
-import type { ERTableNodeProps } from "../components/node/er-table-node";
-import { convertMermaidToERData } from "../utils/import-mermaid-to-er";
+import { describe, it, expect, vi } from "vitest";
+import { convertMermaidToERData, convertParsedDataToNodes } from "../utils/import-mermaid-to-er";
 
 describe("convertMermaidToERData", () => {
   // --- 正常系 ---
@@ -21,22 +19,20 @@ describe("convertMermaidToERData", () => {
 
     expect(result.nodes).toEqual([
       expect.objectContaining({
-        data: expect.objectContaining({
-          name: "User",
-          columns: expect.arrayContaining([
-            expect.objectContaining({ name: "id", type: "int", pk: true }),
-            expect.objectContaining({ name: "name", type: "varchar(255)", pk: false }),
-          ]),
-        }),
+        id: "User",
+        name: "User",
+        columns: expect.arrayContaining([
+          expect.objectContaining({ name: "id", type: "int", pk: true }),
+          expect.objectContaining({ name: "name", type: "varchar(255)", pk: false }),
+        ]),
       }),
       expect.objectContaining({
-        data: expect.objectContaining({
-          name: "Post",
-          columns: expect.arrayContaining([
-            expect.objectContaining({ name: "id", type: "int", pk: true }),
-            expect.objectContaining({ name: "user_id", type: "int", pk: false }),
-          ]),
-        }),
+        id: "Post",
+        name: "Post",
+        columns: expect.arrayContaining([
+          expect.objectContaining({ name: "id", type: "int", pk: true }),
+          expect.objectContaining({ name: "user_id", type: "int", pk: false }),
+        ]),
       }),
     ]);
     expect(result.edges.length).toBe(1);
@@ -114,8 +110,8 @@ describe("convertMermaidToERData", () => {
   }
 `;
     const result = convertMermaidToERData(mermaid);
-    const product = result.nodes.find((n: Node<ERTableNodeProps>) => n.data.name === "Product");
-    expect(product?.data.columns).toEqual(
+    const product = result.nodes.find((n) => n.name === "Product");
+    expect(product?.columns).toEqual(
       expect.arrayContaining([
         expect.objectContaining({ name: "id", type: "uuid", pk: true, uk: true }),
         expect.objectContaining({ name: "name", type: "string", pk: false, uk: true }),
@@ -139,8 +135,8 @@ describe("convertMermaidToERData", () => {
   A ||--o{ B : "rel"
 `;
     const result = convertMermaidToERData(mermaid);
-    const a = result.nodes.find((n: Node<ERTableNodeProps>) => n.data.name === "A");
-    expect(a?.data.columns).toEqual(
+    const a = result.nodes.find((n) => n.name === "A");
+    expect(a?.columns).toEqual(
       expect.arrayContaining([
         expect.objectContaining({ name: "id", type: "int", pk: true, uk: false }),
         expect.objectContaining({ name: "code", type: "string", pk: false, uk: true }),
@@ -157,8 +153,8 @@ describe("convertMermaidToERData", () => {
   }
 `;
     const result = convertMermaidToERData(mermaid);
-    const t = result.nodes.find((n: Node<ERTableNodeProps>) => n.data.name === "T");
-    expect(t?.data.columns).toEqual(
+    const t = result.nodes.find((n) => n.name === "T");
+    expect(t?.columns).toEqual(
       expect.arrayContaining([
         expect.objectContaining({ name: "name", type: "varchar(255)" }),
         expect.objectContaining({ name: "price", type: "decimal(10,2)" }),
@@ -176,8 +172,8 @@ describe("convertMermaidToERData", () => {
   }
 `;
     const result = convertMermaidToERData(mermaid);
-    const t = result.nodes.find((n: Node<ERTableNodeProps>) => n.data.name === "T");
-    expect(t?.data.columns).toEqual(
+    const t = result.nodes.find((n) => n.name === "T");
+    expect(t?.columns).toEqual(
       expect.arrayContaining([
         expect.objectContaining({ name: "id", type: "int", pk: true, uk: true }),
         expect.objectContaining({ name: "name", type: "string", pk: false, uk: false }),
@@ -235,7 +231,7 @@ describe("convertMermaidToERData", () => {
     const result = convertMermaidToERData(mermaid);
     expect(result.nodes.length).toBe(2); // AとBの両方が検出される
     // Aは壊れた定義だが、Bは正常に検出される
-    const nodeNames = result.nodes.map((n) => n.data.name);
+    const nodeNames = result.nodes.map((n) => n.name);
     expect(nodeNames).toContain("A");
     expect(nodeNames).toContain("B");
   });
@@ -250,5 +246,92 @@ A-->B
   it("完全に壊れた記法や意味不明な文字列", () => {
     expect(convertMermaidToERData("this is not mermaid")).toEqual({ nodes: [], edges: [] });
     expect(convertMermaidToERData("1234567890!@#$%^&*()")).toEqual({ nodes: [], edges: [] });
+  });
+});
+
+describe("convertParsedDataToNodes", () => {
+  it("ParsedERTableDataをReactFlowのNode型に変換", () => {
+    const parsedData = [
+      {
+        id: "User",
+        name: "User",
+        columns: [
+          { name: "id", type: "int", pk: true, uk: false },
+          { name: "name", type: "string", pk: false, uk: false },
+        ],
+      },
+      {
+        id: "Post",
+        name: "Post",
+        columns: [
+          { name: "id", type: "int", pk: true, uk: false },
+          { name: "user_id", type: "int", pk: false, uk: false },
+        ],
+      },
+    ];
+
+    const mockHandlers = {
+      onNameChange: vi.fn(),
+      onColumnsChange: vi.fn(),
+    };
+
+    const result = convertParsedDataToNodes(parsedData, mockHandlers);
+
+    expect(result).toHaveLength(2);
+    expect(result[0]).toEqual({
+      id: "User",
+      type: "erTable",
+      position: { x: 0, y: 0 },
+      data: {
+        name: "User",
+        columns: [
+          { name: "id", type: "int", pk: true, uk: false },
+          { name: "name", type: "string", pk: false, uk: false },
+        ],
+        onNameChange: expect.any(Function),
+        onColumnsChange: expect.any(Function),
+      },
+    });
+
+    expect(result[1]).toEqual({
+      id: "Post",
+      type: "erTable",
+      position: { x: 300, y: 0 },
+      data: {
+        name: "Post",
+        columns: [
+          { name: "id", type: "int", pk: true, uk: false },
+          { name: "user_id", type: "int", pk: false, uk: false },
+        ],
+        onNameChange: expect.any(Function),
+        onColumnsChange: expect.any(Function),
+      },
+    });
+  });
+
+  it("ハンドラーが正しく呼び出される", () => {
+    const parsedData = [
+      {
+        id: "Test",
+        name: "Test",
+        columns: [],
+      },
+    ];
+
+    const mockHandlers = {
+      onNameChange: vi.fn(),
+      onColumnsChange: vi.fn(),
+    };
+
+    const result = convertParsedDataToNodes(parsedData, mockHandlers);
+
+    // onNameChangeハンドラーをテスト
+    result[0].data.onNameChange("NewName");
+    expect(mockHandlers.onNameChange).toHaveBeenCalledWith("Test", "NewName");
+
+    // onColumnsChangeハンドラーをテスト
+    const newColumns = [{ name: "id", type: "int", pk: true, uk: false }];
+    result[0].data.onColumnsChange(newColumns);
+    expect(mockHandlers.onColumnsChange).toHaveBeenCalledWith("Test", newColumns);
   });
 });

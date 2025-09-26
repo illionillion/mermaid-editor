@@ -7,6 +7,24 @@ const CARDINALITY_MAP: Record<string, string> = Object.fromEntries(
   Object.entries(ER_CARDINALITY_SYMBOLS).map(([k, v]) => [v, k])
 );
 
+/**
+ * パースされたERテーブルデータの型定義（純粋なデータのみ、UIハンドラーなし）
+ * flowchartのParsedMermaidNodeと同じ設計パターン
+ */
+export interface ParsedERTableData {
+  id: string;
+  name: string;
+  columns: ERColumn[];
+}
+
+/**
+ * パースされたMermaidデータの型定義
+ */
+export interface ParsedMermaidERData {
+  nodes: ParsedERTableData[];
+  edges: Edge[];
+}
+
 function parseColumns(lines: string[]): ERColumn[] {
   return lines
     .map((line) => line.trim())
@@ -25,14 +43,11 @@ function parseColumns(lines: string[]): ERColumn[] {
     .filter(Boolean) as ERColumn[];
 }
 
-export function convertMermaidToERData(mermaid: string): {
-  nodes: Node<ERTableNodeProps>[];
-  edges: Edge[];
-} {
+export function convertMermaidToERData(mermaid: string): ParsedMermaidERData {
   if (!mermaid.trim().startsWith("erDiagram")) return { nodes: [], edges: [] };
 
   const lines = mermaid.split("\n").map((l) => l.trimEnd());
-  const nodes: Node<ERTableNodeProps>[] = [];
+  const nodes: ParsedERTableData[] = [];
   const nodeNames: Set<string> = new Set();
   const edges: Edge[] = [];
 
@@ -80,9 +95,8 @@ export function convertMermaidToERData(mermaid: string): {
       const columns = parseColumns(colLines);
       nodes.push({
         id: name,
-        type: "erTable",
-        position: { x: 0, y: 0 },
-        data: { name, columns, onNameChange: () => {}, onColumnsChange: () => {} },
+        name,
+        columns,
       });
       nodeNames.add(name);
       continue;
@@ -109,18 +123,16 @@ export function convertMermaidToERData(mermaid: string): {
       if (!nodeNames.has(source)) {
         nodes.push({
           id: source,
-          type: "erTable",
-          position: { x: 0, y: 0 },
-          data: { name: source, columns: [], onNameChange: () => {}, onColumnsChange: () => {} },
+          name: source,
+          columns: [],
         });
         nodeNames.add(source);
       }
       if (!nodeNames.has(target)) {
         nodes.push({
           id: target,
-          type: "erTable",
-          position: { x: 0, y: 0 },
-          data: { name: target, columns: [], onNameChange: () => {}, onColumnsChange: () => {} },
+          name: target,
+          columns: [],
         });
         nodeNames.add(target);
       }
@@ -129,4 +141,29 @@ export function convertMermaidToERData(mermaid: string): {
     i++;
   }
   return { nodes, edges };
+}
+
+/**
+ * ParsedERTableDataをReactFlowのNode型に変換するヘルパー関数
+ * flowchartのhandleImportMermaidと同じ設計パターン
+ */
+export function convertParsedDataToNodes(
+  parsedData: ParsedERTableData[],
+  handlers: {
+    onNameChange: (nodeId: string, newName: string) => void;
+    onColumnsChange: (nodeId: string, newColumns: ERColumn[]) => void;
+  }
+): Node<ERTableNodeProps>[] {
+  return parsedData.map((parsedNode, index) => ({
+    id: parsedNode.id,
+    type: "erTable",
+    position: { x: index * 300, y: 0 }, // 簡単なレイアウト
+    data: {
+      name: parsedNode.name,
+      columns: parsedNode.columns,
+      onNameChange: (newName: string) => handlers.onNameChange(parsedNode.id, newName),
+      onColumnsChange: (newColumns: ERColumn[]) =>
+        handlers.onColumnsChange(parsedNode.id, newColumns),
+    },
+  }));
 }
