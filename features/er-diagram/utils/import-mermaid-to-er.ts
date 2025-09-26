@@ -7,6 +7,20 @@ const CARDINALITY_MAP: Record<string, string> = Object.fromEntries(
   Object.entries(ER_CARDINALITY_SYMBOLS).map(([k, v]) => [v, k])
 );
 
+// 正規表現パターン定数
+const COLUMN_PATTERN = /^([A-Za-z0-9_(),]+)\s+([A-Za-z0-9_]+)(.*)$/; // [型名, カラム名, 属性]
+const EDGE_PATTERN = /^(\w+)\s+([|}o\-{]+)\s+(\w+)\s*:(.*)$/; // [source, cardinality, target, label]
+
+/**
+ * テーブル名やラベルの正規化処理
+ * - 空白: mermaid記法で余分な空白が含まれる場合がある
+ * - コロン: ラベル区切り文字として使用されるが、実際のラベルには不要
+ * - 二重引用符: mermaid記法でクォートされた文字列の場合に除去
+ */
+function sanitizeTableName(input: string): string {
+  return input.replace(/^[\s:"]+|[\s:"]+$/g, "");
+}
+
 /**
  * パースされたERテーブルデータの型定義（純粋なデータのみ、UIハンドラーなし）
  * flowchartのParsedMermaidNodeと同じ設計パターン
@@ -34,7 +48,7 @@ function parseColumns(lines: string[]): ERColumn[] {
       // 型名として許可する文字: 英字、数字、アンダースコア、丸括弧、カンマ（例: varchar(255), int, decimal(10,2) など）
       // 注意: 空白を含む型名（decimal(10, 2)など）はMermaid公式仕様でサポートされていないため対応しない
       // 必要に応じて許可文字を調整してください
-      const m = line.match(/^([A-Za-z0-9_(),]+)\s+([A-Za-z0-9_]+)(.*)$/);
+      const m = line.match(COLUMN_PATTERN);
       if (!m) return null;
       const [, type, name, attrs] = m;
       const pk = attrs?.includes("PK") || false;
@@ -107,15 +121,11 @@ export function convertMermaidToERData(mermaid: string): ParsedMermaidERData {
     // 許可されるカーディナリティ記号パターン例:
     // |o--o|, |o--|, |--|, }o--o{, }o--{, }--{, |--o|, |--o, o--o|, o--o, o--|, |--o, o--, --o, --|, --, etc.
     // Mermaid ER図で使用されるカーディナリティ記号の詳細は ER_CARDINALITY_SYMBOLS を参照
-    const edgeMatch = line.match(/^(\w+)\s+([|}o\-{]+)\s+(\w+)\s*:(.*)$/);
+    const edgeMatch = line.match(EDGE_PATTERN);
     if (edgeMatch) {
       const [, source, symbol, target, label] = edgeMatch;
       const card = CARDINALITY_MAP[symbol.trim()] || "one-to-many";
-      // ラベルの正規化処理：
-      // - 空白: mermaid記法で余分な空白が含まれる場合がある
-      // - コロン: ラベル区切り文字として使用されるが、実際のラベルには不要
-      // - 二重引用符: mermaid記法でクォートされた文字列の場合に除去
-      const cleanLabel = label?.replace(/^[\s:"]+|[\s:"]+$/g, "") || "relation";
+      const cleanLabel = sanitizeTableName(label) || "relation";
 
       edges.push({
         id: `${source}-${target}`,
