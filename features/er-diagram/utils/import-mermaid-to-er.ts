@@ -30,8 +30,9 @@ function parseColumns(lines: string[]): ERColumn[] {
     .map((line) => line.trim())
     .filter((l) => l && !l.startsWith("//"))
     .map((line) => {
-      // 型名・カラム名・属性
+      // 型名・カラム名・属性の解析
       // 型名として許可する文字: 英字、数字、アンダースコア、丸括弧、カンマ（例: varchar(255), int, decimal(10,2) など）
+      // 注意: 空白を含む型名（decimal(10, 2)など）はMermaid公式仕様でサポートされていないため対応しない
       // 必要に応じて許可文字を調整してください
       const m = line.match(/^([A-Za-z0-9_(),]+)\s+([A-Za-z0-9_]+)(.*)$/);
       if (!m) return null;
@@ -110,13 +111,18 @@ export function convertMermaidToERData(mermaid: string): ParsedMermaidERData {
     if (edgeMatch) {
       const [, source, symbol, target, label] = edgeMatch;
       const card = CARDINALITY_MAP[symbol.trim()] || "one-to-many";
+      // ラベルの正規化処理：
+      // - 空白: mermaid記法で余分な空白が含まれる場合がある
+      // - コロン: ラベル区切り文字として使用されるが、実際のラベルには不要
+      // - 二重引用符: mermaid記法でクォートされた文字列の場合に除去
+      const cleanLabel = label?.replace(/^[\s:"]+|[\s:"]+$/g, "") || "relation";
+
       edges.push({
         id: `${source}-${target}`,
         type: "erEdge",
         source,
         target,
-        // ラベルの先頭・末尾の空白、コロン、二重引用符を削除
-        data: { label: label?.replace(/^[\s:"]+|[\s:"]+$/g, "") || "relation", cardinality: card },
+        data: { label: cleanLabel, cardinality: card },
       });
 
       // ノード定義がなければダミーノードを追加
