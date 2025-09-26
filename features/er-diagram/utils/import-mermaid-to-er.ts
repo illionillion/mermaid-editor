@@ -23,6 +23,11 @@ const EDGE_PATTERN =
  * - 二重引用符: mermaid記法でクォートされた文字列の場合に除去
  */
 function sanitizeTableName(input: string): string {
+  // 先頭または末尾の空白・コロン・二重引用符を除去する正規表現
+  // ^[\s:"]+   : 文字列の先頭 (^) から空白 (\s)、コロン (:)、二重引用符 (") のいずれかが1文字以上 (+) 連続する部分をマッチ
+  // |          : または
+  // [\s:"]+$   : 文字列の末尾 ($) で空白 (\s)、コロン (:)、二重引用符 (") のいずれかが1文字以上 (+) 連続する部分をマッチ
+  // gフラグ    : グローバルに全ての該当箇所を対象
   return input.replace(/^[\s:"]+|[\s:"]+$/g, "");
 }
 
@@ -104,7 +109,15 @@ export function convertMermaidToERData(mermaid: string): ParsedMermaidERData {
           break;
         }
         if (/^\w+\s*\{/.test(currentLine)) {
-          // 壊れた定義（閉じ括弧なしで次のノード定義が始まった場合）の検出と回復処理
+          /**
+           * エラー回復シナリオ:
+           * 例: "User { id int Post { id int }"
+           * 上記のように、ノード定義の閉じ括弧（}）が抜けている場合、
+           * 次のノード定義（"Post {"）の開始を検出した時点で現在のノード定義を中断し、回復します。
+           * この場合、"User"ノードは無効としてスキップされ、"Post"ノードのパースに進みます。
+           * 公式Mermaid仕様に準拠し、閉じ括弧がないノードは無視します。
+           * 対応テストケース: "公式Mermaidでエラーになる壊れたノード定義は解析できない"
+           */
           break;
         }
         if (currentLine !== "") {
