@@ -7,14 +7,41 @@ const CARDINALITY_MAP: Record<string, string> = Object.fromEntries(
   Object.entries(ER_CARDINALITY_SYMBOLS).map(([k, v]) => [v, k])
 );
 
-// 正規表現パターン定数
-// 型名として許可する文字: 英字、数字、アンダースコア、丸括弧（例: varchar(255), int など）
-// 注意: カンマを含む型名（decimal(10,2)）は公式Mermaidでサポートされていないため除外
-// 複数属性（PK UK）も公式Mermaidでサポートされていないため、単一属性のみ対応
+/**
+ * 列定義の正規表現パターン
+ * @description 型名・カラム名・属性（PK/UK）の組み合わせをパースする
+ * @example "int id PK" → ["int id PK", "int", "id", "PK", ""]
+ * @restrictions
+ * - 型名: 英字、数字、アンダースコア、丸括弧のみ許可（例: varchar(255), int）
+ * - カンマを含む型名（decimal(10,2)）は公式Mermaidでサポートされていないため除外
+ * - 複数属性（PK UK）も公式Mermaidでサポートされていないため、単一属性のみ対応
+ */
 const COLUMN_PATTERN = /^([A-Za-z0-9_()]+)\s+([A-Za-z0-9_]+)\s*(PK|UK)?\s*$/; // [全体マッチ, 型名, カラム名, 属性]
-// エッジのカーディナリティ記号として公式でサポートされているもののみ許可
+/**
+ * エッジのカーディナリティ記号として公式でサポートされているもののみ許可する正規表現
+ * @description 公式Mermaid仕様に準拠したカーディナリティ記号のみをマッチさせる
+ * @example "User ||--o{ Post : has" → ["User ||--o{ Post : has", "User", "||--o{", "Post", " has"]
+ */
 const EDGE_PATTERN =
   /^(\w+)\s+(\|\|--\|\||\|\|--o\{|\}o--\|\||\}o--o\{|o\|--\|\||\|\|--o\|)\s+(\w+)\s*:(.*)$/; // [全体マッチ, source, cardinality, target, label]
+
+/**
+ * テーブル名・ラベル正規化用の正規表現パターン
+ * @description 先頭または末尾の不要な文字（空白・コロン・二重引用符）を除去する
+ * @example ' "User" : ' → 'User'
+ * @pattern ^[\s:"]+   - 文字列の先頭から空白・コロン・二重引用符のいずれかが1文字以上連続する部分
+ * @pattern |          - または
+ * @pattern [\s:"]+$   - 文字列の末尾で空白・コロン・二重引用符のいずれかが1文字以上連続する部分
+ * @pattern gフラグ    - グローバルに全ての該当箇所を対象
+ */
+const SANITIZE_PATTERN = /^[\s:"]+|[\s:"]+$/g;
+
+/**
+ * デフォルトのカーディナリティ
+ * @description 不正またはサポートされていないカーディナリティ記号の場合に使用されるフォールバック値
+ * @rationale 最も一般的なER関係である1対多（one-to-many）を既定値として使用
+ */
+const DEFAULT_CARDINALITY = "one-to-many";
 
 /**
  * テーブル名やラベルの正規化処理
@@ -23,12 +50,7 @@ const EDGE_PATTERN =
  * - 二重引用符: mermaid記法でクォートされた文字列の場合に除去
  */
 function sanitizeTableName(input: string): string {
-  // 先頭または末尾の空白・コロン・二重引用符を除去する正規表現
-  // ^[\s:"]+   : 文字列の先頭 (^) から空白 (\s)、コロン (:)、二重引用符 (") のいずれかが1文字以上 (+) 連続する部分をマッチ
-  // |          : または
-  // [\s:"]+$   : 文字列の末尾 ($) で空白 (\s)、コロン (:)、二重引用符 (") のいずれかが1文字以上 (+) 連続する部分をマッチ
-  // gフラグ    : グローバルに全ての該当箇所を対象
-  return input.replace(/^[\s:"]+|[\s:"]+$/g, "");
+  return input.replace(SANITIZE_PATTERN, "");
 }
 
 /**
@@ -49,14 +71,25 @@ export interface ParsedMermaidERData {
   edges: Edge[];
 }
 
+/**
+ * カラム定義文字列の配列をERColumn配列に変換
+ * @param lines カラム定義の文字列配列
+ * @returns パースされたERColumn配列
+ * @example ["int id PK", "varchar(255) name"] → [{name: "id", type: "int", pk: true, uk: false}, ...]
+ */
 function parseColumns(lines: string[]): ERColumn[] {
   return lines
     .map((line) => line.trim())
     .filter((l) => l && !l.startsWith("//"))
     .map((line) => {
-      // 型名・カラム名・属性の解析
-      // 型名として許可する文字: 英字、数字、アンダースコア、丸括弧（例: varchar(255), int など）
-      // 注意: カンマを含む型名（decimal(10,2)）や複数属性（PK UK）は公式Mermaidでサポートされていないため対応しない
+      /**
+       * 型名・カラム名・属性の解析
+       * @description 各行をCOLUMN_PATTERNでパースし、型名・カラム名・属性を抽出
+       * @example "int id PK" → type="int", name="id", attribute="PK"
+       * @restrictions
+       * - 型名: 英字、数字、アンダースコア、丸括弧のみ許可（例: varchar(255), int）
+       * - カンマを含む型名（decimal(10,2)）や複数属性（PK UK）は公式Mermaidでサポートされていないため対応しない
+       */
       const m = line.match(COLUMN_PATTERN);
       if (!m) return null;
       const [, type, name, attribute] = m;
@@ -139,14 +172,17 @@ export function convertMermaidToERData(mermaid: string): ParsedMermaidERData {
       continue;
     }
 
-    // エッジ定義
-    // 許可されるカーディナリティ記号パターン例:
-    // |o--o|, |o--|, |--|, }o--o{, }o--{, }--{, |--o|, |--o, o--o|, o--o, o--|, |--o, o--, --o, --|, --, etc.
-    // Mermaid ER図で使用されるカーディナリティ記号の詳細は ER_CARDINALITY_SYMBOLS を参照
+    /**
+     * エッジ定義の解析
+     * @description EDGE_PATTERNでカーディナリティ記号を含むエッジ定義をパース
+     * @example "User ||--o{ Post : has" → source="User", symbol="||--o{", target="Post", label=" has"
+     * @reference Mermaid ER図で使用されるカーディナリティ記号の詳細は ER_CARDINALITY_SYMBOLS を参照
+     * @fallback サポートされていない記号の場合はDEFAULT_CARDINALITY（one-to-many）を使用
+     */
     const edgeMatch = line.match(EDGE_PATTERN);
     if (edgeMatch) {
       const [, source, symbol, target, label] = edgeMatch;
-      const card = CARDINALITY_MAP[symbol.trim()] || "one-to-many";
+      const card = CARDINALITY_MAP[symbol.trim()] || DEFAULT_CARDINALITY;
       const cleanLabel = sanitizeTableName(label) || "relation";
 
       edges.push({
@@ -157,7 +193,12 @@ export function convertMermaidToERData(mermaid: string): ParsedMermaidERData {
         data: { label: cleanLabel, cardinality: card },
       });
 
-      // ノード定義がなければダミーノードを追加
+      /**
+       * ダミーノードの自動生成
+       * @description エッジ定義で参照されているが、ノード定義が存在しない場合に空のノードを生成
+       * @example "A ||--o{ B : rel" でAやBのノード定義がない場合、columns=[]のダミーノードを作成
+       * @rationale エッジが存在するがノードが未定義の場合でも、ReactFlowで表示できるようにするため
+       */
       if (!nodeNames.has(source)) {
         nodes.push({
           id: source,
