@@ -13,7 +13,9 @@ function parseColumns(lines: string[]): ERColumn[] {
     .filter((l) => l && !l.startsWith("//"))
     .map((line) => {
       // 型名・カラム名・属性
-      const m = line.match(/^([\w\d_(),]+)\s+([\w\d_]+)(.*)$/);
+      // 型名として許可する文字: 英字、数字、アンダースコア、丸括弧、カンマ（例: varchar(255), int, decimal(10,2) など）
+      // 必要に応じて許可文字を調整してください
+      const m = line.match(/^([A-Za-z0-9_(),]+)\s+([A-Za-z0-9_]+)(.*)$/);
       if (!m) return null;
       const [, type, name, attrs] = m;
       const pk = attrs?.includes("PK") || false;
@@ -87,6 +89,9 @@ export function convertMermaidToERData(mermaid: string): {
     }
 
     // エッジ定義
+    // 許可されるカーディナリティ記号パターン例:
+    // |o--o|, |o--|, |--|, }o--o{, }o--{, }--{, |--o|, |--o, o--o|, o--o, o--|, |--o, o--, --o, --|, --, etc.
+    // Mermaid ER図で使用されるカーディナリティ記号の詳細は ER_CARDINALITY_SYMBOLS を参照
     const edgeMatch = line.match(/^(\w+)\s+([|}o\-{]+)\s+(\w+)\s*:(.*)$/);
     if (edgeMatch) {
       const [, source, symbol, target, label] = edgeMatch;
@@ -96,6 +101,7 @@ export function convertMermaidToERData(mermaid: string): {
         type: "erEdge",
         source,
         target,
+        // Remove leading/trailing spaces, colons, and double quotes from the label
         data: { label: label?.replace(/^[\s:"]+|[\s:"]+$/g, "") || "relation", cardinality: card },
       });
 
