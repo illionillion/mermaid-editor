@@ -159,8 +159,9 @@ describe("PanelContent", () => {
       // メニューを開く
       const menuButton = screen.getByRole("button", { name: "コントリビューションメニュー" });
       await user.click(menuButton);
-      // メニュー内のリンクを取得
-      const githubLink = screen.getByRole("menuitem", { name: "リポジトリを見る" });
+
+      // メニューのアニメーション完了を待つ
+      const githubLink = await screen.findByRole("menuitem", { name: "リポジトリを見る" });
       expect(githubLink).toHaveAttribute("rel", "noopener noreferrer");
     });
   });
