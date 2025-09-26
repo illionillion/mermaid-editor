@@ -8,8 +8,13 @@ const CARDINALITY_MAP: Record<string, string> = Object.fromEntries(
 );
 
 // 正規表現パターン定数
-const COLUMN_PATTERN = /^([A-Za-z0-9_(),]+)\s+([A-Za-z0-9_]+)(.*)$/; // [型名, カラム名, 属性]
-const EDGE_PATTERN = /^(\w+)\s+([|}o\-{]+)\s+(\w+)\s*:(.*)$/; // [source, cardinality, target, label]
+// 型名として許可する文字: 英字、数字、アンダースコア、丸括弧（例: varchar(255), int など）
+// 注意: カンマを含む型名（decimal(10,2)）は公式Mermaidでサポートされていないため除外
+// 複数属性（PK UK）も公式Mermaidでサポートされていないため、単一属性のみ対応
+const COLUMN_PATTERN = /^([A-Za-z0-9_()]+)\s+([A-Za-z0-9_]+)\s*(PK|UK)?\s*$/; // [全体マッチ, 型名, カラム名, 属性]
+// エッジのカーディナリティ記号として公式でサポートされているもののみ許可
+const EDGE_PATTERN =
+  /^(\w+)\s+(\|\|--\|\||\|\|--o\{|\}o--\|\||\}o--o\{|o\|--\|\||\|\|--o\|)\s+(\w+)\s*:(.*)$/; // [全体マッチ, source, cardinality, target, label]
 
 /**
  * テーブル名やラベルの正規化処理
@@ -45,14 +50,13 @@ function parseColumns(lines: string[]): ERColumn[] {
     .filter((l) => l && !l.startsWith("//"))
     .map((line) => {
       // 型名・カラム名・属性の解析
-      // 型名として許可する文字: 英字、数字、アンダースコア、丸括弧、カンマ（例: varchar(255), int, decimal(10,2) など）
-      // 注意: 空白を含む型名（decimal(10, 2)など）はMermaid公式仕様でサポートされていないため対応しない
-      // 必要に応じて許可文字を調整してください
+      // 型名として許可する文字: 英字、数字、アンダースコア、丸括弧（例: varchar(255), int など）
+      // 注意: カンマを含む型名（decimal(10,2)）や複数属性（PK UK）は公式Mermaidでサポートされていないため対応しない
       const m = line.match(COLUMN_PATTERN);
       if (!m) return null;
-      const [, type, name, attrs] = m;
-      const pk = attrs?.includes("PK") || false;
-      const uk = attrs?.includes("UK") || false;
+      const [, type, name, attribute] = m;
+      const pk = attribute === "PK";
+      const uk = attribute === "UK";
       return { name, type, pk, uk };
     })
     .filter(Boolean) as ERColumn[];
@@ -91,14 +95,16 @@ export function convertMermaidToERData(mermaid: string): ParsedMermaidERData {
       i++; // { の次の行に進む
 
       // カラム定義をすべて収集
+      let foundClosingBrace = false;
       while (i < lines.length) {
         const currentLine = lines[i].trim();
         if (currentLine === "}") {
           i++; // } をスキップ
+          foundClosingBrace = true;
           break;
         }
         if (/^\w+\s*\{/.test(currentLine)) {
-          // 次のノード定義が始まった場合（}がない壊れた定義）
+          // 壊れた定義（閉じ括弧なしで次のノード定義が始まった場合）の検出と回復処理
           break;
         }
         if (currentLine !== "") {
@@ -107,13 +113,16 @@ export function convertMermaidToERData(mermaid: string): ParsedMermaidERData {
         i++;
       }
 
-      const columns = parseColumns(colLines);
-      nodes.push({
-        id: name,
-        name,
-        columns,
-      });
-      nodeNames.add(name);
+      // 閉じ括弧が見つかった場合のみノードを追加（公式Mermaid仕様に準拠）
+      if (foundClosingBrace) {
+        const columns = parseColumns(colLines);
+        nodes.push({
+          id: name,
+          name,
+          columns,
+        });
+        nodeNames.add(name);
+      }
       continue;
     }
 
