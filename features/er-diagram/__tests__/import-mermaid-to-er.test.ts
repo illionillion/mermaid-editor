@@ -149,7 +149,7 @@ describe("convertMermaidToERData", () => {
     );
   });
 
-  it("型名に空白やカッコを含む場合", () => {
+  it("型名にカッコやカンマを含む場合", () => {
     const mermaid = `erDiagram
   T {
     varchar(255) name

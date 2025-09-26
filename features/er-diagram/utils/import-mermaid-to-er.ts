@@ -101,7 +101,7 @@ export function convertMermaidToERData(mermaid: string): {
         type: "erEdge",
         source,
         target,
-        // Remove leading/trailing spaces, colons, and double quotes from the label
+        // ラベルの先頭・末尾の空白、コロン、二重引用符を削除
         data: { label: label?.replace(/^[\s:"]+|[\s:"]+$/g, "") || "relation", cardinality: card },
       });
 
