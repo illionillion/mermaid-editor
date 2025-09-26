@@ -9,14 +9,21 @@ const CARDINALITY_MAP: Record<string, string> = Object.fromEntries(
 
 /**
  * 列定義の正規表現パターン
- * @description 型名・カラム名・属性（PK/UK）の組み合わせをパースする
- * @example "int id PK" → ["int id PK", "int", "id", "PK", ""]
+ * @description 型名・カラム名・属性（PK/UK）の組み合わせをパースする正規表現です。
+ * @example
+ *   // "int id PK" の場合
+ *   // マッチ結果: ["int id PK", "int", "id", "PK"]
+ *   // "varchar(255) name" の場合
+ *   // マッチ結果: ["varchar(255) name", "varchar(255)", "name", undefined]
+ * @captureGroup 1 型名（英字、数字、アンダースコア、丸括弧のみ。例: varchar(255), int）
+ * @captureGroup 2 カラム名（英字、数字、アンダースコアのみ）
+ * @captureGroup 3 属性（"PK" または "UK"。省略可）
  * @restrictions
  * - 型名: 英字、数字、アンダースコア、丸括弧のみ許可（例: varchar(255), int）
  * - カンマを含む型名（decimal(10,2)）は公式Mermaidでサポートされていないため除外
  * - 複数属性（PK UK）も公式Mermaidでサポートされていないため、単一属性のみ対応
  */
-const COLUMN_PATTERN = /^([A-Za-z0-9_()]+)\s+([A-Za-z0-9_]+)\s*(PK|UK)?\s*$/; // [全体マッチ, 型名, カラム名, 属性]
+const COLUMN_PATTERN = /^([A-Za-z0-9_()]+)\s+([A-Za-z0-9_]+)\s*(PK|UK)?\s*$/;
 /**
  * エッジのカーディナリティ記号として公式でサポートされているもののみ許可する正規表現
  * @description 公式Mermaid仕様に準拠したカーディナリティ記号のみをマッチさせる
