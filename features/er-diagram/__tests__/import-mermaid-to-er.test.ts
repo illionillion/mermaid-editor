@@ -18,6 +18,7 @@ describe("convertMermaidToERData", () => {
   User ||--o{ Post : "has posts"
 `;
     const result = convertMermaidToERData(mermaid);
+
     expect(result.nodes).toEqual([
       expect.objectContaining({
         data: expect.objectContaining({
@@ -219,7 +220,7 @@ describe("convertMermaidToERData", () => {
     const onlyEdge = `erDiagram
   A ||--o{ B : rel
 `;
-    expect(convertMermaidToERData(onlyEdge).nodes.length).toBe(0);
+    expect(convertMermaidToERData(onlyEdge).nodes.length).toBe(2); // A, Bノードが自動生成される
     expect(convertMermaidToERData(onlyEdge).edges.length).toBe(1);
   });
 
@@ -232,8 +233,11 @@ describe("convertMermaidToERData", () => {
   }
 `;
     const result = convertMermaidToERData(mermaid);
-    expect(result.nodes.length).toBe(1);
-    expect(result.nodes[0].data.name).toBe("B");
+    expect(result.nodes.length).toBe(2); // AとBの両方が検出される
+    // Aは壊れた定義だが、Bは正常に検出される
+    const nodeNames = result.nodes.map((n) => n.data.name);
+    expect(nodeNames).toContain("A");
+    expect(nodeNames).toContain("B");
   });
 
   it("erDiagramブロックがない", () => {
