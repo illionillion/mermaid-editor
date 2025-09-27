@@ -30,7 +30,7 @@ const COLUMN_PATTERN = /^([A-Za-z0-9_()]+)\s+([A-Za-z0-9_]+)\s*(PK|UK)?\s*$/;
  * @example "User ||--o{ Post : has" → ["User ||--o{ Post : has", "User", "||--o{", "Post", " has"]
  */
 const EDGE_PATTERN =
-  /^(\w+)\s+(\|\|--\|\||\|\|--o\{|\}o--\|\||\}o--o\{|o\|--\|\||\|\|--o\|)\s+(\w+)\s*:(.*)$/; // [全体マッチ, source, cardinality, target, label]
+  /^(\w+)\s+(\|\|--\|\||\|\|--o\{|\}o--\|\||\}o--o\{|o\|--\|\||\|\|--o\||\|\|--\|\{)\s+(\w+)\s*:(.*)$/; // [全体マッチ, source, cardinality, target, label]
 
 /**
  * テーブル名・ラベル正規化用の正規表現パターン
@@ -114,6 +114,7 @@ export function convertMermaidToERData(mermaid: string): ParsedMermaidERData {
   const nodes: ParsedERTableData[] = [];
   const nodeNames: Set<string> = new Set();
   const edges: Edge[] = [];
+  let edgeCounter = 0; // エッジのユニークID生成用カウンター
 
   let i = 0;
   // erDiagramヘッダー行をスキップ
@@ -193,7 +194,7 @@ export function convertMermaidToERData(mermaid: string): ParsedMermaidERData {
       const cleanLabel = sanitizeTableName(label) || "relation";
 
       edges.push({
-        id: `${source}-${target}`,
+        id: `edge-${edgeCounter++}`, // ユニークなIDを生成
         type: "erEdge",
         source,
         target,

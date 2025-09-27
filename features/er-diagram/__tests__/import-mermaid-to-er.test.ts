@@ -284,6 +284,65 @@ A-->B
     expect(convertMermaidToERData("this is not mermaid")).toEqual({ nodes: [], edges: [] });
     expect(convertMermaidToERData("1234567890!@#$%^&*()")).toEqual({ nodes: [], edges: [] });
   });
+
+  it("複数エッジが正しく処理される（同じテーブル間の複数リレーション）", () => {
+    const mermaidWithMultipleEdges = `erDiagram
+    CUSTOMER ||--o{ ORDER : places
+    ORDER ||--|{ ORDER_ITEM : contains
+    PRODUCT ||--o{ ORDER_ITEM : includes
+    CUSTOMER {
+        string id
+        string name
+        string email
+    }
+    ORDER {
+        string id
+        date orderDate
+        string status
+    }
+    PRODUCT {
+        string id
+        string name
+        float price
+    }
+    ORDER_ITEM {
+        int quantity
+        float price
+    }
+`;
+
+    const result = convertMermaidToERData(mermaidWithMultipleEdges);
+
+    // 4つのユニークなテーブルが正しくパースされること（重複排除後）
+    const uniqueNodeNames = new Set(result.nodes.map((n) => n.name));
+    expect(uniqueNodeNames.size).toBe(4);
+    expect(Array.from(uniqueNodeNames)).toEqual(
+      expect.arrayContaining(["CUSTOMER", "ORDER", "PRODUCT", "ORDER_ITEM"])
+    );
+
+    // 3つのエッジが全て作成されること（重複や上書きがないこと）
+    expect(result.edges).toHaveLength(3);
+
+    // 各エッジのsource, target, labelが正しいこと
+    const edgeRelations = result.edges.map((e) => ({
+      source: e.source,
+      target: e.target,
+      label: e.data?.label,
+    }));
+
+    expect(edgeRelations).toEqual(
+      expect.arrayContaining([
+        { source: "CUSTOMER", target: "ORDER", label: "places" },
+        { source: "ORDER", target: "ORDER_ITEM", label: "contains" },
+        { source: "PRODUCT", target: "ORDER_ITEM", label: "includes" },
+      ])
+    );
+
+    // エッジIDがユニークであること
+    const edgeIds = result.edges.map((e) => e.id);
+    const uniqueIds = new Set(edgeIds);
+    expect(uniqueIds.size).toBe(edgeIds.length); // 重複がないことを確認
+  });
 });
 
 describe("convertParsedDataToNodes", () => {
