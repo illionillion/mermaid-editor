@@ -60,16 +60,16 @@ export const ERDiagramPanel: FC<ERDiagramPanelProps> = ({
             <Button startIcon={<PlusIcon />} colorScheme="blue" size="sm" onClick={onAddTable}>
               テーブル追加
             </Button>
+            <Button startIcon={<DownloadIcon />} colorScheme="green" size="sm" onClick={setOpen.on}>
+              mermaidコード出力
+            </Button>
             <Button
               startIcon={<UploadIcon />}
-              colorScheme="orange"
+              colorScheme="purple"
               size="sm"
               onClick={setOpenImport.on}
             >
               mermaidインポート
-            </Button>
-            <Button startIcon={<DownloadIcon />} colorScheme="green" size="sm" onClick={setOpen.on}>
-              mermaidコード出力
             </Button>
           </HStack>
         </VStack>
