@@ -162,8 +162,8 @@ describe("convertMermaidToERData", () => {
     );
   });
 
-  it("公式Mermaidでサポートされていない型名（decimal形式）は解析できない", () => {
-    // 実際のMermaidツールでdecimal(10,2)はエラーになるため、このプロジェクトでも対応しない
+  it("コンマを含む型名（decimal形式など）を正しく解析できる", () => {
+    // decimal(10,2)などコンマを含む型名もサポートする
     const mermaidWithDecimal = `erDiagram
   T {
     varchar(255) name
@@ -172,12 +172,12 @@ describe("convertMermaidToERData", () => {
 `;
     const result = convertMermaidToERData(mermaidWithDecimal);
     const t = result.nodes.find((n) => n.name === "T");
-    // decimal(10,2)行は正規表現にマッチせず、無視される
+    // decimal(10,2)行も正しく解析される
     expect(t?.columns).toEqual([
       expect.objectContaining({ name: "name", type: "varchar(255)" }),
-      // priceは解析されない（正規表現にマッチしないため）
+      expect.objectContaining({ name: "price", type: "decimal(10,2)" }),
     ]);
-    expect(t?.columns?.length).toBe(1); // nameのみ
+    expect(t?.columns?.length).toBe(2); // name と price 両方
   });
 
   it("公式Mermaidでサポートされていない複数属性（PK UK）は解析できない", () => {
