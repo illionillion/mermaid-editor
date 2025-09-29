@@ -18,9 +18,10 @@ const COLUMN_PATTERN = /^([A-Za-z0-9_()]+)\s+([A-Za-z0-9_]+)(?:\s+(PK|UK))?$/;
  * エッジのカーディナリティ記号として公式でサポートされているもののみ許可する正規表現
  * @description 公式Mermaid仕様に準拠したカーディナリティ記号のみをマッチさせる
  * @example "User ||--o{ Post : has" → ["User ||--o{ Post : has", "User", "||--o{", "Post", " has"]
+ * @example "LINE-ITEM ||--o{ ORDER : belongs" → ハイフンを含むテーブル名もサポート
  */
 const EDGE_PATTERN =
-  /^(\w+)\s+(\|\|--\|\||\|\|--o\{|\}o--\|\||\}o--o\{|o\|--\|\||\|\|--o\||\|\|--\|\{)\s+(\w+)\s*:(.*)$/; // [全体マッチ, source, cardinality, target, label]
+  /^([\w-]+)\s+(\|\|--\|\||\|\|--o\{|\}o--\|\||\}o--o\{|o\|--\|\||\|\|--o\||\|\|--\|\{)\s+([\w-]+)\s*:(.*)$/; // [全体マッチ, source, cardinality, target, label]
 
 /**
  * テーブル名・ラベル正規化用の正規表現パターン
@@ -118,9 +119,9 @@ export function convertMermaidToERData(mermaid: string): ParsedMermaidERData {
       continue;
     }
 
-    // ノード定義
-    if (/^\w+\s*\{/.test(line)) {
-      const nameMatch = line.match(/^(\w+)\s*\{/);
+    // ノード定義（ハイフンを含むテーブル名もサポート：LINE-ITEM, DELIVERY-ADDRESS等）
+    if (/^[\w-]+\s*\{/.test(line)) {
+      const nameMatch = line.match(/^([\w-]+)\s*\{/);
       if (!nameMatch) {
         i++;
         continue;
@@ -139,7 +140,7 @@ export function convertMermaidToERData(mermaid: string): ParsedMermaidERData {
           foundClosingBrace = true;
           break;
         }
-        if (/^\w+\s*\{/.test(currentLine)) {
+        if (/^[\w-]+\s*\{/.test(currentLine)) {
           /**
            * エラー回復シナリオ:
            * 例: "User { id int Post { id int }"

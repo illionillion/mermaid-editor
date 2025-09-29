@@ -430,4 +430,49 @@ describe("convertParsedDataToNodes", () => {
     result[0].data.onColumnsChange(newColumns);
     expect(mockHandlers.onColumnsChange).toHaveBeenCalledWith("Test", newColumns);
   });
+
+  it("ハイフンを含むテーブル名（LINE-ITEM, DELIVERY-ADDRESS等）を正しく解析できる", () => {
+    const mermaidWithHyphens = `erDiagram
+    ORDER {
+        int orderID PK
+        string orderNumber
+        string customerID
+    }
+    LINE-ITEM {
+        string productCode
+        int quantity
+        float pricePerUnit
+    }
+    DELIVERY-ADDRESS {
+        string street
+        string city
+        string state
+        int zip
+    }
+    ORDER ||--|{ LINE-ITEM : contains
+    ORDER }o--o{ DELIVERY-ADDRESS : uses
+`;
+    const result = convertMermaidToERData(mermaidWithHyphens);
+
+    // 3つのテーブルが正しく解析されることを確認
+    expect(result.nodes.length).toBe(3);
+    expect(result.nodes.map((n) => n.name)).toEqual(
+      expect.arrayContaining(["ORDER", "LINE-ITEM", "DELIVERY-ADDRESS"])
+    );
+
+    // LINE-ITEMテーブルの内容確認
+    const lineItem = result.nodes.find((n) => n.name === "LINE-ITEM");
+    expect(lineItem?.columns).toEqual([
+      expect.objectContaining({ name: "productCode", type: "string" }),
+      expect.objectContaining({ name: "quantity", type: "int" }),
+      expect.objectContaining({ name: "pricePerUnit", type: "float" }),
+    ]);
+
+    // エッジの確認
+    expect(result.edges.length).toBe(2);
+    const edgeSources = result.edges.map((e) => e.source);
+    const edgeTargets = result.edges.map((e) => e.target);
+    expect(edgeSources).toEqual(expect.arrayContaining(["ORDER", "ORDER"]));
+    expect(edgeTargets).toEqual(expect.arrayContaining(["LINE-ITEM", "DELIVERY-ADDRESS"]));
+  });
 });
