@@ -9,9 +9,19 @@ const CARDINALITY_MAP: Record<string, string> = Object.fromEntries(
 
 /**
  * カラム定義の正規表現パターン
- * 形式: 型名 カラム名 [属性]
- * 例: varchar(255) name PK, int id UK
- * 型名にはカッコを含むことができるが、コンマは公式Mermaidでエラーとなるため非対応
+ * @description 型名・カラム名・属性（PK/UK）の組み合わせをパースする正規表現です。
+ * @example
+ *   // "int id PK" の場合
+ *   // マッチ結果: ["int id PK", "int", "id", "PK"]
+ *   // "varchar(255) name" の場合
+ *   // マッチ結果: ["varchar(255) name", "varchar(255)", "name", undefined]
+ * @captureGroup 1 型名（英字、数字、アンダースコア、丸括弧のみ。例: varchar(255), int）
+ * @captureGroup 2 カラム名（英字、数字、アンダースコアのみ）
+ * @captureGroup 3 属性（"PK" または "UK"。省略可）
+ * @restrictions
+ * - 型名: 英字、数字、アンダースコア、丸括弧のみ許可（例: varchar(255), int）
+ * - カンマを含む型名（decimal(10,2)）は公式Mermaidでサポートされていないため除外
+ * - 複数属性（PK UK）も公式Mermaidでサポートされていないため、単一属性のみ対応
  */
 const COLUMN_PATTERN = /^([A-Za-z0-9_()]+)\s+([A-Za-z0-9_]+)(?:\s+(PK|UK))?$/;
 /**
@@ -19,9 +29,18 @@ const COLUMN_PATTERN = /^([A-Za-z0-9_()]+)\s+([A-Za-z0-9_]+)(?:\s+(PK|UK))?$/;
  * @description 公式Mermaid仕様に準拠したカーディナリティ記号のみをマッチさせる
  * @example "User ||--o{ Post : has" → ["User ||--o{ Post : has", "User", "||--o{", "Post", " has"]
  * @example "LINE-ITEM ||--o{ ORDER : belongs" → ハイフンを含むテーブル名もサポート
+ * @captureGroup 1 ソーステーブル名（英字・数字・アンダースコア・ハイフンのみ）
+ * @captureGroup 2 カーディナリティ記号（7種類の公式記法）
+ * @captureGroup 3 ターゲットテーブル名（英字・数字・アンダースコア・ハイフンのみ）
+ * @captureGroup 4 リレーションラベル（コロン以降の任意文字列）
+ * @restrictions
+ * - テーブル名: 英字、数字、アンダースコア、ハイフンのみ許可（例: USER, LINE-ITEM）
+ * - カーディナリティ記号: 公式Mermaidでサポートされる7種類のみ対応
+ *   ||--|| (one-to-one), ||--o{ (one-to-many), }o--|| (many-to-one), }o--o{ (many-to-many),
+ *   o|--|| (zero-to-one), ||--o| (one-to-zero), ||--|{ (one-to-many-mandatory)
  */
 const EDGE_PATTERN =
-  /^([\w-]+)\s+(\|\|--\|\||\|\|--o\{|\}o--\|\||\}o--o\{|o\|--\|\||\|\|--o\||\|\|--\|\{)\s+([\w-]+)\s*:(.*)$/; // [全体マッチ, source, cardinality, target, label]
+  /^([\w-]+)\s+(\|\|--\|\||\|\|--o\{|\}o--\|\||\}o--o\{|o\|--\|\||\|\|--o\||\|\|--\|\{)\s+([\w-]+)\s*:(.*)$/;
 
 /**
  * テーブル名・ラベル正規化用の正規表現パターン
