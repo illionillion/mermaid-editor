@@ -1,3 +1,4 @@
+import type { Edge } from "@xyflow/react";
 import { describe, it, expect, vi } from "vitest";
 import { convertMermaidToERData, convertParsedDataToNodes } from "../utils/import-mermaid-to-er";
 
@@ -371,13 +372,23 @@ describe("convertParsedDataToNodes", () => {
       onColumnsChange: vi.fn(),
     };
 
-    const result = convertParsedDataToNodes(parsedData, mockHandlers);
+    const mockEdges = [
+      {
+        id: "edge-1",
+        type: "erEdge",
+        source: "User",
+        target: "Post",
+        data: { label: "has", cardinality: "one-to-many" },
+      },
+    ];
+
+    const result = convertParsedDataToNodes(parsedData, mockEdges, mockHandlers);
 
     expect(result).toHaveLength(2);
     expect(result[0]).toEqual({
       id: "User",
       type: "erTable",
-      position: { x: 0, y: 0 },
+      position: expect.objectContaining({ x: expect.any(Number), y: expect.any(Number) }),
       data: {
         name: "User",
         columns: [
@@ -392,7 +403,7 @@ describe("convertParsedDataToNodes", () => {
     expect(result[1]).toEqual({
       id: "Post",
       type: "erTable",
-      position: { x: 300, y: 0 },
+      position: expect.objectContaining({ x: expect.any(Number), y: expect.any(Number) }),
       data: {
         name: "Post",
         columns: [
@@ -419,7 +430,9 @@ describe("convertParsedDataToNodes", () => {
       onColumnsChange: vi.fn(),
     };
 
-    const result = convertParsedDataToNodes(parsedData, mockHandlers);
+    const mockEdges: Edge[] = [];
+
+    const result = convertParsedDataToNodes(parsedData, mockEdges, mockHandlers);
 
     // onNameChangeハンドラーをテスト
     result[0].data.onNameChange("NewName");

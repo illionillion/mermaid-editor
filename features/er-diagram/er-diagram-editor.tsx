@@ -140,7 +140,7 @@ export const ERDiagramEditor: FC = () => {
   const handleImportMermaid = useCallback(
     (data: ParsedMermaidERData) => {
       // ノードとエッジをクリアしてからインポートデータを設定
-      const importedNodes = convertParsedDataToNodes(data.nodes, {
+      const importedNodes = convertParsedDataToNodes(data.nodes, data.edges, {
         onNameChange: (nodeId: string, newName: string) => {
           setNodes((nds) =>
             nds.map((n) => (n.id === nodeId ? { ...n, data: { ...n.data, name: newName } } : n))
