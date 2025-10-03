@@ -13,6 +13,7 @@ export default {
 export const Default = () => (
   <ERDiagramPanel
     onAddTable={() => alert("テーブル追加")}
+    onImportMermaid={() => alert("Mermaidインポート")}
     nodes={dummyNodes}
     edges={dummyEdges}
     generateCode={dummyGenerateCode}
