@@ -20,6 +20,7 @@ describe("ERDiagramPanel", () => {
         nodes={dummyNodes}
         edges={dummyEdges}
         generateCode={dummyGenerateCode}
+        onImportMermaid={() => {}}
       />
     );
     expect(screen.getByText("Mermaid ER図エディター")).toBeInTheDocument();
@@ -34,6 +35,7 @@ describe("ERDiagramPanel", () => {
         nodes={dummyNodes}
         edges={dummyEdges}
         generateCode={dummyGenerateCode}
+        onImportMermaid={() => {}}
       />
     );
     await userEvent.click(screen.getByRole("button", { name: /テーブル追加/ }));

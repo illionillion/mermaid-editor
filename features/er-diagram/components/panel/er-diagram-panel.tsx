@@ -1,14 +1,17 @@
 import type { Node, Edge } from "@xyflow/react";
 import { Panel } from "@xyflow/react";
-import { PlusIcon, DownloadIcon } from "@yamada-ui/lucide";
+import { PlusIcon, DownloadIcon, UploadIcon } from "@yamada-ui/lucide";
 import type { FC } from "@yamada-ui/react";
 import { VStack, HStack, Text, Button, useBoolean } from "@yamada-ui/react";
 import { NavigationMenu } from "@/components/ui";
+import type { ParsedMermaidERData } from "../../utils/import-mermaid-to-er";
+import { ImportModal } from "../mermaid/import-modal";
 import type { ERTableNodeProps } from "../node/er-table-node";
 import { ERDiagramMermaidModal } from "./er-diagram-mermaid-modal";
 
 export type ERDiagramPanelProps = {
   onAddTable: () => void;
+  onImportMermaid: (data: ParsedMermaidERData) => void;
   nodes: Node<ERTableNodeProps>[];
   edges: Edge[];
   generateCode: (nodes: Node<ERTableNodeProps>[], edges: Edge[]) => string;
@@ -16,11 +19,13 @@ export type ERDiagramPanelProps = {
 
 export const ERDiagramPanel: FC<ERDiagramPanelProps> = ({
   onAddTable,
+  onImportMermaid,
   nodes,
   edges,
   generateCode,
 }) => {
   const [open, setOpen] = useBoolean(false);
+  const [openImport, setOpenImport] = useBoolean(false);
   const code = generateCode(nodes, edges);
 
   const handleDownload = () => {
@@ -58,6 +63,14 @@ export const ERDiagramPanel: FC<ERDiagramPanelProps> = ({
             <Button startIcon={<DownloadIcon />} colorScheme="green" size="sm" onClick={setOpen.on}>
               mermaidコード出力
             </Button>
+            <Button
+              startIcon={<UploadIcon />}
+              colorScheme="purple"
+              size="sm"
+              onClick={setOpenImport.on}
+            >
+              mermaidインポート
+            </Button>
           </HStack>
         </VStack>
       </VStack>
@@ -67,6 +80,7 @@ export const ERDiagramPanel: FC<ERDiagramPanelProps> = ({
         code={code}
         onDownload={handleDownload}
       />
+      <ImportModal open={openImport} onClose={setOpenImport.off} onImport={onImportMermaid} />
     </Panel>
   );
 };

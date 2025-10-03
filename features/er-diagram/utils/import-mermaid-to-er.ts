@@ -8,7 +8,7 @@ const CARDINALITY_MAP: Record<string, string> = Object.fromEntries(
 );
 
 /**
- * 列定義の正規表現パターン
+ * カラム定義の正規表現パターン
  * @description 型名・カラム名・属性（PK/UK）の組み合わせをパースする正規表現です。
  * @example
  *   // "int id PK" の場合
@@ -23,14 +23,24 @@ const CARDINALITY_MAP: Record<string, string> = Object.fromEntries(
  * - カンマを含む型名（decimal(10,2)）は公式Mermaidでサポートされていないため除外
  * - 複数属性（PK UK）も公式Mermaidでサポートされていないため、単一属性のみ対応
  */
-const COLUMN_PATTERN = /^([A-Za-z0-9_()]+)\s+([A-Za-z0-9_]+)\s*(PK|UK)?\s*$/;
+const COLUMN_PATTERN = /^([A-Za-z0-9_()]+)\s+([A-Za-z0-9_]+)(?:\s+(PK|UK))?$/;
 /**
  * エッジのカーディナリティ記号として公式でサポートされているもののみ許可する正規表現
  * @description 公式Mermaid仕様に準拠したカーディナリティ記号のみをマッチさせる
  * @example "User ||--o{ Post : has" → ["User ||--o{ Post : has", "User", "||--o{", "Post", " has"]
+ * @example "LINE-ITEM ||--o{ ORDER : belongs" → ハイフンを含むテーブル名もサポート
+ * @captureGroup 1 ソーステーブル名（英字・数字・アンダースコア・ハイフンのみ）
+ * @captureGroup 2 カーディナリティ記号（7種類の公式記法）
+ * @captureGroup 3 ターゲットテーブル名（英字・数字・アンダースコア・ハイフンのみ）
+ * @captureGroup 4 リレーションラベル（コロン以降の任意文字列）
+ * @restrictions
+ * - テーブル名: 英字、数字、アンダースコア、ハイフンのみ許可（例: USER, LINE-ITEM）
+ * - カーディナリティ記号: 公式Mermaidでサポートされる7種類のみ対応
+ *   ||--|| (one-to-one), ||--o{ (one-to-many), }o--|| (many-to-one), }o--o{ (many-to-many),
+ *   o|--|| (zero-to-one), ||--o| (one-to-zero), ||--|{ (one-to-many-mandatory)
  */
 const EDGE_PATTERN =
-  /^(\w+)\s+(\|\|--\|\||\|\|--o\{|\}o--\|\||\}o--o\{|o\|--\|\||\|\|--o\|)\s+(\w+)\s*:(.*)$/; // [全体マッチ, source, cardinality, target, label]
+  /^([\w-]+)\s+(\|\|--\|\||\|\|--o\{|\}o--\|\||\}o--o\{|o\|--\|\||\|\|--o\||\|\|--\|\{)\s+([\w-]+)\s*:(.*)$/;
 
 /**
  * テーブル名・ラベル正規化用の正規表現パターン
@@ -114,6 +124,7 @@ export function convertMermaidToERData(mermaid: string): ParsedMermaidERData {
   const nodes: ParsedERTableData[] = [];
   const nodeNames: Set<string> = new Set();
   const edges: Edge[] = [];
+  let edgeCounter = 0; // エッジのユニークID生成用カウンター
 
   let i = 0;
   // erDiagramヘッダー行をスキップ
@@ -127,9 +138,9 @@ export function convertMermaidToERData(mermaid: string): ParsedMermaidERData {
       continue;
     }
 
-    // ノード定義
-    if (/^\w+\s*\{/.test(line)) {
-      const nameMatch = line.match(/^(\w+)\s*\{/);
+    // ノード定義（ハイフンを含むテーブル名もサポート：LINE-ITEM, DELIVERY-ADDRESS等）
+    if (/^[\w-]+\s*\{/.test(line)) {
+      const nameMatch = line.match(/^([\w-]+)\s*\{/);
       if (!nameMatch) {
         i++;
         continue;
@@ -148,7 +159,7 @@ export function convertMermaidToERData(mermaid: string): ParsedMermaidERData {
           foundClosingBrace = true;
           break;
         }
-        if (/^\w+\s*\{/.test(currentLine)) {
+        if (/^[\w-]+\s*\{/.test(currentLine)) {
           /**
            * エラー回復シナリオ:
            * 例: "User { id int Post { id int }"
@@ -193,7 +204,7 @@ export function convertMermaidToERData(mermaid: string): ParsedMermaidERData {
       const cleanLabel = sanitizeTableName(label) || "relation";
 
       edges.push({
-        id: `${source}-${target}`,
+        id: `edge-${edgeCounter++}`, // ユニークなIDを生成
         type: "erEdge",
         source,
         target,
@@ -229,21 +240,110 @@ export function convertMermaidToERData(mermaid: string): ParsedMermaidERData {
   return { nodes, edges };
 }
 
+// ER図レイアウト定数（flowchartを参考、テーブルサイズに合わせて調整）
+const ER_LAYOUT_CONSTANTS = {
+  LEVEL_HEIGHT: 280, // テーブル間の縦間隔（テーブルの高さを考慮して拡大）
+  TABLE_SPACING: 450, // 同レベル内のテーブル間隔（横方向、テーブルの幅を考慮して拡大）
+  CENTER_OFFSET: 500, // 中央揃えのためのオフセット（全体の余裕を増加）
+  VERTICAL_OFFSET: 100, // 上部からの初期オフセット（少し余裕を追加）
+} as const;
+
 /**
  * ParsedERTableDataをReactFlowのNode型に変換するヘルパー関数
- * flowchartのhandleImportMermaidと同じ設計パターン
+ * flowchartのhandleImportMermaidと同じ設計パターン + 自動レイアウト機能
  */
 export function convertParsedDataToNodes(
   parsedData: ParsedERTableData[],
+  edges: Edge[],
   handlers: {
     onNameChange: (nodeId: string, newName: string) => void;
     onColumnsChange: (nodeId: string, newColumns: ERColumn[]) => void;
   }
 ): Node<ERTableNodeProps>[] {
-  return parsedData.map((parsedNode, index) => ({
+  /**
+   * テーブルの階層構造を分析してレイアウトを決定
+   * @description エッジの関係から各テーブルの階層レベルを計算し、適切な位置に配置
+   * @example ルートテーブル（参照されないテーブル）はレベル0、それを参照するテーブルはレベル1...
+   */
+  const layoutTables = (
+    tables: ParsedERTableData[],
+    edges: Edge[]
+  ): Map<string, { x: number; y: number }> => {
+    const levels = new Map<string, number>();
+
+    // 全テーブルを初期化（レベル0）
+    tables.forEach((table) => {
+      levels.set(table.id, 0);
+    });
+
+    // エッジを分析して階層を決定
+    const hasIncomingEdge = new Set<string>();
+    edges.forEach((edge) => {
+      hasIncomingEdge.add(edge.target);
+    });
+
+    // ルートテーブル（他から参照されないテーブル）をレベル0に設定
+    const rootTables = tables.filter((table) => !hasIncomingEdge.has(table.id));
+    if (rootTables.length === 0 && tables.length > 0) {
+      // 循環参照などでルートが特定できない場合は最初のテーブルをルートとする
+      levels.set(tables[0].id, 0);
+    }
+
+    // BFSで階層を計算
+    const queue: string[] = rootTables.map((table) => table.id);
+    const visited = new Set<string>();
+
+    while (queue.length > 0) {
+      const current = queue.shift()!;
+      if (visited.has(current)) continue;
+      visited.add(current);
+
+      const currentLevel = levels.get(current) || 0;
+
+      // 現在のテーブルから出る全てのエッジを探す
+      edges.forEach((edge) => {
+        if (edge.source === current && !visited.has(edge.target)) {
+          const newLevel = currentLevel + 1;
+          const existingLevel = levels.get(edge.target) || 0;
+          levels.set(edge.target, Math.max(existingLevel, newLevel));
+          queue.push(edge.target);
+        }
+      });
+    }
+
+    // レベルごとにテーブルをグループ化
+    const tablesByLevel = new Map<number, string[]>();
+    levels.forEach((level, tableId) => {
+      if (!tablesByLevel.has(level)) {
+        tablesByLevel.set(level, []);
+      }
+      tablesByLevel.get(level)!.push(tableId);
+    });
+
+    // 位置を計算
+    const positions = new Map<string, { x: number; y: number }>();
+
+    tablesByLevel.forEach((tableIds, level) => {
+      const levelWidth = tableIds.length * ER_LAYOUT_CONSTANTS.TABLE_SPACING;
+      const startX = -levelWidth / 2; // 中央揃え
+
+      tableIds.forEach((tableId, index) => {
+        positions.set(tableId, {
+          x: startX + index * ER_LAYOUT_CONSTANTS.TABLE_SPACING + ER_LAYOUT_CONSTANTS.CENTER_OFFSET,
+          y: level * ER_LAYOUT_CONSTANTS.LEVEL_HEIGHT + ER_LAYOUT_CONSTANTS.VERTICAL_OFFSET,
+        });
+      });
+    });
+
+    return positions;
+  };
+
+  const positions = layoutTables(parsedData, edges);
+
+  return parsedData.map((parsedNode) => ({
     id: parsedNode.id,
     type: "erTable",
-    position: { x: index * 300, y: 0 }, // 簡単なレイアウト
+    position: positions.get(parsedNode.id) || { x: 400, y: 80 }, // フォールバック位置
     data: {
       name: parsedNode.name,
       columns: parsedNode.columns,

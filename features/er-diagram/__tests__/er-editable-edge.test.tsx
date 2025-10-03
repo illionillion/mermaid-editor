@@ -32,9 +32,9 @@ describe("ErEditableEdge", () => {
     // カーディナリティボタンをラベルで直接取得
     const menuButton = screen.getByRole("button", { name: "1...1" });
     fireEvent.click(menuButton);
-    // メニューと目的のアイテムをシンプルに取得
+    // メニューと目的のアイテムをシンプルに取得（重複しないラベルを選択）
     const menu = screen.getByRole("menu", { hidden: true });
-    const menuItem = within(menu).getByText(/1\.\.\.\*/);
+    const menuItem = within(menu).getByText(/1\.\.\.\+/);
     fireEvent.click(menuItem);
     expect(baseProps.onCardinalityChange).toHaveBeenCalled();
   });

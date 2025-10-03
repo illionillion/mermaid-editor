@@ -25,6 +25,8 @@ import {
   parseConnectingNodeId,
 } from "./hooks/er-diagram-helpers";
 import { generateERDiagramMermaidCode } from "./utils/generate-mermaid-code";
+import { convertParsedDataToNodes } from "./utils/import-mermaid-to-er";
+import type { ParsedMermaidERData } from "./utils/import-mermaid-to-er";
 
 const nodeTypes = {
   erTable: ERTableNode,
@@ -133,6 +135,36 @@ export const ERDiagramEditor: FC = () => {
     setNodes((nds) => [...nds, newNode]);
     setNodeId((id) => id + 1);
   }, [nodeId, setNodes]);
+
+  // Mermaidインポート処理
+  const handleImportMermaid = useCallback(
+    (data: ParsedMermaidERData) => {
+      // ノードとエッジをクリアしてからインポートデータを設定
+      const importedNodes = convertParsedDataToNodes(data.nodes, data.edges, {
+        onNameChange: (nodeId: string, newName: string) => {
+          setNodes((nds) =>
+            nds.map((n) => (n.id === nodeId ? { ...n, data: { ...n.data, name: newName } } : n))
+          );
+        },
+        onColumnsChange: (nodeId: string, newColumns: ERColumn[]) => {
+          setNodes((nds) =>
+            nds.map((n) =>
+              n.id === nodeId ? { ...n, data: { ...n.data, columns: newColumns } } : n
+            )
+          );
+        },
+      });
+
+      setNodes(importedNodes);
+      setEdges(data.edges);
+
+      // 次のノードIDを更新（重複を避けるため）
+      const maxId = Math.max(...importedNodes.map((n) => parseInt(n.id, 10) || 0));
+      setNodeId(maxId + 1);
+    },
+    [setNodes, setEdges]
+  );
+
   // エッジからノード作成
   const onConnectStart = useCallback(
     (_: MouseEvent | TouchEvent | null, params: OnConnectStartParams) => {
@@ -203,7 +235,7 @@ export const ERDiagramEditor: FC = () => {
       setNodeId((id) => id + 1);
       connectingNodeId.current = null;
     },
-    [nodeId, setNodes, setEdges, screenToFlowPosition, nodes]
+    [nodeId, setNodes, setEdges, screenToFlowPosition, nodes, nodeWidth]
   );
 
   // flowchartと同じonConnect: 既存ノード同士が繋がった場合はconnectingNodeId.current = 'connected'を必ずセット
@@ -279,6 +311,7 @@ export const ERDiagramEditor: FC = () => {
         <FlowLayout>
           <ERDiagramPanel
             onAddTable={handleAddTable}
+            onImportMermaid={handleImportMermaid}
             nodes={nodes}
             edges={edges}
             generateCode={generateERDiagramMermaidCode}

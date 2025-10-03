@@ -1,3 +1,4 @@
+import type { Edge } from "@xyflow/react";
 import { describe, it, expect, vi } from "vitest";
 import { convertMermaidToERData, convertParsedDataToNodes } from "../utils/import-mermaid-to-er";
 
@@ -284,6 +285,65 @@ A-->B
     expect(convertMermaidToERData("this is not mermaid")).toEqual({ nodes: [], edges: [] });
     expect(convertMermaidToERData("1234567890!@#$%^&*()")).toEqual({ nodes: [], edges: [] });
   });
+
+  it("複数エッジが正しく処理される（同じテーブル間の複数リレーション）", () => {
+    const mermaidWithMultipleEdges = `erDiagram
+    CUSTOMER ||--o{ ORDER : places
+    ORDER ||--|{ ORDER_ITEM : contains
+    PRODUCT ||--o{ ORDER_ITEM : includes
+    CUSTOMER {
+        string id
+        string name
+        string email
+    }
+    ORDER {
+        string id
+        date orderDate
+        string status
+    }
+    PRODUCT {
+        string id
+        string name
+        float price
+    }
+    ORDER_ITEM {
+        int quantity
+        float price
+    }
+`;
+
+    const result = convertMermaidToERData(mermaidWithMultipleEdges);
+
+    // 4つのユニークなテーブルが正しくパースされること（重複排除後）
+    const uniqueNodeNames = new Set(result.nodes.map((n) => n.name));
+    expect(uniqueNodeNames.size).toBe(4);
+    expect(Array.from(uniqueNodeNames)).toEqual(
+      expect.arrayContaining(["CUSTOMER", "ORDER", "PRODUCT", "ORDER_ITEM"])
+    );
+
+    // 3つのエッジが全て作成されること（重複や上書きがないこと）
+    expect(result.edges).toHaveLength(3);
+
+    // 各エッジのsource, target, labelが正しいこと
+    const edgeRelations = result.edges.map((e) => ({
+      source: e.source,
+      target: e.target,
+      label: e.data?.label,
+    }));
+
+    expect(edgeRelations).toEqual(
+      expect.arrayContaining([
+        { source: "CUSTOMER", target: "ORDER", label: "places" },
+        { source: "ORDER", target: "ORDER_ITEM", label: "contains" },
+        { source: "PRODUCT", target: "ORDER_ITEM", label: "includes" },
+      ])
+    );
+
+    // エッジIDがユニークであること
+    const edgeIds = result.edges.map((e) => e.id);
+    const uniqueIds = new Set(edgeIds);
+    expect(uniqueIds.size).toBe(edgeIds.length); // 重複がないことを確認
+  });
 });
 
 describe("convertParsedDataToNodes", () => {
@@ -312,13 +372,23 @@ describe("convertParsedDataToNodes", () => {
       onColumnsChange: vi.fn(),
     };
 
-    const result = convertParsedDataToNodes(parsedData, mockHandlers);
+    const mockEdges = [
+      {
+        id: "edge-1",
+        type: "erEdge",
+        source: "User",
+        target: "Post",
+        data: { label: "has", cardinality: "one-to-many" },
+      },
+    ];
+
+    const result = convertParsedDataToNodes(parsedData, mockEdges, mockHandlers);
 
     expect(result).toHaveLength(2);
     expect(result[0]).toEqual({
       id: "User",
       type: "erTable",
-      position: { x: 0, y: 0 },
+      position: expect.objectContaining({ x: expect.any(Number), y: expect.any(Number) }),
       data: {
         name: "User",
         columns: [
@@ -333,7 +403,7 @@ describe("convertParsedDataToNodes", () => {
     expect(result[1]).toEqual({
       id: "Post",
       type: "erTable",
-      position: { x: 300, y: 0 },
+      position: expect.objectContaining({ x: expect.any(Number), y: expect.any(Number) }),
       data: {
         name: "Post",
         columns: [
@@ -360,7 +430,9 @@ describe("convertParsedDataToNodes", () => {
       onColumnsChange: vi.fn(),
     };
 
-    const result = convertParsedDataToNodes(parsedData, mockHandlers);
+    const mockEdges: Edge[] = [];
+
+    const result = convertParsedDataToNodes(parsedData, mockEdges, mockHandlers);
 
     // onNameChangeハンドラーをテスト
     result[0].data.onNameChange("NewName");
@@ -370,5 +442,50 @@ describe("convertParsedDataToNodes", () => {
     const newColumns = [{ name: "id", type: "int", pk: true, uk: false }];
     result[0].data.onColumnsChange(newColumns);
     expect(mockHandlers.onColumnsChange).toHaveBeenCalledWith("Test", newColumns);
+  });
+
+  it("ハイフンを含むテーブル名（LINE-ITEM, DELIVERY-ADDRESS等）を正しく解析できる", () => {
+    const mermaidWithHyphens = `erDiagram
+    ORDER {
+        int orderID PK
+        string orderNumber
+        string customerID
+    }
+    LINE-ITEM {
+        string productCode
+        int quantity
+        float pricePerUnit
+    }
+    DELIVERY-ADDRESS {
+        string street
+        string city
+        string state
+        int zip
+    }
+    ORDER ||--|{ LINE-ITEM : contains
+    ORDER }o--o{ DELIVERY-ADDRESS : uses
+`;
+    const result = convertMermaidToERData(mermaidWithHyphens);
+
+    // 3つのテーブルが正しく解析されることを確認
+    expect(result.nodes.length).toBe(3);
+    expect(result.nodes.map((n) => n.name)).toEqual(
+      expect.arrayContaining(["ORDER", "LINE-ITEM", "DELIVERY-ADDRESS"])
+    );
+
+    // LINE-ITEMテーブルの内容確認
+    const lineItem = result.nodes.find((n) => n.name === "LINE-ITEM");
+    expect(lineItem?.columns).toEqual([
+      expect.objectContaining({ name: "productCode", type: "string" }),
+      expect.objectContaining({ name: "quantity", type: "int" }),
+      expect.objectContaining({ name: "pricePerUnit", type: "float" }),
+    ]);
+
+    // エッジの確認
+    expect(result.edges.length).toBe(2);
+    const edgeSources = result.edges.map((e) => e.source);
+    const edgeTargets = result.edges.map((e) => e.target);
+    expect(edgeSources).toEqual(expect.arrayContaining(["ORDER", "ORDER"]));
+    expect(edgeTargets).toEqual(expect.arrayContaining(["LINE-ITEM", "DELIVERY-ADDRESS"]));
   });
 });
