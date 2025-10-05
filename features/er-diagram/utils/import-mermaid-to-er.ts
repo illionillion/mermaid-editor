@@ -165,6 +165,7 @@ export function convertMermaidToERData(mermaid: string): ParsedMermaidERData {
   if (!mermaid.trim().startsWith("erDiagram")) return { nodes: [], edges: [] };
 
   const lines = mermaid.split("\n").map((l) => l.trimEnd());
+
   const nodes: ParsedERTableData[] = [];
   const nodeNames: Set<string> = new Set();
   const edges: Edge[] = [];
@@ -352,6 +353,104 @@ const ER_LAYOUT_CONSTANTS = {
 } as const;
 
 /**
+ * テーブル階層レベルの計算
+ * @description エッジの関係から各テーブルの階層レベルをBFS探索で決定
+ * @param tables 全テーブルデータ
+ * @param edges エッジデータ
+ * @returns テーブルIDと階層レベルのマップ
+ */
+function calculateTableLevels(tables: ParsedERTableData[], edges: Edge[]): Map<string, number> {
+  const levels = new Map<string, number>();
+
+  // 全テーブルを初期化（レベル0）
+  tables.forEach((table) => {
+    levels.set(table.id, 0);
+  });
+
+  // エッジを分析して階層を決定
+  const hasIncomingEdge = new Set<string>();
+  edges.forEach((edge) => {
+    hasIncomingEdge.add(edge.target);
+  });
+
+  // ルートテーブル（他から参照されないテーブル）をレベル0に設定
+  const rootTables = tables.filter((table) => !hasIncomingEdge.has(table.id));
+  if (rootTables.length === 0 && tables.length > 0) {
+    // 循環参照などでルートが特定できない場合は最初のテーブルをルートとする
+    levels.set(tables[0].id, 0);
+  }
+
+  // BFSで階層を計算
+  const queue: string[] = rootTables.map((table) => table.id);
+  const visited = new Set<string>();
+
+  while (queue.length > 0) {
+    const current = queue.shift()!;
+    if (visited.has(current)) continue;
+    visited.add(current);
+
+    const currentLevel = levels.get(current) || 0;
+
+    // 現在のテーブルから出る全てのエッジを探す
+    edges.forEach((edge) => {
+      if (edge.source === current && !visited.has(edge.target)) {
+        const newLevel = currentLevel + 1;
+        const existingLevel = levels.get(edge.target) || 0;
+        levels.set(edge.target, Math.max(existingLevel, newLevel));
+        queue.push(edge.target);
+      }
+    });
+  }
+
+  return levels;
+}
+
+/**
+ * レベル別テーブルグループの作成
+ * @description 階層レベルごとにテーブルをグループ化
+ * @param levels テーブルIDと階層レベルのマップ
+ * @returns レベルごとのテーブルIDリスト
+ */
+function groupTablesByLevel(levels: Map<string, number>): Map<number, string[]> {
+  const tablesByLevel = new Map<number, string[]>();
+
+  levels.forEach((level, tableId) => {
+    if (!tablesByLevel.has(level)) {
+      tablesByLevel.set(level, []);
+    }
+    tablesByLevel.get(level)!.push(tableId);
+  });
+
+  return tablesByLevel;
+}
+
+/**
+ * テーブル位置の計算
+ * @description レベル別グループから各テーブルの座標を計算
+ * @param tablesByLevel レベルごとのテーブルIDリスト
+ * @returns テーブルIDと座標のマップ
+ */
+function calculateTablePositions(
+  tablesByLevel: Map<number, string[]>
+): Map<string, { x: number; y: number }> {
+  const positions = new Map<string, { x: number; y: number }>();
+
+  tablesByLevel.forEach((tableIds, level) => {
+    const levelWidth = tableIds.length * ER_LAYOUT_CONSTANTS.TABLE_SPACING;
+    const startX = -levelWidth / 2; // 中央揃え
+
+    tableIds.forEach((tableId, index) => {
+      positions.set(tableId, {
+        x: startX + index * ER_LAYOUT_CONSTANTS.TABLE_SPACING + ER_LAYOUT_CONSTANTS.CENTER_OFFSET,
+        y: level * ER_LAYOUT_CONSTANTS.LEVEL_HEIGHT + ER_LAYOUT_CONSTANTS.VERTICAL_OFFSET,
+      });
+    });
+  });
+
+  return positions;
+}
+
+/**
  * ParsedERTableDataをReactFlowのNode型に変換するヘルパー関数
  * flowchartのhandleImportMermaidと同じ設計パターン + 自動レイアウト機能
  */
@@ -372,73 +471,9 @@ export function convertParsedDataToNodes(
     tables: ParsedERTableData[],
     edges: Edge[]
   ): Map<string, { x: number; y: number }> => {
-    const levels = new Map<string, number>();
-
-    // 全テーブルを初期化（レベル0）
-    tables.forEach((table) => {
-      levels.set(table.id, 0);
-    });
-
-    // エッジを分析して階層を決定
-    const hasIncomingEdge = new Set<string>();
-    edges.forEach((edge) => {
-      hasIncomingEdge.add(edge.target);
-    });
-
-    // ルートテーブル（他から参照されないテーブル）をレベル0に設定
-    const rootTables = tables.filter((table) => !hasIncomingEdge.has(table.id));
-    if (rootTables.length === 0 && tables.length > 0) {
-      // 循環参照などでルートが特定できない場合は最初のテーブルをルートとする
-      levels.set(tables[0].id, 0);
-    }
-
-    // BFSで階層を計算
-    const queue: string[] = rootTables.map((table) => table.id);
-    const visited = new Set<string>();
-
-    while (queue.length > 0) {
-      const current = queue.shift()!;
-      if (visited.has(current)) continue;
-      visited.add(current);
-
-      const currentLevel = levels.get(current) || 0;
-
-      // 現在のテーブルから出る全てのエッジを探す
-      edges.forEach((edge) => {
-        if (edge.source === current && !visited.has(edge.target)) {
-          const newLevel = currentLevel + 1;
-          const existingLevel = levels.get(edge.target) || 0;
-          levels.set(edge.target, Math.max(existingLevel, newLevel));
-          queue.push(edge.target);
-        }
-      });
-    }
-
-    // レベルごとにテーブルをグループ化
-    const tablesByLevel = new Map<number, string[]>();
-    levels.forEach((level, tableId) => {
-      if (!tablesByLevel.has(level)) {
-        tablesByLevel.set(level, []);
-      }
-      tablesByLevel.get(level)!.push(tableId);
-    });
-
-    // 位置を計算
-    const positions = new Map<string, { x: number; y: number }>();
-
-    tablesByLevel.forEach((tableIds, level) => {
-      const levelWidth = tableIds.length * ER_LAYOUT_CONSTANTS.TABLE_SPACING;
-      const startX = -levelWidth / 2; // 中央揃え
-
-      tableIds.forEach((tableId, index) => {
-        positions.set(tableId, {
-          x: startX + index * ER_LAYOUT_CONSTANTS.TABLE_SPACING + ER_LAYOUT_CONSTANTS.CENTER_OFFSET,
-          y: level * ER_LAYOUT_CONSTANTS.LEVEL_HEIGHT + ER_LAYOUT_CONSTANTS.VERTICAL_OFFSET,
-        });
-      });
-    });
-
-    return positions;
+    const levels = calculateTableLevels(tables, edges);
+    const tablesByLevel = groupTablesByLevel(levels);
+    return calculateTablePositions(tablesByLevel);
   };
 
   const positions = layoutTables(parsedData, edges);
