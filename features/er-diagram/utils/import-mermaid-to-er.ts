@@ -8,7 +8,13 @@ const CARDINALITY_MAP: Record<string, string> = Object.fromEntries(
 );
 
 /**
- * 列定義の正規表現パターン
+ * カラム属性パターン
+ * @description PK（主キー）またはUK（ユニークキー）の属性定義パターン
+ */
+const COLUMN_ATTRIBUTE_PATTERN = "(PK|UK)";
+
+/**
+ * カラム定義の正規表現パターン
  * @description 型名・カラム名・属性（PK/UK）の組み合わせをパースする正規表現です。
  * @example
  *   // "int id PK" の場合
@@ -23,14 +29,44 @@ const CARDINALITY_MAP: Record<string, string> = Object.fromEntries(
  * - カンマを含む型名（decimal(10,2)）は公式Mermaidでサポートされていないため除外
  * - 複数属性（PK UK）も公式Mermaidでサポートされていないため、単一属性のみ対応
  */
-const COLUMN_PATTERN = /^([A-Za-z0-9_()]+)\s+([A-Za-z0-9_]+)\s*(PK|UK)?\s*$/;
+const COLUMN_PATTERN = new RegExp(
+  `^([A-Za-z0-9_()]+)\\s+([A-Za-z0-9_]+)(?:\\s+${COLUMN_ATTRIBUTE_PATTERN})?$`
+);
+
+/**
+ * カーディナリティ記号パターン
+ * @description 公式Mermaidでサポートされる7種類のカーディナリティ記号
+ */
+const CARDINALITY_SYMBOLS_PATTERN =
+  "\\|\\|--\\|\\||\\|\\|--o\\{|\\}o--\\|\\||\\}o--o\\{|o\\|--\\|\\||\\|\\|--o\\||\\|\\|--\\|\\{";
+
+/**
+ * テーブル定義ブロックの開始パターン
+ * @description テーブル名と開始括弧を検出するための正規表現
+ * @pattern /^[\w-]+\s*\{/ 英字、数字、アンダースコア、ハイフンを許可
+ * @example "User {", "LINE-ITEM {", "DELIVERY-ADDRESS {"
+ * @usage ノード定義の検出とエラー回復処理で使用
+ */
+const TABLE_DEFINITION_PATTERN = /^[\w-]+\s*\{/;
+
 /**
  * エッジのカーディナリティ記号として公式でサポートされているもののみ許可する正規表現
  * @description 公式Mermaid仕様に準拠したカーディナリティ記号のみをマッチさせる
  * @example "User ||--o{ Post : has" → ["User ||--o{ Post : has", "User", "||--o{", "Post", " has"]
+ * @example "LINE-ITEM ||--o{ ORDER : belongs" → ハイフンを含むテーブル名もサポート
+ * @captureGroup 1 ソーステーブル名（英字・数字・アンダースコア・ハイフンのみ）
+ * @captureGroup 2 カーディナリティ記号（7種類の公式記法）
+ * @captureGroup 3 ターゲットテーブル名（英字・数字・アンダースコア・ハイフンのみ）
+ * @captureGroup 4 リレーションラベル（コロン以降の任意文字列）
+ * @restrictions
+ * - テーブル名: 英字、数字、アンダースコア、ハイフンのみ許可（例: USER, LINE-ITEM）
+ * - カーディナリティ記号: 公式Mermaidでサポートされる7種類のみ対応
+ *   ||--|| (one-to-one), ||--o{ (one-to-many), }o--|| (many-to-one), }o--o{ (many-to-many),
+ *   o|--|| (zero-to-one), ||--o| (one-to-zero), ||--| { (one-to-many-mandatory)
  */
-const EDGE_PATTERN =
-  /^(\w+)\s+(\|\|--\|\||\|\|--o\{|\}o--\|\||\}o--o\{|o\|--\|\||\|\|--o\|)\s+(\w+)\s*:(.*)$/; // [全体マッチ, source, cardinality, target, label]
+const EDGE_PATTERN = new RegExp(
+  `^([\\w-]+)\\s+(${CARDINALITY_SYMBOLS_PATTERN})\\s+([\\w-]+)\\s*:(.*)$`
+);
 
 /**
  * テーブル名・ラベル正規化用の正規表現パターン
@@ -107,16 +143,56 @@ function parseColumns(lines: string[]): ERColumn[] {
     .filter(Boolean) as ERColumn[];
 }
 
+/**
+ * MermaidのER図コードをパースしてテーブルとエッジのデータに変換
+ * @description 入力されたMermaid ER図コードを解析し、テーブル定義とリレーション定義を抽出します
+ * @param mermaid パースするMermaid ER図コード文字列
+ * @returns パースされたテーブルデータとエッジデータ
+ * @example
+ *   const result = convertMermaidToERData(`
+ *     erDiagram
+ *     User {
+ *       int id PK
+ *       varchar(255) name
+ *     }
+ *     User ||--o{ Post : has
+ *   `);
+ *   // result.nodes: [{id: "User", name: "User", columns: [...]}]
+ *   // result.edges: [{id: "edge-0", source: "User", target: "Post", ...}]
+ * @features
+ * - テーブル定義の解析（ハイフンを含むテーブル名もサポート）
+ * - カラム定義の解析（型名、カラム名、PK/UK属性）
+ * - 7種類のカーディナリティ記号に対応
+ * - エッジの一意ID生成による重複回避
+ * - エラー回復機能（不正な記法に対する堅牢性）
+ * @restrictions
+ * - 公式Mermaid仕様に準拠した記法のみサポート
+ * - コンマを含む型名（decimal(10,2)）は非対応
+ * - 複数属性（PK UK）は非対応
+ */
 export function convertMermaidToERData(mermaid: string): ParsedMermaidERData {
   if (!mermaid.trim().startsWith("erDiagram")) return { nodes: [], edges: [] };
 
   const lines = mermaid.split("\n").map((l) => l.trimEnd());
+
   const nodes: ParsedERTableData[] = [];
   const nodeNames: Set<string> = new Set();
   const edges: Edge[] = [];
 
+  /**
+   * エッジのユニークID生成用カウンター
+   * @description 各エッジに一意のIDを付与するためのインクリメンタルカウンター
+   * @example "edge-0", "edge-1", "edge-2"...
+   * @rationale 同じテーブル間に複数のリレーションがある場合でも重複を避けるため
+   */
+  let edgeCounter = 0;
+
+  /**
+   * erDiagramヘッダー行をスキップするためのインデックス
+   * @description 入力されたMermaid文字列の解析開始位置を管理
+   * @example "erDiagram"行をスキップしてテーブル定義から解析を開始
+   */
   let i = 0;
-  // erDiagramヘッダー行をスキップ
   while (i < lines.length && !/^erDiagram\b/.test(lines[i])) i++;
   if (i < lines.length && /^erDiagram\b/.test(lines[i])) i++;
 
@@ -127,9 +203,15 @@ export function convertMermaidToERData(mermaid: string): ParsedMermaidERData {
       continue;
     }
 
-    // ノード定義
-    if (/^\w+\s*\{/.test(line)) {
-      const nameMatch = line.match(/^(\w+)\s*\{/);
+    /**
+     * ノード定義の解析
+     * @description テーブル定義ブロックの開始を検出し、テーブル名とカラム定義を抽出
+     * @pattern /^[\w-]+\s*\{/ ハイフンを含むテーブル名もサポート
+     * @example "User {", "LINE-ITEM {", "DELIVERY-ADDRESS {"
+     * @restrictions 英字、数字、アンダースコア、ハイフンのみ許可
+     */
+    if (TABLE_DEFINITION_PATTERN.test(line)) {
+      const nameMatch = line.match(/^([\w-]+)\s*\{/);
       if (!nameMatch) {
         i++;
         continue;
@@ -148,7 +230,7 @@ export function convertMermaidToERData(mermaid: string): ParsedMermaidERData {
           foundClosingBrace = true;
           break;
         }
-        if (/^\w+\s*\{/.test(currentLine)) {
+        if (TABLE_DEFINITION_PATTERN.test(currentLine)) {
           /**
            * エラー回復シナリオ:
            * 例: "User { id int Post { id int }"
@@ -192,8 +274,14 @@ export function convertMermaidToERData(mermaid: string): ParsedMermaidERData {
       const card = CARDINALITY_MAP[symbol.trim()] || DEFAULT_CARDINALITY;
       const cleanLabel = sanitizeTableName(label) || "relation";
 
+      /**
+       * エッジオブジェクトの生成
+       * @description ReactFlow用のエッジデータを作成し、一意のIDを付与
+       * @id edge-${counter} 形式で重複を回避
+       * @type erEdge カスタムエッジタイプ
+       */
       edges.push({
-        id: `${source}-${target}`,
+        id: `edge-${edgeCounter++}`,
         type: "erEdge",
         source,
         target,
@@ -230,20 +318,179 @@ export function convertMermaidToERData(mermaid: string): ParsedMermaidERData {
 }
 
 /**
+ * ER図レイアウト定数
+ * @description flowchartを参考にしつつ、テーブルサイズに合わせて調整した配置パラメータ
+ * @reference flowchart レイアウト機能と同じ設計パターンを採用
+ * @rationale ERテーブルはフローチャートのノードより大きいため、間隔を拡大して配置
+ */
+const ER_LAYOUT_CONSTANTS = {
+  /**
+   * テーブル間の縦間隔
+   * @description 階層レベル間のY軸方向の距離
+   * @unit ピクセル（px）
+   * @value 280
+   * @rationale テーブルの高さ（約200px）を考慮して十分な余白を確保
+   */
+  LEVEL_HEIGHT: 280,
+
+  /**
+   * 同レベル内のテーブル間隔
+   * @description 同じ階層レベル内でのテーブル間のX軸方向の距離
+   * @unit ピクセル（px）
+   * @value 450
+   * @rationale テーブルの幅（約300px）を考慮して重複を避ける間隔
+   */
+  TABLE_SPACING: 450,
+
+  /**
+   * 中央揃えのためのオフセット
+   * @description 全体を画面中央に配置するためのX軸調整値
+   * @unit ピクセル（px）
+   * @value 500
+   * @rationale ReactFlowキャンバスの中央付近に配置するための基準点
+   */
+  CENTER_OFFSET: 500,
+
+  /**
+   * 上部からの初期オフセット
+   * @description 最上位階層テーブルのY軸開始位置
+   * @unit ピクセル（px）
+   * @value 100
+   * @rationale ヘッダーやツールバーとの干渉を避けるための上部余白
+   */
+  VERTICAL_OFFSET: 100,
+} as const;
+
+/**
+ * テーブル階層レベルの計算
+ * @description エッジの関係から各テーブルの階層レベルをBFS探索で決定
+ * @param tables 全テーブルデータ
+ * @param edges エッジデータ
+ * @returns テーブルIDと階層レベルのマップ
+ */
+function calculateTableLevels(tables: ParsedERTableData[], edges: Edge[]): Map<string, number> {
+  const levels = new Map<string, number>();
+
+  // 全テーブルを初期化（レベル0）
+  tables.forEach((table) => {
+    levels.set(table.id, 0);
+  });
+
+  // エッジを分析して階層を決定
+  const hasIncomingEdge = new Set<string>();
+  edges.forEach((edge) => {
+    hasIncomingEdge.add(edge.target);
+  });
+
+  // ルートテーブル（他から参照されないテーブル）をレベル0に設定
+  const rootTables = tables.filter((table) => !hasIncomingEdge.has(table.id));
+  if (rootTables.length === 0 && tables.length > 0) {
+    // 循環参照などでルートが特定できない場合は最初のテーブルをルートとする
+    levels.set(tables[0].id, 0);
+  }
+
+  // BFSで階層を計算
+  const queue: string[] = rootTables.map((table) => table.id);
+  const visited = new Set<string>();
+
+  while (queue.length > 0) {
+    const current = queue.shift()!;
+    if (visited.has(current)) continue;
+    visited.add(current);
+
+    const currentLevel = levels.get(current) || 0;
+
+    // 現在のテーブルから出る全てのエッジを探す
+    edges.forEach((edge) => {
+      if (edge.source === current && !visited.has(edge.target)) {
+        const newLevel = currentLevel + 1;
+        const existingLevel = levels.get(edge.target) || 0;
+        levels.set(edge.target, Math.max(existingLevel, newLevel));
+        queue.push(edge.target);
+      }
+    });
+  }
+
+  return levels;
+}
+
+/**
+ * レベル別テーブルグループの作成
+ * @description 階層レベルごとにテーブルをグループ化
+ * @param levels テーブルIDと階層レベルのマップ
+ * @returns レベルごとのテーブルIDリスト
+ */
+function groupTablesByLevel(levels: Map<string, number>): Map<number, string[]> {
+  const tablesByLevel = new Map<number, string[]>();
+
+  levels.forEach((level, tableId) => {
+    if (!tablesByLevel.has(level)) {
+      tablesByLevel.set(level, []);
+    }
+    tablesByLevel.get(level)!.push(tableId);
+  });
+
+  return tablesByLevel;
+}
+
+/**
+ * テーブル位置の計算
+ * @description レベル別グループから各テーブルの座標を計算
+ * @param tablesByLevel レベルごとのテーブルIDリスト
+ * @returns テーブルIDと座標のマップ
+ */
+function calculateTablePositions(
+  tablesByLevel: Map<number, string[]>
+): Map<string, { x: number; y: number }> {
+  const positions = new Map<string, { x: number; y: number }>();
+
+  tablesByLevel.forEach((tableIds, level) => {
+    const levelWidth = tableIds.length * ER_LAYOUT_CONSTANTS.TABLE_SPACING;
+    const startX = -levelWidth / 2; // 中央揃え
+
+    tableIds.forEach((tableId, index) => {
+      positions.set(tableId, {
+        x: startX + index * ER_LAYOUT_CONSTANTS.TABLE_SPACING + ER_LAYOUT_CONSTANTS.CENTER_OFFSET,
+        y: level * ER_LAYOUT_CONSTANTS.LEVEL_HEIGHT + ER_LAYOUT_CONSTANTS.VERTICAL_OFFSET,
+      });
+    });
+  });
+
+  return positions;
+}
+
+/**
  * ParsedERTableDataをReactFlowのNode型に変換するヘルパー関数
- * flowchartのhandleImportMermaidと同じ設計パターン
+ * flowchartのhandleImportMermaidと同じ設計パターン + 自動レイアウト機能
  */
 export function convertParsedDataToNodes(
   parsedData: ParsedERTableData[],
+  edges: Edge[],
   handlers: {
     onNameChange: (nodeId: string, newName: string) => void;
     onColumnsChange: (nodeId: string, newColumns: ERColumn[]) => void;
   }
 ): Node<ERTableNodeProps>[] {
-  return parsedData.map((parsedNode, index) => ({
+  /**
+   * テーブルの階層構造を分析してレイアウトを決定
+   * @description エッジの関係から各テーブルの階層レベルを計算し、適切な位置に配置
+   * @example ルートテーブル（参照されないテーブル）はレベル0、それを参照するテーブルはレベル1...
+   */
+  const layoutTables = (
+    tables: ParsedERTableData[],
+    edges: Edge[]
+  ): Map<string, { x: number; y: number }> => {
+    const levels = calculateTableLevels(tables, edges);
+    const tablesByLevel = groupTablesByLevel(levels);
+    return calculateTablePositions(tablesByLevel);
+  };
+
+  const positions = layoutTables(parsedData, edges);
+
+  return parsedData.map((parsedNode) => ({
     id: parsedNode.id,
     type: "erTable",
-    position: { x: index * 300, y: 0 }, // 簡単なレイアウト
+    position: positions.get(parsedNode.id) || { x: 400, y: 80 }, // フォールバック位置
     data: {
       name: parsedNode.name,
       columns: parsedNode.columns,

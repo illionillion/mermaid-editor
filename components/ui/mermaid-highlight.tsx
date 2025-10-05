@@ -19,7 +19,7 @@ export const MermaidHighlight: FC<MermaidHighlightProps> = ({
   fontSize = "14px",
 }) => {
   return (
-    <Box w="full" borderRadius="md" overflow="hidden" border="1px solid" borderColor="border">
+    <Box w="full" borderRadius="md" overflow="auto" border="1px solid" borderColor="border">
       <SyntaxHighlighter
         language="mermaid"
         style={vscDarkPlus}
