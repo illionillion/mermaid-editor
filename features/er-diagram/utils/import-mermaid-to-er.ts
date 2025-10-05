@@ -41,6 +41,15 @@ const CARDINALITY_SYMBOLS_PATTERN =
   "\\|\\|--\\|\\||\\|\\|--o\\{|\\}o--\\|\\||\\}o--o\\{|o\\|--\\|\\||\\|\\|--o\\||\\|\\|--\\|\\{";
 
 /**
+ * テーブル定義ブロックの開始パターン
+ * @description テーブル名と開始括弧を検出するための正規表現
+ * @pattern /^[\w-]+\s*\{/ 英字、数字、アンダースコア、ハイフンを許可
+ * @example "User {", "LINE-ITEM {", "DELIVERY-ADDRESS {"
+ * @usage ノード定義の検出とエラー回復処理で使用
+ */
+const TABLE_DEFINITION_PATTERN = /^[\w-]+\s*\{/;
+
+/**
  * エッジのカーディナリティ記号として公式でサポートされているもののみ許可する正規表現
  * @description 公式Mermaid仕様に準拠したカーディナリティ記号のみをマッチさせる
  * @example "User ||--o{ Post : has" → ["User ||--o{ Post : has", "User", "||--o{", "Post", " has"]
@@ -53,7 +62,7 @@ const CARDINALITY_SYMBOLS_PATTERN =
  * - テーブル名: 英字、数字、アンダースコア、ハイフンのみ許可（例: USER, LINE-ITEM）
  * - カーディナリティ記号: 公式Mermaidでサポートされる7種類のみ対応
  *   ||--|| (one-to-one), ||--o{ (one-to-many), }o--|| (many-to-one), }o--o{ (many-to-many),
- *   o|--|| (zero-to-one), ||--o| (one-to-zero), ||--|{ (one-to-many-mandatory)
+ *   o|--|| (zero-to-one), ||--o| (one-to-zero), ||--| { (one-to-many-mandatory)
  */
 const EDGE_PATTERN = new RegExp(
   `^([\\w-]+)\\s+(${CARDINALITY_SYMBOLS_PATTERN})\\s+([\\w-]+)\\s*:(.*)$`
@@ -201,7 +210,7 @@ export function convertMermaidToERData(mermaid: string): ParsedMermaidERData {
      * @example "User {", "LINE-ITEM {", "DELIVERY-ADDRESS {"
      * @restrictions 英字、数字、アンダースコア、ハイフンのみ許可
      */
-    if (/^[\w-]+\s*\{/.test(line)) {
+    if (TABLE_DEFINITION_PATTERN.test(line)) {
       const nameMatch = line.match(/^([\w-]+)\s*\{/);
       if (!nameMatch) {
         i++;
@@ -221,7 +230,7 @@ export function convertMermaidToERData(mermaid: string): ParsedMermaidERData {
           foundClosingBrace = true;
           break;
         }
-        if (/^[\w-]+\s*\{/.test(currentLine)) {
+        if (TABLE_DEFINITION_PATTERN.test(currentLine)) {
           /**
            * エラー回復シナリオ:
            * 例: "User { id int Post { id int }"
