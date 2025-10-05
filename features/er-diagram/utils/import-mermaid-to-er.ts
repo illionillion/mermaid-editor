@@ -169,10 +169,19 @@ export function convertMermaidToERData(mermaid: string): ParsedMermaidERData {
   const nodeNames: Set<string> = new Set();
   const edges: Edge[] = [];
 
-  /** エッジのユニークID生成用カウンター */
+  /**
+   * エッジのユニークID生成用カウンター
+   * @description 各エッジに一意のIDを付与するためのインクリメンタルカウンター
+   * @example "edge-0", "edge-1", "edge-2"...
+   * @rationale 同じテーブル間に複数のリレーションがある場合でも重複を避けるため
+   */
   let edgeCounter = 0;
 
-  /** erDiagramヘッダー行をスキップ */
+  /**
+   * erDiagramヘッダー行をスキップするためのインデックス
+   * @description 入力されたMermaid文字列の解析開始位置を管理
+   * @example "erDiagram"行をスキップしてテーブル定義から解析を開始
+   */
   let i = 0;
   while (i < lines.length && !/^erDiagram\b/.test(lines[i])) i++;
   if (i < lines.length && /^erDiagram\b/.test(lines[i])) i++;
@@ -184,7 +193,13 @@ export function convertMermaidToERData(mermaid: string): ParsedMermaidERData {
       continue;
     }
 
-    /** ノード定義（ハイフンを含むテーブル名もサポート：LINE-ITEM, DELIVERY-ADDRESS等） */
+    /**
+     * ノード定義の解析
+     * @description テーブル定義ブロックの開始を検出し、テーブル名とカラム定義を抽出
+     * @pattern /^[\w-]+\s*\{/ ハイフンを含むテーブル名もサポート
+     * @example "User {", "LINE-ITEM {", "DELIVERY-ADDRESS {"
+     * @restrictions 英字、数字、アンダースコア、ハイフンのみ許可
+     */
     if (/^[\w-]+\s*\{/.test(line)) {
       const nameMatch = line.match(/^([\w-]+)\s*\{/);
       if (!nameMatch) {
@@ -249,8 +264,14 @@ export function convertMermaidToERData(mermaid: string): ParsedMermaidERData {
       const card = CARDINALITY_MAP[symbol.trim()] || DEFAULT_CARDINALITY;
       const cleanLabel = sanitizeTableName(label) || "relation";
 
+      /**
+       * エッジオブジェクトの生成
+       * @description ReactFlow用のエッジデータを作成し、一意のIDを付与
+       * @id edge-${counter} 形式で重複を回避
+       * @type erEdge カスタムエッジタイプ
+       */
       edges.push({
-        id: `edge-${edgeCounter++}` /** ユニークなIDを生成 */,
+        id: `edge-${edgeCounter++}`,
         type: "erEdge",
         source,
         target,
