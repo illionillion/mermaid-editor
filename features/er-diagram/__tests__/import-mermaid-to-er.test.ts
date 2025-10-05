@@ -488,4 +488,58 @@ describe("convertParsedDataToNodes", () => {
     expect(edgeSources).toEqual(expect.arrayContaining(["ORDER", "ORDER"]));
     expect(edgeTargets).toEqual(expect.arrayContaining(["LINE-ITEM", "DELIVERY-ADDRESS"]));
   });
+
+  it("日本語テーブル名を正しく解析できる", () => {
+    const mermaid = `erDiagram
+  ユーザー {
+    int id PK
+    varchar(255) name UK
+  }
+  テーブル2 {
+    int id PK
+  }
+  テーブル3 {
+    int id PK
+  }
+  テーブル4 {
+    int id PK
+  }
+  ユーザー ||--o{ テーブル2 : relation
+  ユーザー ||--o{ テーブル3 : relation
+  テーブル2 ||--o{ テーブル4 : relation
+  テーブル3 ||--o{ テーブル4 : relation
+`;
+    const result = convertMermaidToERData(mermaid);
+
+    // 日本語テーブル名が正しく解析されることを確認
+    expect(result.nodes.length).toBe(4);
+    expect(result.nodes.map((n) => n.name)).toEqual(
+      expect.arrayContaining(["ユーザー", "テーブル2", "テーブル3", "テーブル4"])
+    );
+
+    // ユーザーテーブルの内容確認
+    const userTable = result.nodes.find((n) => n.name === "ユーザー");
+    expect(userTable?.columns).toEqual([
+      expect.objectContaining({ name: "id", type: "int", pk: true, uk: false }),
+      expect.objectContaining({ name: "name", type: "varchar(255)", pk: false, uk: true }),
+    ]);
+
+    // エッジの確認
+    expect(result.edges.length).toBe(4);
+    const relationships = result.edges.map((e) => `${e.source}-${e.target}`);
+    expect(relationships).toEqual(
+      expect.arrayContaining([
+        "ユーザー-テーブル2",
+        "ユーザー-テーブル3",
+        "テーブル2-テーブル4",
+        "テーブル3-テーブル4",
+      ])
+    );
+
+    // すべてのエッジがone-to-manyであることを確認
+    result.edges.forEach((edge) => {
+      expect(edge.data?.cardinality).toBe("one-to-many");
+      expect(edge.data?.label).toBe("relation");
+    });
+  });
 });

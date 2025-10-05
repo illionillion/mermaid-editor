@@ -43,29 +43,30 @@ const CARDINALITY_SYMBOLS_PATTERN =
 /**
  * テーブル定義ブロックの開始パターン
  * @description テーブル名と開始括弧を検出するための正規表現
- * @pattern /^[\w-]+\s*\{/ 英字、数字、アンダースコア、ハイフンを許可
- * @example "User {", "LINE-ITEM {", "DELIVERY-ADDRESS {"
+ * @pattern /^[^\s{}]+\s*\{/ 空白・波括弧以外の文字を許可（日本語対応）
+ * @example "User {", "LINE-ITEM {", "ユーザー {", "テーブル2 {"
  * @usage ノード定義の検出とエラー回復処理で使用
+ * @rationale [\w-]から[^\s{}]に変更して日本語文字（ひらがな・カタカナ・漢字）をサポート
  */
-const TABLE_DEFINITION_PATTERN = /^[\w-]+\s*\{/;
+const TABLE_DEFINITION_PATTERN = /^[^\s{}]+\s*\{/;
 
 /**
  * エッジのカーディナリティ記号として公式でサポートされているもののみ許可する正規表現
  * @description 公式Mermaid仕様に準拠したカーディナリティ記号のみをマッチさせる
  * @example "User ||--o{ Post : has" → ["User ||--o{ Post : has", "User", "||--o{", "Post", " has"]
- * @example "LINE-ITEM ||--o{ ORDER : belongs" → ハイフンを含むテーブル名もサポート
- * @captureGroup 1 ソーステーブル名（英字・数字・アンダースコア・ハイフンのみ）
+ * @example "ユーザー ||--o{ テーブル2 : relation" → 日本語テーブル名もサポート
+ * @captureGroup 1 ソーステーブル名（日本語文字を含む任意の文字）
  * @captureGroup 2 カーディナリティ記号（7種類の公式記法）
- * @captureGroup 3 ターゲットテーブル名（英字・数字・アンダースコア・ハイフンのみ）
+ * @captureGroup 3 ターゲットテーブル名（日本語文字を含む任意の文字）
  * @captureGroup 4 リレーションラベル（コロン以降の任意文字列）
  * @restrictions
- * - テーブル名: 英字、数字、アンダースコア、ハイフンのみ許可（例: USER, LINE-ITEM）
+ * - テーブル名: 空白以外の任意の文字を許可（日本語文字対応）
  * - カーディナリティ記号: 公式Mermaidでサポートされる7種類のみ対応
  *   ||--|| (one-to-one), ||--o{ (one-to-many), }o--|| (many-to-one), }o--o{ (many-to-many),
- *   o|--|| (zero-to-one), ||--o| (one-to-zero), ||--| { (one-to-many-mandatory)
+ *   o|--|| (zero-to-one), ||--o| (one-to-zero), ||--|{ (one-to-many-mandatory)
  */
 const EDGE_PATTERN = new RegExp(
-  `^([\\w-]+)\\s+(${CARDINALITY_SYMBOLS_PATTERN})\\s+([\\w-]+)\\s*:(.*)$`
+  `^([^\\s]+)\\s+(${CARDINALITY_SYMBOLS_PATTERN})\\s+([^\\s]+)\\s*:(.*)$`
 );
 
 /**
@@ -206,12 +207,12 @@ export function convertMermaidToERData(mermaid: string): ParsedMermaidERData {
     /**
      * ノード定義の解析
      * @description テーブル定義ブロックの開始を検出し、テーブル名とカラム定義を抽出
-     * @pattern /^[\w-]+\s*\{/ ハイフンを含むテーブル名もサポート
-     * @example "User {", "LINE-ITEM {", "DELIVERY-ADDRESS {"
-     * @restrictions 英字、数字、アンダースコア、ハイフンのみ許可
+     * @pattern /^[^\s{}]+\s*\{/ 日本語文字を含むテーブル名もサポート
+     * @example "User {", "LINE-ITEM {", "ユーザー {", "テーブル2 {"
+     * @restrictions 空白・波括弧以外の文字を許可（日本語対応）
      */
     if (TABLE_DEFINITION_PATTERN.test(line)) {
-      const nameMatch = line.match(/^([\w-]+)\s*\{/);
+      const nameMatch = line.match(/^([^\s{}]+)\s*\{/);
       if (!nameMatch) {
         i++;
         continue;
