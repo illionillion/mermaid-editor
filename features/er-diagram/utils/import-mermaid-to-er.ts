@@ -8,6 +8,12 @@ const CARDINALITY_MAP: Record<string, string> = Object.fromEntries(
 );
 
 /**
+ * カラム属性パターン
+ * @description PK（主キー）またはUK（ユニークキー）の属性定義パターン
+ */
+const COLUMN_ATTRIBUTE_PATTERN = "(PK|UK)";
+
+/**
  * カラム定義の正規表現パターン
  * @description 型名・カラム名・属性（PK/UK）の組み合わせをパースする正規表現です。
  * @example
@@ -23,7 +29,17 @@ const CARDINALITY_MAP: Record<string, string> = Object.fromEntries(
  * - カンマを含む型名（decimal(10,2)）は公式Mermaidでサポートされていないため除外
  * - 複数属性（PK UK）も公式Mermaidでサポートされていないため、単一属性のみ対応
  */
-const COLUMN_PATTERN = /^([A-Za-z0-9_()]+)\s+([A-Za-z0-9_]+)(?:\s+(PK|UK))?$/;
+const COLUMN_PATTERN = new RegExp(
+  `^([A-Za-z0-9_()]+)\\s+([A-Za-z0-9_]+)(?:\\s+${COLUMN_ATTRIBUTE_PATTERN})?$`
+);
+
+/**
+ * カーディナリティ記号パターン
+ * @description 公式Mermaidでサポートされる7種類のカーディナリティ記号
+ */
+const CARDINALITY_SYMBOLS_PATTERN =
+  "\\|\\|--\\|\\||\\|\\|--o\\{|\\}o--\\|\\||\\}o--o\\{|o\\|--\\|\\||\\|\\|--o\\||\\|\\|--\\|\\{";
+
 /**
  * エッジのカーディナリティ記号として公式でサポートされているもののみ許可する正規表現
  * @description 公式Mermaid仕様に準拠したカーディナリティ記号のみをマッチさせる
@@ -39,8 +55,9 @@ const COLUMN_PATTERN = /^([A-Za-z0-9_()]+)\s+([A-Za-z0-9_]+)(?:\s+(PK|UK))?$/;
  *   ||--|| (one-to-one), ||--o{ (one-to-many), }o--|| (many-to-one), }o--o{ (many-to-many),
  *   o|--|| (zero-to-one), ||--o| (one-to-zero), ||--|{ (one-to-many-mandatory)
  */
-const EDGE_PATTERN =
-  /^([\w-]+)\s+(\|\|--\|\||\|\|--o\{|\}o--\|\||\}o--o\{|o\|--\|\||\|\|--o\||\|\|--\|\{)\s+([\w-]+)\s*:(.*)$/;
+const EDGE_PATTERN = new RegExp(
+  `^([\\w-]+)\\s+(${CARDINALITY_SYMBOLS_PATTERN})\\s+([\\w-]+)\\s*:(.*)$`
+);
 
 /**
  * テーブル名・ラベル正規化用の正規表現パターン
@@ -117,6 +134,33 @@ function parseColumns(lines: string[]): ERColumn[] {
     .filter(Boolean) as ERColumn[];
 }
 
+/**
+ * MermaidのER図コードをパースしてテーブルとエッジのデータに変換
+ * @description 入力されたMermaid ER図コードを解析し、テーブル定義とリレーション定義を抽出します
+ * @param mermaid パースするMermaid ER図コード文字列
+ * @returns パースされたテーブルデータとエッジデータ
+ * @example
+ *   const result = convertMermaidToERData(`
+ *     erDiagram
+ *     User {
+ *       int id PK
+ *       varchar(255) name
+ *     }
+ *     User ||--o{ Post : has
+ *   `);
+ *   // result.nodes: [{id: "User", name: "User", columns: [...]}]
+ *   // result.edges: [{id: "edge-0", source: "User", target: "Post", ...}]
+ * @features
+ * - テーブル定義の解析（ハイフンを含むテーブル名もサポート）
+ * - カラム定義の解析（型名、カラム名、PK/UK属性）
+ * - 7種類のカーディナリティ記号に対応
+ * - エッジの一意ID生成による重複回避
+ * - エラー回復機能（不正な記法に対する堅牢性）
+ * @restrictions
+ * - 公式Mermaid仕様に準拠した記法のみサポート
+ * - コンマを含む型名（decimal(10,2)）は非対応
+ * - 複数属性（PK UK）は非対応
+ */
 export function convertMermaidToERData(mermaid: string): ParsedMermaidERData {
   if (!mermaid.trim().startsWith("erDiagram")) return { nodes: [], edges: [] };
 
@@ -124,10 +168,12 @@ export function convertMermaidToERData(mermaid: string): ParsedMermaidERData {
   const nodes: ParsedERTableData[] = [];
   const nodeNames: Set<string> = new Set();
   const edges: Edge[] = [];
-  let edgeCounter = 0; // エッジのユニークID生成用カウンター
 
+  /** エッジのユニークID生成用カウンター */
+  let edgeCounter = 0;
+
+  /** erDiagramヘッダー行をスキップ */
   let i = 0;
-  // erDiagramヘッダー行をスキップ
   while (i < lines.length && !/^erDiagram\b/.test(lines[i])) i++;
   if (i < lines.length && /^erDiagram\b/.test(lines[i])) i++;
 
@@ -138,7 +184,7 @@ export function convertMermaidToERData(mermaid: string): ParsedMermaidERData {
       continue;
     }
 
-    // ノード定義（ハイフンを含むテーブル名もサポート：LINE-ITEM, DELIVERY-ADDRESS等）
+    /** ノード定義（ハイフンを含むテーブル名もサポート：LINE-ITEM, DELIVERY-ADDRESS等） */
     if (/^[\w-]+\s*\{/.test(line)) {
       const nameMatch = line.match(/^([\w-]+)\s*\{/);
       if (!nameMatch) {
@@ -204,7 +250,7 @@ export function convertMermaidToERData(mermaid: string): ParsedMermaidERData {
       const cleanLabel = sanitizeTableName(label) || "relation";
 
       edges.push({
-        id: `edge-${edgeCounter++}`, // ユニークなIDを生成
+        id: `edge-${edgeCounter++}` /** ユニークなIDを生成 */,
         type: "erEdge",
         source,
         target,
