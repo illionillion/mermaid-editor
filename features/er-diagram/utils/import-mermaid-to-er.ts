@@ -307,12 +307,48 @@ export function convertMermaidToERData(mermaid: string): ParsedMermaidERData {
   return { nodes, edges };
 }
 
-// ER図レイアウト定数（flowchartを参考、テーブルサイズに合わせて調整）
+/**
+ * ER図レイアウト定数
+ * @description flowchartを参考にしつつ、テーブルサイズに合わせて調整した配置パラメータ
+ * @reference flowchart レイアウト機能と同じ設計パターンを採用
+ * @rationale ERテーブルはフローチャートのノードより大きいため、間隔を拡大して配置
+ */
 const ER_LAYOUT_CONSTANTS = {
-  LEVEL_HEIGHT: 280, // テーブル間の縦間隔（テーブルの高さを考慮して拡大）
-  TABLE_SPACING: 450, // 同レベル内のテーブル間隔（横方向、テーブルの幅を考慮して拡大）
-  CENTER_OFFSET: 500, // 中央揃えのためのオフセット（全体の余裕を増加）
-  VERTICAL_OFFSET: 100, // 上部からの初期オフセット（少し余裕を追加）
+  /**
+   * テーブル間の縦間隔
+   * @description 階層レベル間のY軸方向の距離
+   * @unit ピクセル（px）
+   * @value 280
+   * @rationale テーブルの高さ（約200px）を考慮して十分な余白を確保
+   */
+  LEVEL_HEIGHT: 280,
+
+  /**
+   * 同レベル内のテーブル間隔
+   * @description 同じ階層レベル内でのテーブル間のX軸方向の距離
+   * @unit ピクセル（px）
+   * @value 450
+   * @rationale テーブルの幅（約300px）を考慮して重複を避ける間隔
+   */
+  TABLE_SPACING: 450,
+
+  /**
+   * 中央揃えのためのオフセット
+   * @description 全体を画面中央に配置するためのX軸調整値
+   * @unit ピクセル（px）
+   * @value 500
+   * @rationale ReactFlowキャンバスの中央付近に配置するための基準点
+   */
+  CENTER_OFFSET: 500,
+
+  /**
+   * 上部からの初期オフセット
+   * @description 最上位階層テーブルのY軸開始位置
+   * @unit ピクセル（px）
+   * @value 100
+   * @rationale ヘッダーやツールバーとの干渉を避けるための上部余白
+   */
+  VERTICAL_OFFSET: 100,
 } as const;
 
 /**
