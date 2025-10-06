@@ -137,8 +137,9 @@ describe("PanelContent", () => {
       // メニューを開く
       const menuButton = screen.getByRole("button", { name: "コントリビューションメニュー" });
       await user.click(menuButton);
-      // メニュー内のリンクを取得
-      const githubLink = screen.getByRole("menuitem", { name: "リポジトリを見る" });
+
+      // アニメーション完了を待ってからメニュー内のリンクを取得
+      const githubLink = await screen.findByRole("menuitem", { name: "リポジトリを見る" });
       expect(githubLink).toHaveAttribute("href", "https://github.com/illionillion/mermaid-editor");
       expect(githubLink).toHaveAttribute("target", "_blank");
       expect(githubLink).toHaveAttribute("rel", "noopener noreferrer");
