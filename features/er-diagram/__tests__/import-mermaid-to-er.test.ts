@@ -542,4 +542,31 @@ describe("convertParsedDataToNodes", () => {
       expect(edge.data?.label).toBe("relation");
     });
   });
+
+  it("波括弧を含むテーブル名はエッジで正しく除外される", () => {
+    // EDGE_PATTERNで[^\s{}]パターンが正しく動作することをテスト
+    const mermaid = `erDiagram
+  ValidTable {
+    int id PK
+  }
+  InvalidTable{} {
+    int id PK
+  }
+  ValidTable ||--o{ InvalidTable{} : should-fail
+  ValidTable ||--o{ AnotherValid : should-work
+`;
+    const result = convertMermaidToERData(mermaid);
+
+    // 波括弧を含むテーブル名のエッジは作成されない
+    expect(result.edges.length).toBe(1);
+    expect(result.edges[0].source).toBe("ValidTable");
+    expect(result.edges[0].target).toBe("AnotherValid");
+    expect(result.edges[0].data?.label).toBe("should-work");
+
+    // 波括弧を含むテーブル名を参照するエッジは無視される
+    const invalidEdge = result.edges.find(
+      (e) => e.source === "InvalidTable{}" || e.target === "InvalidTable{}"
+    );
+    expect(invalidEdge).toBeUndefined();
+  });
 });

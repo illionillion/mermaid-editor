@@ -65,7 +65,7 @@ const TABLE_DEFINITION_PATTERN = /^[^\s{}]+\s*\{/;
  *   o|--|| (zero-to-one), ||--o| (one-to-zero), ||--|{ (one-to-many-mandatory)
  */
 const EDGE_PATTERN = new RegExp(
-  `^([^\\s]+)\\s+(${CARDINALITY_SYMBOLS_PATTERN})\\s+([^\\s]+)\\s*:(.*)$`
+  `^([^\\s{}]+)\\s+(${CARDINALITY_SYMBOLS_PATTERN})\\s+([^\\s{}]+)\\s*:(.*)$`
 );
 
 /**
