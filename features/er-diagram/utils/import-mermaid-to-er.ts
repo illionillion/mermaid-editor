@@ -45,8 +45,7 @@ const CARDINALITY_SYMBOLS_PATTERN =
  * @description テーブル名と開始括弧を検出するための正規表現
  * @pattern /^[^\s{}]+\s*\{/ 空白・波括弧以外の文字を許可（日本語対応）
  * @example "User {", "LINE-ITEM {", "ユーザー {", "テーブル2 {"
- * @usage ノード定義の検出とエラー回復処理で使用
- * @rationale [\w-]から[^\s{}]に変更して日本語文字（ひらがな・カタカナ・漢字）をサポート
+ * @remarks ノード定義の検出とエラー回復処理で使用。[\w-]から[^\s{}]に変更して日本語文字（ひらがな・カタカナ・漢字）をサポート
  */
 const TABLE_DEFINITION_PATTERN = /^[^\s{}]+\s*\{/;
 
@@ -55,12 +54,12 @@ const TABLE_DEFINITION_PATTERN = /^[^\s{}]+\s*\{/;
  * @description 公式Mermaid仕様に準拠したカーディナリティ記号のみをマッチさせる
  * @example "User ||--o{ Post : has" → ["User ||--o{ Post : has", "User", "||--o{", "Post", " has"]
  * @example "ユーザー ||--o{ テーブル2 : relation" → 日本語テーブル名もサポート
- * @captureGroup 1 ソーステーブル名（日本語文字を含む任意の文字）
+ * @captureGroup 1 ソーステーブル名（空白・波括弧以外の任意の文字）
  * @captureGroup 2 カーディナリティ記号（7種類の公式記法）
- * @captureGroup 3 ターゲットテーブル名（日本語文字を含む任意の文字）
+ * @captureGroup 3 ターゲットテーブル名（空白・波括弧以外の任意の文字）
  * @captureGroup 4 リレーションラベル（コロン以降の任意文字列）
  * @restrictions
- * - テーブル名: 空白以外の任意の文字を許可（日本語文字対応）
+ * - テーブル名: 空白・波括弧以外の任意の文字を許可（日本語文字対応）
  * - カーディナリティ記号: 公式Mermaidでサポートされる7種類のみ対応
  *   ||--|| (one-to-one), ||--o{ (one-to-many), }o--|| (many-to-one), }o--o{ (many-to-many),
  *   o|--|| (zero-to-one), ||--o| (one-to-zero), ||--|{ (one-to-many-mandatory)
