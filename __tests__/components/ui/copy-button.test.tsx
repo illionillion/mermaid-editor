@@ -85,6 +85,30 @@ describe("CopyButton", () => {
       await expect(user.click(button)).resolves.not.toThrow();
       expect(button).toBeEnabled();
     });
+
+    test("日本語文字列もコピーできる", async () => {
+      const japaneseValue = "こんにちは世界！テスト用のフローチャート図です";
+      const user = userEvent.setup();
+      render(<CopyButton value={japaneseValue} />);
+
+      const button = screen.getByRole("button");
+
+      // 日本語文字列でもクリック動作がエラーなく実行されることを確認
+      await expect(user.click(button)).resolves.not.toThrow();
+      expect(button).toBeEnabled();
+    });
+
+    test("Unicode文字（絵文字）もコピーできる", async () => {
+      const unicodeValue = "フローチャート 📊 → ER図 🗂️ 変換テスト 🔄";
+      const user = userEvent.setup();
+      render(<CopyButton value={unicodeValue} />);
+
+      const button = screen.getByRole("button");
+
+      // Unicode文字（絵文字）でもクリック動作がエラーなく実行されることを確認
+      await expect(user.click(button)).resolves.not.toThrow();
+      expect(button).toBeEnabled();
+    });
   });
 
   describe("ツールチップ表示", () => {
