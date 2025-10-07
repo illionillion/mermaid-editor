@@ -1,133 +1,90 @@
 # 🧪 テストガイド
 
-このガイドでは、Mermaid フローチャート エディターのテスト戦略、実行方法、新しいテストの書き方について説明します。
+このガイドでは、プロジェクトのテスト戦略と実践的なベストプラクティスについて説明します。
 
-## 📊 テスト概要
+## 📊 テスト構成
 
-### テストカバレッジ
-
-現在のプロジェクトは **97.5%以上** の高いテストカバレッジを維持しています：
-
-- **Lines**: 97.5%
-- **Statements**: 97.5%
-- **Functions**: 90%
-- **Branches**: 90%
-
-### テスト構成
+### ディレクトリ構造
 
 ```
+features/
+├── er-diagram/
+│   └── __tests__/           # ER図機能のテスト
+└── flowchart/
+    └── __tests__/           # フローチャート機能のテスト
+
 __tests__/
-├── components/           # コンポーネントテスト
-│   ├── editor/          # エディター系コンポーネント
-│   ├── flow/            # React Flow関連コンポーネント
-│   ├── mermaid/         # Mermaidコード処理関連
-│   ├── node/            # ノード操作関連
-│   └── ui/              # UIコンポーネント
-└── utils/               # ユーティリティ関数テスト
-    └── mermaid/         # Mermaidパーサー・生成器
+├── components/              # 共通UIコンポーネントテスト
+├── setup.ts                # テストセットアップ
+└── test-utils.tsx          # テストユーティリティ
 ```
 
 ## 🚀 テスト実行
 
-### 基本的なテスト実行
-
 ```bash
 # 全テスト実行
-pnpm test
+pnpm test:run
 
 # ウォッチモード（開発中推奨）
 pnpm test:watch
 
-# カバレッジレポート生成
+# カバレッジレポート
 pnpm test:coverage
 
-# 特定のテストファイルのみ実行
-pnpm test components/mermaid/editable-mermaid-highlight.test.tsx
-```
-
-### CI/CD での実行
-
-```bash
-# CI環境での実行（シングルラン）
-pnpm test:run
-
-# 型チェック
-pnpm type-check
-
-# リント
-pnpm lint
-```
-
-## 🏗️ テスト技術スタック
-
-### 主要ライブラリ
-
-- **Vitest**: 高速なテストランナー
-- **@testing-library/react**: React コンポーネントテスト
-- **@testing-library/jest-dom**: DOM アサーション
-- **jsdom**: ブラウザ環境のシミュレーション
-
-### モッキング
-
-```typescript
-// PrismJSのモック例
-vi.mock("prismjs", () => ({
-  highlight: vi.fn(),
-  languages: {
-    mermaid: {},
-  },
-}));
-
-// react-simple-code-editorのモック例
-vi.mock("react-simple-code-editor", () => ({
-  default: ({ value, onValueChange, placeholder, highlight }: any) => {
-    // カスタムモックコンポーネント
-  },
-}));
+# 特定ファイルのみ実行
+pnpm test:run features/er-diagram/__tests__/import-mermaid-to-er.test.ts
 ```
 
 ## 📝 テストの書き方
 
-### コンポーネントテストの基本構造
+### 基本構造
 
 ```typescript
 import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, test, expect, vi, beforeEach } from "vitest";
-import { MyComponent } from "../../../components/MyComponent";
 
-describe("MyComponent", () => {
-  const defaultProps = {
-    value: "test value",
-    onChange: vi.fn(),
-  };
+describe("ComponentName", () => {
+  const defaultProps = { value: "test", onChange: vi.fn() };
 
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  describe("基本機能", () => {
-    test("コンポーネントが正しくレンダリングされる", () => {
-      render(<MyComponent {...defaultProps} />);
-
-      expect(screen.getByTestId("my-component")).toBeInTheDocument();
-      expect(screen.getByDisplayValue(defaultProps.value)).toBeInTheDocument();
-    });
+  test("基本的なレンダリング", () => {
+    render(<Component {...defaultProps} />);
+    expect(screen.getByRole("textbox")).toBeInTheDocument();
   });
 
-  describe("ユーザー操作", () => {
-    test("値の変更時にonChangeが呼ばれる", () => {
-      render(<MyComponent {...defaultProps} />);
-
-      const input = screen.getByRole("textbox");
-      fireEvent.change(input, { target: { value: "新しい値" } });
-
-      expect(defaultProps.onChange).toHaveBeenCalledWith("新しい値");
-    });
+  test("ユーザー操作", () => {
+    render(<Component {...defaultProps} />);
+    const input = screen.getByRole("textbox");
+    fireEvent.change(input, { target: { value: "新しい値" } });
+    expect(defaultProps.onChange).toHaveBeenCalledWith("新しい値");
   });
 });
 ```
 
-### ユーティリティ関数テストの例
+### モッキング
+
+```typescript
+// 外部ライブラリのモック
+vi.mock("prismjs", () => ({
+  highlight: vi.fn(),
+  languages: { mermaid: {} },
+}));
+
+// React コンポーネントのモック
+vi.mock("react-simple-code-editor", () => ({
+  default: ({ value, onValueChange }: any) => (
+    <textarea
+      value={value}
+      onChange={(e) => onValueChange(e.target.value)}
+    />
+  ),
+}));
+```
+
+### ユーティリティ関数テスト
 
 ```typescript
 import { describe, test, expect } from "vitest";
@@ -153,7 +110,6 @@ describe("parseMermaidCode", () => {
 
   test("不正なコードでエラーが発生する", () => {
     const invalidCode = "invalid mermaid code";
-
     expect(() => parseMermaidCode(invalidCode)).toThrow();
   });
 });
@@ -163,31 +119,17 @@ describe("parseMermaidCode", () => {
 
 ### 1. 基本機能テスト
 
-各コンポーネントの基本的な動作を確認：
-
-- レンダリング
-- プロパティの表示
-- デフォルト値の動作
+レンダリング、プロパティ表示、デフォルト値の動作確認
 
 ### 2. ユーザー操作テスト
 
-ユーザーインタラクションをシミュレート：
-
-- クリック、変更、キーボード操作
-- フォーム送信
-- ドラッグ&ドロップ
+クリック、変更、キーボード操作、フォーム送信、ドラッグ&ドロップ
 
 ### 3. エラーハンドリングテスト
 
-エラー状態の適切な処理を確認：
-
-- 不正な入力値
-- API エラー
-- 境界値テスト
+不正な入力値、APIエラー、境界値テスト
 
 ### 4. セキュリティテスト
-
-XSS などのセキュリティ脆弱性を確認：
 
 ```typescript
 test("悪意のあるコードが安全に処理される", () => {
@@ -195,24 +137,20 @@ test("悪意のあるコードが安全に処理される", () => {
   const { container } = render(
     <EditableMermaidHighlight value={maliciousCode} onChange={vi.fn()} />
   );
-
-  // スクリプトタグが実行されていないことを確認
   expect(container.querySelector("script")).toBeNull();
 });
 ```
 
 ## 📋 テストチェックリスト
 
-新しい機能を追加する際のテストチェックリスト：
-
 ### ✅ コンポーネントテスト
 
 - [ ] 基本的なレンダリング
 - [ ] プロパティの正しい表示
-- [ ] ユーザー操作（クリック、入力、など）
+- [ ] ユーザー操作（クリック、入力等）
 - [ ] コールバック関数の呼び出し
 - [ ] エラー状態の処理
-- [ ] アクセシビリティ（aria-label、role など）
+- [ ] アクセシビリティ（aria-label、role等）
 
 ### ✅ ユーティリティ関数テスト
 
@@ -221,13 +159,47 @@ test("悪意のあるコードが安全に処理される", () => {
 - [ ] 境界値テスト
 - [ ] 型安全性
 
-### ✅ 統合テスト
+## 🎯 実践的ベストプラクティス
 
-- [ ] コンポーネント間の連携
-- [ ] データフローの確認
-- [ ] 状態管理の動作
+### 修正前のテスト検証
 
-## 🔧 テスト環境設定
+コード修正前に既存テストが修正内容をカバーしているか確認。不足していればテストケース追加。
+
+```bash
+# 1. 対象テスト確認 → 2. カバレッジ確認 → 3. 必要に応じてテスト追加 → 4. 実装修正
+pnpm test:run features/er-diagram/__tests__/import-mermaid-to-er.test.ts
+```
+
+### CI安定性対策
+
+UIアニメーション待機には `findByRole` を使用：
+
+```typescript
+// ❌ CI失敗の可能性
+const item = screen.getByRole("menuitem");
+
+// ✅ アニメーション完了を待機
+const item = await screen.findByRole("menuitem");
+```
+
+### テスト設計
+
+- **正常系**: 基本的な動作確認
+- **異常系**: エラーハンドリング
+- **境界値**: 空文字、null、極値
+- **エッジケース**: 特殊パターン
+- **国際化**: 日本語入力対応
+
+### 効率的テスト実行
+
+変更ファイル関連のテストのみ実行して開発速度向上：
+
+```bash
+# 全体実行は避ける
+pnpm test:run features/specific/__tests__/target.test.ts
+```
+
+## 🔧 環境設定
 
 ### vitest.config.ts
 
@@ -269,43 +241,38 @@ Object.defineProperty(window, "matchMedia", {
 });
 ```
 
-## 🐛 デバッグとトラブルシューティング
+## 🐛 トラブルシューティング
 
 ### よくある問題
 
-**Q: テストが間欠的に失敗する**
-A: 非同期処理の待機不足。`waitFor` や `findBy*` を使用
+- **間欠的失敗**: `waitFor` や `findBy*` を使用
+- **モック効かない**: `vi.clearAllMocks()` を `beforeEach` で実行
+- **DOM操作失敗**: `screen.debug()` で状態確認
 
-**Q: モックが効かない**
-A: `vi.clearAllMocks()` を `beforeEach` で実行
-
-**Q: DOM 操作テストが失敗する**
-A: `screen.debug()` でDOMの状態を確認
-
-### デバッグテクニック
+### デバッグ
 
 ```typescript
-// DOM の状態を確認
+// DOM確認
 screen.debug();
 
-// 特定の要素のみ確認
+// 特定要素のみ確認
 screen.debug(screen.getByTestId("my-element"));
 
-// 非同期処理の待機
+// 非同期待機
 await waitFor(() => {
-  expect(screen.getByText("読み込み完了")).toBeInTheDocument();
+  expect(screen.getByText("完了")).toBeInTheDocument();
 });
 ```
 
 ## 📈 継続的改善
 
-### カバレッジの向上
+### カバレッジ向上
 
 1. **未テスト箇所の特定**: カバレッジレポートで確認
 2. **優先度付け**: 重要な機能から順次テスト追加
 3. **リファクタリング**: テストしやすいコード構造に改善
 
-### テスト品質の向上
+### テスト品質向上
 
 - **定期的なレビュー**: テストコードの品質チェック
 - **パフォーマンス**: テスト実行時間の最適化
