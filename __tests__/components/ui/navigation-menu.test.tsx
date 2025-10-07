@@ -6,10 +6,10 @@ import { NavigationMenu } from "@/components/ui/navigation-menu";
 /**
  * NavigationMenuコンポーネントのテストスイート
  * @description ナビゲーション動作、アクセシビリティ、ルーティングを検証
- */
-/**
- * Next.jsルーターのモック
- * @description next/navigationとnext/linkをテスト用にモック
+ *
+ * Next.jsルーターのモック設定:
+ * - next/navigationとnext/linkをテスト用にモック
+ * - usePathname, useRouter, Linkコンポーネントの動作をシミュレート
  */
 const mockUsePathname = vi.fn();
 
