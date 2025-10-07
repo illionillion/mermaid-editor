@@ -196,19 +196,40 @@ describe("MermaidHighlight", () => {
     });
   });
 
-  describe("エラーハンドリング", () => {
-    test("nullコードでもエラーにならない", () => {
-      // TypeScriptの型チェックをバイパスしてnullをテスト
-      const nullCode = null as unknown as string;
+  describe("エッジケースとエラーハンドリング", () => {
+    test("空文字でもエラーにならない", () => {
+      render(<MermaidHighlight code="" />);
 
-      expect(() => render(<MermaidHighlight code={nullCode} />)).not.toThrow();
+      const syntaxHighlighter = screen.getByTestId("syntax-highlighter");
+      expect(syntaxHighlighter).toBeInTheDocument();
+      expect(syntaxHighlighter.textContent).toBe("");
     });
 
-    test("undefinedコードでもエラーにならない", () => {
-      // TypeScriptの型チェックをバイパスしてundefinedをテスト
-      const undefinedCode = undefined as unknown as string;
+    test("空白文字のみでもエラーにならない", () => {
+      const whitespaceCode = "   \t\n   ";
+      render(<MermaidHighlight code={whitespaceCode} />);
 
-      expect(() => render(<MermaidHighlight code={undefinedCode} />)).not.toThrow();
+      const syntaxHighlighter = screen.getByTestId("syntax-highlighter");
+      expect(syntaxHighlighter).toBeInTheDocument();
+      expect(syntaxHighlighter.textContent).toBe(whitespaceCode);
+    });
+
+    test("改行のみでもエラーにならない", () => {
+      const newlineCode = "\n\n\n";
+      render(<MermaidHighlight code={newlineCode} />);
+
+      const syntaxHighlighter = screen.getByTestId("syntax-highlighter");
+      expect(syntaxHighlighter).toBeInTheDocument();
+      expect(syntaxHighlighter.textContent).toBe(newlineCode);
+    });
+
+    test("不正なMermaid記法でもレンダリングできる", () => {
+      const invalidCode = "invalid mermaid syntax !@#$%";
+      render(<MermaidHighlight code={invalidCode} />);
+
+      const syntaxHighlighter = screen.getByTestId("syntax-highlighter");
+      expect(syntaxHighlighter).toBeInTheDocument();
+      expect(syntaxHighlighter.textContent).toBe(invalidCode);
     });
 
     test("非常に長いコードでもレンダリングできる", () => {
@@ -219,6 +240,15 @@ describe("MermaidHighlight", () => {
       const syntaxHighlighter = screen.getByTestId("syntax-highlighter");
       expect(syntaxHighlighter).toBeInTheDocument();
       expect(syntaxHighlighter.textContent).toBe(longCode);
+    });
+
+    test("特殊な改行コードが含まれていてもレンダリングできる", () => {
+      const mixedNewlinesCode = "flowchart TD\r\n  A --> B\r\n  B --> C\n  C --> D";
+      render(<MermaidHighlight code={mixedNewlinesCode} />);
+
+      const syntaxHighlighter = screen.getByTestId("syntax-highlighter");
+      expect(syntaxHighlighter).toBeInTheDocument();
+      expect(syntaxHighlighter.textContent).toBe(mixedNewlinesCode);
     });
   });
 
