@@ -167,7 +167,8 @@ test("悪意のあるコードが安全に処理される", () => {
 
 ```bash
 # 1. 対象テスト確認 → 2. カバレッジ確認 → 3. 必要に応じてテスト追加 → 4. 実装修正
-pnpm test:run features/er-diagram/__tests__/import-mermaid-to-er.test.ts
+pnpm test:run __tests__/components/ui/component-name.test.ts
+pnpm test:run features/feature-name/__tests__/target.test.ts
 ```
 
 ### CI安定性対策
