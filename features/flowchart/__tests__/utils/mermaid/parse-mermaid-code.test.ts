@@ -603,4 +603,62 @@ describe("parseMermaidCode", () => {
       expect(parseMermaidCode(mermaid)).toEqual(expected);
     });
   });
+
+  describe("パラレルエッジ（同一ノード間の複数エッジ）の解析", () => {
+    test("ラベル付きパラレルエッジを正しく解析する", () => {
+      const mermaid = `
+        flowchart TD
+        A[サーバー]
+        B[データベース]
+        A -->|読み取り| B
+        A -->|書き込み| B
+      `;
+
+      const result = parseMermaidCode(mermaid);
+
+      expect(result.edges).toHaveLength(2);
+      expect(result.edges[0]).toMatchObject({
+        source: "A",
+        target: "B",
+        label: "読み取り",
+        arrowType: "arrow",
+      });
+      expect(result.edges[1]).toMatchObject({
+        source: "A",
+        target: "B",
+        label: "書き込み",
+        arrowType: "arrow",
+      });
+    });
+
+    test("異なる矢印タイプのパラレルエッジを正しく解析する", () => {
+      const mermaid = `
+        flowchart TD
+        A[ノードA]
+        B[ノードB]
+        A --> B
+        A -.-> B
+        A ==> B
+      `;
+
+      const result = parseMermaidCode(mermaid);
+
+      expect(result.edges).toHaveLength(3);
+      expect(result.edges[0]).toMatchObject({
+        source: "A",
+        target: "B",
+        arrowType: "arrow",
+      });
+      expect(result.edges[1]).toMatchObject({
+        source: "A",
+        target: "B",
+        arrowType: "dotted",
+      });
+      expect(result.edges[2]).toMatchObject({
+        source: "A",
+        target: "B",
+        arrowType: "thick",
+      });
+    });
+  });
 });
