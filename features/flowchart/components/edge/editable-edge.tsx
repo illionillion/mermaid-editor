@@ -6,7 +6,7 @@ import { XIcon } from "@yamada-ui/lucide";
 import { Input, Box, IconButton, HStack } from "@yamada-ui/react";
 import type { MouseEvent, KeyboardEvent } from "react";
 import { useState, useRef, useEffect } from "react";
-import { adjustEdgeLabelPosition, getCyclicEdgeStyle } from "../../hooks/edge-layout";
+import { calculateEdgeOffset, getCyclicEdgeStyle } from "../../hooks/edge-layout";
 import { getArrowTypeSymbol } from "../../hooks/mermaid";
 import type { MermaidArrowType } from "../../types/types";
 import { ArrowTypeSelector } from "./arrow-type-selector";
@@ -173,43 +173,53 @@ export function EditableEdge({
   source,
   target,
 }: EditableEdgeProps) {
-  const { getEdges, getNodes } = useReactFlow();
+  const { getEdges } = useReactFlow();
   const allEdges = getEdges();
-  const allNodes = getNodes();
 
   const currentEdge = { id, source, target };
 
+  /**
+   * エッジのオフセットを計算（パラレルエッジ・循環参照対応）
+   */
+  const edgeAsEdge = allEdges.find((e) => e.id === id);
+  const { offsetX, offsetY } = edgeAsEdge
+    ? calculateEdgeOffset(edgeAsEdge, allEdges)
+    : { offsetX: 0, offsetY: 0 };
+
+  /**
+   * オフセットを適用してエッジパスを計算
+   */
   const [edgePath, labelX, labelY] = getBezierPath({
-    sourceX,
-    sourceY,
+    sourceX: sourceX + offsetX,
+    sourceY: sourceY + offsetY,
     sourcePosition,
-    targetX,
-    targetY,
+    targetX: targetX + offsetX,
+    targetY: targetY + offsetY,
     targetPosition,
   });
 
-  // 循環参照対応のラベル位置調整
-  const { adjustedX, adjustedY } = adjustEdgeLabelPosition(
-    currentEdge,
-    labelX,
-    labelY,
-    allEdges,
-    allNodes
-  );
+  /**
+   * ラベル位置の調整
+   * @description オフセット適用後のラベル位置を計算
+   */
+  const adjustedLabelX = labelX;
+  const adjustedLabelY = labelY;
 
-  // 循環参照対応のエッジスタイル（オプション）
-  // ラベル位置調整のみにしたい場合は enableCyclicEdgeStyling: false にする
+  /**
+   * 循環参照対応のエッジスタイル（オプション）
+   * @description ラベル位置調整のみにしたい場合は enableCyclicEdgeStyling: false にする
+   */
   const cyclicStyle = getCyclicEdgeStyle(
     currentEdge,
     allEdges,
     data?.enableCyclicEdgeStyling ?? false
-  ); // ラベル位置のみ
+  );
 
   return (
     <>
       <BaseEdge path={edgePath} markerEnd={markerEnd} style={cyclicStyle} />
       <EdgeLabelRenderer>
-        <EdgeContent id={id} labelX={adjustedX} labelY={adjustedY} data={data} />
+        <EdgeContent id={id} labelX={adjustedLabelX} labelY={adjustedLabelY} data={data} />
       </EdgeLabelRenderer>
     </>
   );
