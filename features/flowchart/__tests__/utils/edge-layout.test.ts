@@ -2,6 +2,7 @@ import type { Edge } from "@xyflow/react";
 import { describe, test, expect } from "vitest";
 import {
   detectCyclicEdges,
+  detectParallelEdges,
   calculateEdgeOffset,
   getCyclicEdgeStyle,
   adjustEdgeLabelPosition,
@@ -112,6 +113,83 @@ describe("edge-layout utility functions", () => {
       expect(offset2.offsetX !== 0 || offset2.offsetY !== 0).toBe(true);
       expect(offset1).not.toEqual(offset2);
     });
+
+    test("パラレルエッジ（同一ノード間の複数エッジ）にオフセットを適用する", () => {
+      const parallelEdges: Edge[] = [
+        { id: "e1", source: "A", target: "B" },
+        { id: "e2", source: "A", target: "B" },
+        { id: "e3", source: "C", target: "D" },
+      ] as Edge[];
+
+      const offset1 = calculateEdgeOffset(parallelEdges[0], parallelEdges);
+      const offset2 = calculateEdgeOffset(parallelEdges[1], parallelEdges);
+      const offset3 = calculateEdgeOffset(parallelEdges[2], parallelEdges);
+
+      // 2本のパラレルエッジは異なるオフセットを持つ
+      expect(offset1).not.toEqual(offset2);
+      // 垂直方向（Y軸）にオフセットが適用される
+      expect(offset1.offsetY).not.toBe(offset2.offsetY);
+      // 通常のエッジはオフセットなし
+      expect(offset3.offsetX).toBe(0);
+      expect(offset3.offsetY).toBe(0);
+    });
+
+    test("3本のパラレルエッジが中央を基準に分散配置される", () => {
+      const parallelEdges: Edge[] = [
+        { id: "e1", source: "A", target: "B" },
+        { id: "e2", source: "A", target: "B" },
+        { id: "e3", source: "A", target: "B" },
+      ] as Edge[];
+
+      const offset1 = calculateEdgeOffset(parallelEdges[0], parallelEdges, 20);
+      const offset2 = calculateEdgeOffset(parallelEdges[1], parallelEdges, 20);
+      const offset3 = calculateEdgeOffset(parallelEdges[2], parallelEdges, 20);
+
+      // 3本の場合は -20, 0, 20 のように中央を基準に配置される
+      expect(offset1.offsetY).toBe(-20);
+      expect(offset2.offsetY).toBe(0);
+      expect(offset3.offsetY).toBe(20);
+      // X方向のオフセットは0
+      expect(offset1.offsetX).toBe(0);
+      expect(offset2.offsetX).toBe(0);
+      expect(offset3.offsetX).toBe(0);
+    });
+
+    test("4本のパラレルエッジが均等に分散配置される", () => {
+      const parallelEdges: Edge[] = [
+        { id: "e1", source: "A", target: "B" },
+        { id: "e2", source: "A", target: "B" },
+        { id: "e3", source: "A", target: "B" },
+        { id: "e4", source: "A", target: "B" },
+      ] as Edge[];
+
+      const offsets = parallelEdges.map((edge) => calculateEdgeOffset(edge, parallelEdges, 20));
+
+      // 4本の場合は -30, -10, 10, 30 のように配置される
+      expect(offsets[0].offsetY).toBe(-30);
+      expect(offsets[1].offsetY).toBe(-10);
+      expect(offsets[2].offsetY).toBe(10);
+      expect(offsets[3].offsetY).toBe(30);
+      // 全てのY座標が異なることを確認
+      const uniqueYOffsets = new Set(offsets.map((o) => o.offsetY));
+      expect(uniqueYOffsets.size).toBe(4);
+    });
+
+    test("循環参照エッジよりパラレルエッジの方が優先されない（循環参照が優先）", () => {
+      const mixedEdges: Edge[] = [
+        { id: "e1", source: "A", target: "B" },
+        { id: "e2", source: "A", target: "B" },
+        { id: "e3", source: "B", target: "A" },
+      ] as Edge[];
+
+      const offset1 = calculateEdgeOffset(mixedEdges[0], mixedEdges);
+      const offset2 = calculateEdgeOffset(mixedEdges[1], mixedEdges);
+
+      // 循環参照として処理される（パラレルエッジとしては処理されない）
+      // 循環参照エッジはX座標とY座標の両方にオフセットを持つ
+      expect(offset1.offsetX !== 0 || offset1.offsetY !== 0).toBe(true);
+      expect(offset2.offsetX !== 0 || offset2.offsetY !== 0).toBe(true);
+    });
   });
 
   describe("adjustEdgeLabelPosition", () => {
@@ -166,6 +244,76 @@ describe("edge-layout utility functions", () => {
       // 位置は変更されない
       expect(adjustedX).toBe(originalX);
       expect(adjustedY).toBe(originalY);
+    });
+  });
+
+  describe("detectParallelEdges", () => {
+    test("同一ノード間の複数エッジを正しく検出する", () => {
+      const parallelEdges: Edge[] = [
+        { id: "e1", source: "A", target: "B" },
+        { id: "e2", source: "A", target: "B" },
+        { id: "e3", source: "C", target: "D" },
+      ] as Edge[];
+
+      const parallelGroups = detectParallelEdges(parallelEdges);
+
+      expect(parallelGroups.size).toBe(1);
+      expect(parallelGroups.has("A->B")).toBe(true);
+
+      const group = parallelGroups.get("A->B");
+      expect(group).toHaveLength(2);
+      expect(group?.some((e: Edge) => e.id === "e1")).toBe(true);
+      expect(group?.some((e: Edge) => e.id === "e2")).toBe(true);
+    });
+
+    test("1本しかないエッジはパラレルエッジとして検出しない", () => {
+      const singleEdges: Edge[] = [
+        { id: "e1", source: "A", target: "B" },
+        { id: "e2", source: "B", target: "C" },
+      ] as Edge[];
+
+      const parallelGroups = detectParallelEdges(singleEdges);
+      expect(parallelGroups.size).toBe(0);
+    });
+
+    test("複数のパラレルエッジグループを正しく処理する", () => {
+      const multiParallelEdges: Edge[] = [
+        { id: "e1", source: "A", target: "B" },
+        { id: "e2", source: "A", target: "B" },
+        { id: "e3", source: "C", target: "D" },
+        { id: "e4", source: "C", target: "D" },
+        { id: "e5", source: "C", target: "D" },
+      ] as Edge[];
+
+      const parallelGroups = detectParallelEdges(multiParallelEdges);
+      expect(parallelGroups.size).toBe(2);
+      expect(parallelGroups.has("A->B")).toBe(true);
+      expect(parallelGroups.has("C->D")).toBe(true);
+
+      const groupAB = parallelGroups.get("A->B");
+      expect(groupAB).toHaveLength(2);
+
+      const groupCD = parallelGroups.get("C->D");
+      expect(groupCD).toHaveLength(3);
+    });
+
+    test("逆方向のエッジは別グループとして扱う", () => {
+      const reverseEdges: Edge[] = [
+        { id: "e1", source: "A", target: "B" },
+        { id: "e2", source: "A", target: "B" },
+        { id: "e3", source: "B", target: "A" },
+        { id: "e4", source: "B", target: "A" },
+      ] as Edge[];
+
+      const parallelGroups = detectParallelEdges(reverseEdges);
+      expect(parallelGroups.size).toBe(2);
+      expect(parallelGroups.has("A->B")).toBe(true);
+      expect(parallelGroups.has("B->A")).toBe(true);
+    });
+
+    test("空のエッジ配列ではパラレルエッジなし", () => {
+      const parallelGroups = detectParallelEdges([]);
+      expect(parallelGroups.size).toBe(0);
     });
   });
 
