@@ -17,7 +17,15 @@ const meta: Meta<typeof ErCardinalitySelector> = {
   argTypes: {
     current: {
       control: "select",
-      options: ["zero-or-one", "exactly-one", "zero-or-more", "one-or-more"],
+      options: [
+        "one-to-one",
+        "one-to-many",
+        "many-to-one",
+        "many-to-many",
+        "zero-to-one",
+        "one-to-zero",
+        "one-to-many-mandatory",
+      ],
       description: "現在選択されている基数",
     },
   },
@@ -27,11 +35,11 @@ export default meta;
 type Story = StoryObj<typeof ErCardinalitySelector>;
 
 /**
- * 基本状態: exactly-one（1対1）選択
+ * 基本状態: one-to-one（1対1）選択
  */
 export const Default: Story = {
   render: () => {
-    const [cardinality, setCardinality] = useState<ErCardinality>("exactly-one");
+    const [cardinality, setCardinality] = useState<ErCardinality>("one-to-one");
 
     return (
       <div style={{ padding: "20px" }}>
@@ -45,11 +53,11 @@ export const Default: Story = {
 };
 
 /**
- * zero-or-one（0または1）選択
+ * zero-to-one（0対1）選択
  */
-export const ZeroOrOne: Story = {
+export const ZeroToOne: Story = {
   render: () => {
-    const [cardinality, setCardinality] = useState<ErCardinality>("zero-or-one");
+    const [cardinality, setCardinality] = useState<ErCardinality>("zero-to-one");
 
     return (
       <div style={{ padding: "20px" }}>
@@ -63,11 +71,11 @@ export const ZeroOrOne: Story = {
 };
 
 /**
- * zero-or-more（0以上、多）選択
+ * many-to-many（多対多）選択
  */
-export const ZeroOrMore: Story = {
+export const ManyToMany: Story = {
   render: () => {
-    const [cardinality, setCardinality] = useState<ErCardinality>("zero-or-more");
+    const [cardinality, setCardinality] = useState<ErCardinality>("many-to-many");
 
     return (
       <div style={{ padding: "20px" }}>
@@ -81,11 +89,11 @@ export const ZeroOrMore: Story = {
 };
 
 /**
- * one-or-more（1以上、多）選択
+ * one-to-many（1対多）選択
  */
-export const OneOrMore: Story = {
+export const OneToMany: Story = {
   render: () => {
-    const [cardinality, setCardinality] = useState<ErCardinality>("one-or-more");
+    const [cardinality, setCardinality] = useState<ErCardinality>("one-to-many");
 
     return (
       <div style={{ padding: "20px" }}>
@@ -103,7 +111,7 @@ export const OneOrMore: Story = {
  */
 export const WithAlert: Story = {
   render: () => {
-    const [cardinality, setCardinality] = useState<ErCardinality>("exactly-one");
+    const [cardinality, setCardinality] = useState<ErCardinality>("one-to-one");
 
     const handleChange = (newCardinality: ErCardinality) => {
       setCardinality(newCardinality);
@@ -126,8 +134,8 @@ export const WithAlert: Story = {
  */
 export const Multiple: Story = {
   render: () => {
-    const [leftCardinality, setLeftCardinality] = useState<ErCardinality>("exactly-one");
-    const [rightCardinality, setRightCardinality] = useState<ErCardinality>("zero-or-more");
+    const [leftCardinality, setLeftCardinality] = useState<ErCardinality>("one-to-one");
+    const [rightCardinality, setRightCardinality] = useState<ErCardinality>("one-to-many");
 
     return (
       <div style={{ padding: "20px" }}>
@@ -172,12 +180,12 @@ export const Multiple: Story = {
 };
 
 /**
- * 一般的なリレーションパターン：1対多
+ * 一般的なリレーションパターン：1対多（表示のみ）
  */
-export const OneToMany: Story = {
+export const OneToManyReadOnly: Story = {
   render: () => {
-    const [leftCardinality] = useState<ErCardinality>("exactly-one");
-    const [rightCardinality] = useState<ErCardinality>("zero-or-more");
+    const [leftCardinality] = useState<ErCardinality>("one-to-one");
+    const [rightCardinality] = useState<ErCardinality>("one-to-many");
 
     return (
       <div style={{ padding: "20px" }}>
@@ -204,12 +212,12 @@ export const OneToMany: Story = {
 };
 
 /**
- * 一般的なリレーションパターン：多対多
+ * 一般的なリレーションパターン：多対多（表示のみ）
  */
-export const ManyToMany: Story = {
+export const ManyToManyReadOnly: Story = {
   render: () => {
-    const [leftCardinality] = useState<ErCardinality>("zero-or-more");
-    const [rightCardinality] = useState<ErCardinality>("zero-or-more");
+    const [leftCardinality] = useState<ErCardinality>("many-to-many");
+    const [rightCardinality] = useState<ErCardinality>("many-to-many");
 
     return (
       <div style={{ padding: "20px" }}>

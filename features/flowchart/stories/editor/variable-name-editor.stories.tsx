@@ -26,22 +26,7 @@ const meta: Meta<typeof VariableNameEditor> = {
     },
     shapeType: {
       control: "select",
-      options: [
-        "rectangle",
-        "rounded",
-        "stadium",
-        "subroutine",
-        "cylindrical",
-        "circle",
-        "asymmetric",
-        "rhombus",
-        "hexagon",
-        "parallelogram",
-        "parallelogram-alt",
-        "trapezoid",
-        "trapezoid-alt",
-        "double-circle",
-      ],
+      options: ["rectangle", "diamond", "rounded", "circle", "hexagon", "stadium"],
       description: "ノード形状タイプ",
     },
   },
@@ -167,9 +152,9 @@ export const CircleShape: Story = {
 };
 
 /**
- * 各形状タイプ: Rhombus（菱形）
+ * 各形状タイプ: Diamond（菱形）
  */
-export const RhombusShape: Story = {
+export const DiamondShape: Story = {
   render: () => {
     const [value, setValue] = useState("decision");
     const [isEditing, setIsEditing] = useState(false);
@@ -188,7 +173,7 @@ export const RhombusShape: Story = {
         <VariableNameEditor
           value={value}
           isEditing={isEditing}
-          shapeType="rhombus"
+          shapeType="diamond"
           onClick={() => setIsEditing(true)}
           onChange={(e) => setValue(e.target.value)}
           onKeyDown={(e) => {
@@ -291,10 +276,10 @@ export const AllShapes: Story = {
     const shapes: MermaidShapeType[] = [
       "rectangle",
       "circle",
-      "rhombus",
+      "diamond",
       "hexagon",
       "stadium",
-      "cylindrical",
+      "rounded",
     ];
 
     return (

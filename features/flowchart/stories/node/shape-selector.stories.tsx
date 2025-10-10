@@ -16,22 +16,7 @@ const meta: Meta<typeof ShapeSelector> = {
   argTypes: {
     currentShape: {
       control: "select",
-      options: [
-        "rectangle",
-        "rounded",
-        "stadium",
-        "subroutine",
-        "cylindrical",
-        "circle",
-        "asymmetric",
-        "rhombus",
-        "hexagon",
-        "parallelogram",
-        "parallelogram-alt",
-        "trapezoid",
-        "trapezoid-alt",
-        "double-circle",
-      ],
+      options: ["rectangle", "diamond", "rounded", "circle", "hexagon", "stadium"],
       description: "現在選択されている形状",
     },
   },
@@ -77,11 +62,11 @@ export const CircleSelected: Story = {
 };
 
 /**
- * Rhombus（菱形）選択
+ * Diamond（菱形）選択
  */
-export const RhombusSelected: Story = {
+export const DiamondSelected: Story = {
   render: () => {
-    const [shape, setShape] = useState("rhombus");
+    const [shape, setShape] = useState("diamond");
 
     return (
       <div style={{ padding: "20px" }}>
@@ -192,7 +177,7 @@ export const Multiple: Story = {
   render: () => {
     const [shape1, setShape1] = useState("rectangle");
     const [shape2, setShape2] = useState("circle");
-    const [shape3, setShape3] = useState("rhombus");
+    const [shape3, setShape3] = useState("diamond");
 
     return (
       <div style={{ padding: "20px", display: "flex", gap: "40px" }}>
