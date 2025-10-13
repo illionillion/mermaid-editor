@@ -150,7 +150,7 @@ style: |
 正規表現地獄🥺
 
 <div class="img-container">
-  <img src="./image3.png" width="1000px" height="500px" style="object-fit: contain;" />
+  <img src="./image3.png" width="1000px" height="500px" style="object-fit: contain" />
 </div>
 
 ---
