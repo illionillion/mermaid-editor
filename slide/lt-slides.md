@@ -73,6 +73,32 @@ style: |
     padding: 0.2em 0.4em;
     border-radius: 0.25em;
   }
+
+    .img-container {
+    width: 500px;
+    height: 500px;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+  }
+  .row2 {
+    width: 100%;
+    justify-content: space-between;
+    display: flex;
+
+    div {
+      flex: 1;
+    }
+
+    div:nth-child(1) {
+      justify-content: center;
+      display: flex;
+      align-items: center;
+    }
+  }
 ---
 
 # MermaidパーサーをAIと作った話
