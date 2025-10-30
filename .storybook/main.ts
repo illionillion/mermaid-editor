@@ -1,5 +1,5 @@
 import { resolve } from "node:path";
-import type { StorybookConfig } from "@storybook/react-vite";
+import type { StorybookConfig } from "@storybook/nextjs-vite";
 import { mergeConfig } from "vite";
 
 const config: StorybookConfig = {
