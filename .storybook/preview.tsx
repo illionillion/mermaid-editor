@@ -1,5 +1,5 @@
 import type { StoryContext, StoryFn } from "@storybook/nextjs";
-import type { Preview } from "@storybook/react-vite";
+import type { Preview } from "@storybook/nextjs-vite";
 import { AppProviders } from "../components/providers";
 
 const withProviders = (Story: StoryFn, context: StoryContext) => (
