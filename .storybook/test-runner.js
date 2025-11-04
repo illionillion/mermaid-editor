@@ -8,6 +8,9 @@ export default {
   setup() {
     expect.extend({ toMatchImageSnapshot });
   },
+  tags: {
+    include: ["vrt"],
+  },
   async preVisit(page) {
     // 画面幅を明示的に指定
     await page.setViewportSize(VIEWPORT);
