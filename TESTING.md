@@ -33,6 +33,50 @@ pnpm test:coverage
 
 # 特定ファイルのみ実行
 pnpm test:run features/er-diagram/__tests__/import-mermaid-to-er.test.ts
+
+# Visual Regression Test (VRT) 実行
+make vrt-test  # または pnpm test:vrt
+```
+
+### Visual Regression Test (VRT)
+
+Storybook の story に `tags: ['vrt']` を付けることで、そのコンポーネントの見た目を自動でスナップショット撮影し、視覚的な差分を検出できます。
+
+#### VRT タグの運用ルール
+
+**VRT が必要な Story（`tags: ['vrt']` を付ける）**:
+
+- パネル・モーダルなどの親コンポーネント
+- variant や状態変化が複雑なコンポーネント（例: ArrowTypeSelector、ErCardinalitySelector）
+- 編集中/非編集中など複数の状態を持つコンポーネント
+
+**VRT が不要な Story（タグを付けない）**:
+
+- 他の親コンポーネントで既に使用されている小さな共通 UI（例: CopyButton、ContributionPanel）
+- 見た目の差分チェックが不要な純粋な機能確認用 Story
+
+#### VRT タグの付け方
+
+```typescript
+// ✅ VRT 必要（variant や状態が複雑）
+export const Default: Story = {
+  tags: ["vrt"],
+  render: () => <ArrowTypeSelector currentArrowType="arrow" onArrowTypeChange={...} />,
+};
+
+// ❌ VRT 不要（親コンポーネントでカバー済み）
+export const Default: Story = {
+  render: () => <CopyButton value="test" />,
+};
+```
+
+#### VRT 実行結果の確認
+
+```bash
+# VRT 実行後、スナップショットは __image_snapshots__ に保存される
+ls __image_snapshots__
+
+# CI で差分が検出された場合は差分画像を確認して意図した変更か判断する
 ```
 
 ## 📝 テストの書き方
