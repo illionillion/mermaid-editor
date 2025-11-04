@@ -8,6 +8,7 @@ const meta: Meta<typeof ImportModal> = {
 export default meta;
 
 export const Default = {
+  tags: ["vrt"],
   render: () => (
     <ImportModal
       open={true}

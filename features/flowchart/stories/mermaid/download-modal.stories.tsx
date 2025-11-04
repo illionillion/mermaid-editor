@@ -16,6 +16,7 @@ const dummyFlowData = {
 };
 
 export const Default = {
+  tags: ["vrt"],
   render: () => (
     <DownloadModal open={true} onClose={() => alert("閉じる")} flowData={dummyFlowData} />
   ),

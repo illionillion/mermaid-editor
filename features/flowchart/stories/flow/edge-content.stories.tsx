@@ -10,6 +10,7 @@ const meta: Meta<typeof EdgeContent> = {
 export default meta;
 
 export const Default = {
+  tags: ["vrt"],
   render: () => (
     <Center w="full" h="100vh" position="relative">
       <EdgeContent

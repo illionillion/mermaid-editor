@@ -25,4 +25,6 @@ const meta: Meta<typeof ERDiagramMermaidModal> = {
 export default meta;
 type Story = StoryObj<typeof ERDiagramMermaidModal>;
 
-export const Default: Story = {};
+export const Default: Story = {
+  tags: ["vrt"],
+};

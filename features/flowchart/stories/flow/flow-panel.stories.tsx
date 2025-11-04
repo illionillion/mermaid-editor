@@ -8,6 +8,7 @@ const meta: Meta<typeof FlowPanel> = {
 export default meta;
 
 export const Default = {
+  tags: ["vrt"],
   render: () => (
     <FlowPanel
       edges={[]}

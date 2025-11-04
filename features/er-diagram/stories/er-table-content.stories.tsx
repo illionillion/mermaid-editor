@@ -15,6 +15,7 @@ const initialColumns: ERColumn[] = [
 ];
 
 export const Default = {
+  tags: ["vrt"],
   render: () => {
     const [name, setName] = useState("ユーザー");
     const [columns, setColumns] = useState(initialColumns);

@@ -10,12 +10,15 @@ export default {
   component: ERDiagramPanel,
 };
 
-export const Default = () => (
-  <ERDiagramPanel
-    onAddTable={() => alert("テーブル追加")}
-    onImportMermaid={() => alert("Mermaidインポート")}
-    nodes={dummyNodes}
-    edges={dummyEdges}
-    generateCode={dummyGenerateCode}
-  />
-);
+export const Default = {
+  tags: ["vrt"],
+  render: () => (
+    <ERDiagramPanel
+      onAddTable={() => alert("テーブル追加")}
+      onImportMermaid={() => alert("Mermaidインポート")}
+      nodes={dummyNodes}
+      edges={dummyEdges}
+      generateCode={dummyGenerateCode}
+    />
+  ),
+};
