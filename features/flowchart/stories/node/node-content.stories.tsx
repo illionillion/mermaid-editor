@@ -8,6 +8,7 @@ const meta: Meta<typeof NodeContent> = {
 export default meta;
 
 export const Default = {
+  tags: ["vrt"],
   render: () => (
     <NodeContent
       id="1"

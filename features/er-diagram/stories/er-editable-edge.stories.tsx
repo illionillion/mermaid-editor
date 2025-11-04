@@ -29,6 +29,7 @@ export default meta;
 type Story = StoryObj<typeof ErEditableEdge>;
 
 export const Default: Story = {
+  tags: ["vrt"],
   args: {
     label: "relation",
     cardinality: "1:N" as ErCardinality,
@@ -36,6 +37,7 @@ export const Default: Story = {
 };
 
 export const Editing: Story = {
+  tags: ["vrt"],
   render: (args) => (
     <ErEditableEdge {...args} id={args.id ?? "edge-1"} cardinality={"0..1" as ErCardinality} />
   ),

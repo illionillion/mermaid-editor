@@ -10,6 +10,7 @@ const meta: Meta<typeof NodeMenu> = {
 export default meta;
 
 export const Default = {
+  tags: ["vrt"],
   render: () => {
     const [shape, setShape] = useState("rectangle");
     return (

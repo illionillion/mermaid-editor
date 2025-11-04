@@ -159,4 +159,13 @@
   - CI環境での安定性を考慮し `findByRole` でアニメーション完了を待機
   - 異常系・境界値・エッジケース・国際化対応を含む包括的なテスト設計
 
+#### Visual Regression Test (VRT) 運用
+
+- **VRT タグ付与方針** (2025-11-04)
+  - Storybook の story に `tags: ['vrt']` を付与することで、視覚的差分検出の対象になる
+  - **VRT 必要**: パネル・モーダル等の親コンポーネント、variant/状態変化が複雑なコンポーネント（ArrowTypeSelector、ErCardinalitySelector など）
+  - **VRT 不要**: 親コンポーネントで既にカバーされている小さな共通 UI（CopyButton、ContributionPanel など）
+  - VRT 実行は `make vrt-test` で行い、スナップショットは `__image_snapshots__` に保存される
+  - 詳細な運用ルールは `TESTING.md` の「Visual Regression Test (VRT)」セクションを参照
+
 <!-- AUTO_RULES_END -->
