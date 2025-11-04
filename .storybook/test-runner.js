@@ -8,6 +8,13 @@ export default {
   setup() {
     expect.extend({ toMatchImageSnapshot });
   },
+  /**
+   * VRTタグフィルタリング設定
+   * @description
+   * この設定により、`tags: ['vrt']` が付与されたStoryのみがVRT（Visual Regression Test）のテスト対象となります。
+   * タグが付与されていないStoryは全てテスト対象外となるため、VRTテストを追加したい場合はStory側で`tags: ['vrt']`を明示してください。
+   * 将来的なStory追加・メンテナンス時はこの仕様に注意してください。
+   */
   tags: {
     include: ["vrt"],
   },
