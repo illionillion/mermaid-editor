@@ -12,9 +12,9 @@ export default meta;
 type Story = StoryObj<typeof ArrowTypeSelector>;
 
 export const Default: Story = {
+  tags: ["vrt"],
   render: () => {
     const [arrow, setArrow] = useState<MermaidArrowType>("arrow");
     return <ArrowTypeSelector currentArrowType={arrow} onArrowTypeChange={setArrow} />;
   },
-  tags: ["vrt"],
 };
