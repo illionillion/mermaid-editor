@@ -12,10 +12,12 @@ export default meta;
 type Story = StoryObj<typeof ContributionPanel>;
 
 export const Default: Story = {
+  tags: ["vrt"],
   render: () => <ContributionPanel />,
 };
 
 export const Opened: Story = {
+  // パネルが開いている状態を表現するがVRTはしない
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     // ボタンをクリックしてパネルを開く
