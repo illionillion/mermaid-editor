@@ -97,7 +97,9 @@ describe("generateERDiagramMermaidCode", () => {
         },
       ];
       const code = generateERDiagramMermaidCode(nodes, edges);
-      expect(code).toContain(`A ${expectedSymbols[i]} B : ${card}`);
+      // one / many で始まるラベルは囲む (囲まない one-to-one などは Mermaid で文法の誤りになる)
+      const label = card.startsWith("zero") ? card : `"${card}"`;
+      expect(code).toContain(`A ${expectedSymbols[i]} B : ${label}`);
     });
   });
 
@@ -214,7 +216,8 @@ describe("generateERDiagramMermaidCode", () => {
     expect(code).not.toContain("UK");
   });
 
-  it("カラム名・型が空文字の場合でも出力される", () => {
+  // 名前も型も空の列は Mermaid に書けない (`     PK` は文法の誤り)。その列は出力しない
+  it("カラム名・型が空文字の場合は、その列を出力しない", () => {
     const nodes: Node<ERTableNodeProps>[] = [
       {
         id: "1",
@@ -229,7 +232,7 @@ describe("generateERDiagramMermaidCode", () => {
       },
     ];
     const code = generateERDiagramMermaidCode(nodes, []);
-    expect(code).toContain("PK"); // 空文字でもPKは出力される
+    expect(code).toBe("erDiagram\n  User {\n  }");
   });
 
   it("ノード・エッジが空配列の場合、erDiagramのみ出力", () => {
@@ -327,5 +330,68 @@ describe("generateERDiagramMermaidCode", () => {
     ];
     const code = generateERDiagramMermaidCode(nodes, []);
     expect(code).toContain("EmptyTable {\n  }");
+  });
+});
+
+// Mermaid でそのまま読めない名前・ラベルは "…" で囲み、書けない列は出力しない
+describe("generateERDiagramMermaidCode の名前と列", () => {
+  const table = (id: string, name: string, columns: ERTableNodeProps["columns"] = []) => ({
+    id,
+    type: "erTable",
+    position: { x: 0, y: 0 },
+    data: { name, columns, onNameChange: () => {}, onColumnsChange: () => {} },
+  });
+
+  it("空白・記号・キーワードを含むテーブル名と関係のラベルを囲む (関係の行の両端も)", () => {
+    const code = generateERDiagramMermaidCode(
+      [table("1", "注文 明細"), table("2", 'Customer "VIP"')],
+      [
+        {
+          id: "e",
+          source: "1",
+          target: "2",
+          type: "erEdge",
+          data: { label: "has many", cardinality: "one-to-many" },
+        },
+      ]
+    );
+    expect(code).toBe(
+      [
+        "erDiagram",
+        '  "注文 明細" {',
+        "  }",
+        '  "Customer #quot;VIP#quot;" {',
+        "  }",
+        '  "注文 明細" ||--o{ "Customer #quot;VIP#quot;" : "has many"',
+      ].join("\n")
+    );
+  });
+
+  it("そのまま読める名前は今までどおり囲まない", () => {
+    const code = generateERDiagramMermaidCode(
+      [table("1", "User"), table("2", "ユーザー")],
+      [{ id: "e", source: "1", target: "2", type: "erEdge", data: { label: "has" } }]
+    );
+    expect(code).toContain("  User {");
+    expect(code).toContain("  ユーザー {");
+    expect(code).toContain("  User ||--o{ ユーザー : has");
+  });
+
+  it("書きかけの列 (名前か型が空) と、Mermaid に書けない列を出力しない", () => {
+    const code = generateERDiagramMermaidCode(
+      [
+        table("1", "Order", [
+          { name: "", type: "", pk: false, uk: false },
+          { name: "id", type: "int", pk: true, uk: false },
+          { name: "", type: "int", pk: false, uk: false },
+          { name: "x", type: "", pk: false, uk: false },
+          { name: "order date", type: "date", pk: false, uk: false },
+          { name: "pk", type: "int", pk: false, uk: false },
+          { name: "tags", type: "List~string~", pk: false, uk: false },
+        ]),
+      ],
+      []
+    );
+    expect(code).toBe("erDiagram\n  Order {\n    int id PK\n    List~string~ tags\n  }");
   });
 });
